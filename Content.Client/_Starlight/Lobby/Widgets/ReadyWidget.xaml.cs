@@ -14,7 +14,7 @@ using Robust.Shared.Timing;
 namespace Content.Client._Starlight.Lobby.Widgets;
 
 [GenerateTypedNameReferences]
-public sealed partial class ReadyButtonsWidget : UIWidget
+public sealed partial class ReadyWidget : UIWidget
 {
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IClientPreferencesManager _preferences = default!;
@@ -26,13 +26,21 @@ public sealed partial class ReadyButtonsWidget : UIWidget
 
     public Action? OnLateJoinReady = null;
 
-    public ReadyButtonsWidget()
+    public ReadyWidget()
     {
         RobustXamlLoader.Load(this);
-        _gameTicker = _entityManager.System<ClientGameTicker>();
+        IoCManager.InjectDependencies(this);
         ReadyButton.TooltipSupplier = GetReadyButtonTooltip;
         ReadyButton.OnPressed += OnReadyPressed;
         ReadyButton.OnToggled += OnReadyToggled;
+        //UpdateButtons();
+    }
+
+    public void LoadDependencies()
+    {
+        _gameTicker = _entityManager.System<ClientGameTicker>();
+        RoundTimer.LoadDependencies();
+        UpdateButtons();
     }
 
     private void OnReadyToggled(BaseButton.ButtonToggledEventArgs args)
@@ -61,6 +69,7 @@ public sealed partial class ReadyButtonsWidget : UIWidget
 
     public void UpdateButtons()
     {
+        RoundTimer.UpdateTimer();
          if (_gameTicker.IsGameStarted)
          {
              ReadyButton.Text = Loc.GetString("lobby-state-ready-button-join-state");

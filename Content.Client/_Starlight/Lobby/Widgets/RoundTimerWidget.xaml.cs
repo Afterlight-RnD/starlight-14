@@ -19,15 +19,22 @@ public sealed partial class RoundTimerWidget : UIWidget
     public RoundTimerWidget()
     {
         RobustXamlLoader.Load(this);
+        IoCManager.InjectDependencies(this);
+        //_gameTicker = _entityManager.System<ClientGameTicker>();
+    }
+
+    public void LoadDependencies()
+    {
         _gameTicker = _entityManager.System<ClientGameTicker>();
     }
 
-    public void TickTimer()
+    public void UpdateTimer()
     {
         if (_gameTicker.IsGameStarted)
         {
             StartTime.Text = string.Empty;
             var roundTime = _gameTiming.CurTime.Subtract(_gameTicker.RoundStartTimeSpan);
+            StartTime.Text = string.Empty;
             StationTime.Text = Loc.GetString("lobby-state-player-status-round-time", ("hours", roundTime.Hours), ("minutes", roundTime.Minutes));
             return;
         }

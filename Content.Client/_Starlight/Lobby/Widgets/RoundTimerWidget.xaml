@@ -4,12 +4,14 @@
     xmlns:maths="clr-namespace:Robust.Shared.Maths;assembly=Robust.Shared.Maths"
 
     xmlns:widgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets">
-    <Label Name="StartTime"
-           Access="Protected"
-           Align="Left"
-           FontColorOverride="{x:Static maths:Color.DarkGray}"
-           StyleClasses="LabelBig" HorizontalExpand="True" />
-    <Label Name="StationTime" Access="Public" FontColorOverride="{x:Static maths:Color.LightGray}"
-           Margin="3 3 3 3" HorizontalAlignment="Center" Visible="True"/>
-    <!--> <RichTextLabel Name="PlaytimeComment" Visible="False" Access="Public" HorizontalAlignment="Center" /> <!-->
+    <BoxContainer Orientation="Vertical">
+        <Label Name="StartTime"
+               Access="Protected"
+               Align="Left"
+               FontColorOverride="{x:Static maths:Color.DarkGray}"
+               StyleClasses="LabelBig" HorizontalExpand="True" />
+        <Label Name="StationTime" Access="Public" FontColorOverride="{x:Static maths:Color.LightGray}"
+               Margin="3 3 3 3" HorizontalAlignment="Center" Visible="True"/>
+        <!--> <RichTextLabel Name="PlaytimeComment" Visible="False" Access="Public" HorizontalAlignment="Center" /> <!-->
+    </BoxContainer>
 </widgets:RoundTimerWidget>
