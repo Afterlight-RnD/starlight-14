@@ -9,5 +9,7 @@
            Align="Left"
            FontColorOverride="{x:Static maths:Color.DarkGray}"
            StyleClasses="LabelBig" HorizontalExpand="True" />
-    <RichTextLabel Name="PlaytimeComment" Visible="False" Access="Public" HorizontalAlignment="Center" />
+    <Label Name="StationTime" Access="Public" FontColorOverride="{x:Static maths:Color.LightGray}"
+           Margin="3 3 3 3" HorizontalAlignment="Center" Visible="True"/>
+    <!--> <RichTextLabel Name="PlaytimeComment" Visible="False" Access="Public" HorizontalAlignment="Center" /> <!-->
 </widgets:RoundTimerWidget>

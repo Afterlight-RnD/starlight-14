@@ -22,13 +22,16 @@ public sealed partial class RoundTimerWidget : UIWidget
         _gameTicker = _entityManager.System<ClientGameTicker>();
     }
 
-    public void UpdateTimer()
+    public void TickTimer()
     {
         if (_gameTicker.IsGameStarted)
         {
             StartTime.Text = string.Empty;
+            var roundTime = _gameTiming.CurTime.Subtract(_gameTicker.RoundStartTimeSpan);
+            StationTime.Text = Loc.GetString("lobby-state-player-status-round-time", ("hours", roundTime.Hours), ("minutes", roundTime.Minutes));
             return;
         }
+        StationTime.Text = Loc.GetString("lobby-state-player-status-round-not-started");
 
         string text;
 
