@@ -1,0 +1,13 @@
+﻿<widgets:RoundTimerWidget
+    xmlns="https://spacestation14.io"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:maths="clr-namespace:Robust.Shared.Maths;assembly=Robust.Shared.Maths"
+
+    xmlns:widgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets">
+    <Label Name="StartTime"
+           Access="Protected"
+           Align="Left"
+           FontColorOverride="{x:Static maths:Color.DarkGray}"
+           StyleClasses="LabelBig" HorizontalExpand="True" />
+    <RichTextLabel Name="PlaytimeComment" Visible="False" Access="Public" HorizontalAlignment="Center" />
+</widgets:RoundTimerWidget>
