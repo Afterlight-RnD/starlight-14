@@ -10,10 +10,13 @@
     xmlns:info="clr-namespace:Content.Client.Info"
     xmlns:nulllink="clr-namespace:Content.Client._NullLink"
     xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
-    xmlns:slwidgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets">
+    xmlns:slwidgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
+    HorizontalExpand="True" VerticalExpand="True"
+    HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <BoxContainer Name="MainContainer" VerticalExpand="True" HorizontalExpand="True" Orientation="Horizontal"
-                  Margin="10 10 10 10" SeparationOverride="2">
-        <SplitContainer State="Auto" ResizeMode="NotResizable" HorizontalExpand="True">
+                  Margin="10 10 10 10" SeparationOverride="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <SplitContainer State="Auto" ResizeMode="NotResizable" HorizontalExpand="True" VerticalExpand="True"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <!-- LHS Controls -->
             <BoxContainer Name="LeftSide" Orientation="Vertical" SeparationOverride="4" HorizontalExpand="True">
                 <Control Name="DefaultState" VerticalExpand="True">

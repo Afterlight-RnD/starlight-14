@@ -1,3 +1,4 @@
+using Content.Client._Starlight.Lobby.Screens;
 using Content.Client.Audio;
 using Content.Client.GameTicking.Managers;
 using Content.Client.Lobby.UI;
@@ -44,8 +45,11 @@ namespace Content.Client.Lobby
             {
                 return;
             }
-
             Lobby = (LobbyGui) _userInterfaceManager.ActiveScreen;
+            //TODO: Jezi testing code
+            Lobby.Visible = false;  //hide old lobby
+            Lobby.PushLayer<SLLobbyScreenTest>();
+            Lobby.PushLayer<SLLobbyLayer>();
 
             var chatController = _userInterfaceManager.GetUIController<ChatUIController>();
             _gameTicker = _entityManager.System<ClientGameTicker>();
