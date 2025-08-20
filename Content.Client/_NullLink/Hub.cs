@@ -22,9 +22,9 @@ using static Robust.Client.UserInterface.Controls.BoxContainer;
 
 namespace Content.Client._NullLink;
 
-// It’s not finished, still needs a lot of info displayed, scroll support once more servers show up, max hub width, a hide button, etc.
-// But I’m rushing it for the upstream, will finish it properly someday.
-internal sealed class Hub : PanelContainer, IDisposable
+// Itï¿½s not finished, still needs a lot of info displayed, scroll support once more servers show up, max hub width, a hide button, etc.
+// But Iï¿½m rushing it for the upstream, will finish it properly someday.
+public sealed class Hub : PanelContainer, IDisposable
 {
     [Dependency] private readonly ILogManager _logs = default!;
     [Dependency] private readonly IEntitySystemManager _systemManager = default!;
@@ -57,8 +57,8 @@ internal sealed class Hub : PanelContainer, IDisposable
         };
         AddChild(_gridContainer);
 
-        // This crap throws a NullRef exception—what the hell, the Try method doesn’t even check for null,
-        // and Init is private, so there’s no way to figure out what’s going on in there.
+        // This crap throws a NullRef exceptionï¿½what the hell, the Try method doesnï¿½t even check for null,
+        // and Init is private, so thereï¿½s no way to figure out whatï¿½s going on in there.
         //try
         //{
         //    if (_systemManager.TryGetEntitySystem<HubSystem>(out var hub))
