@@ -13,19 +13,13 @@ namespace Content.Client._Starlight.Lobby.Widgets;
 public sealed partial class RoundTimerWidget : UIWidget
 {
     [Dependency] private IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IEntityManager _entityManager = default!;
 
     private ClientGameTicker _gameTicker = default!;
     public RoundTimerWidget()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
-        //_gameTicker = _entityManager.System<ClientGameTicker>();
-    }
-
-    public void LoadDependencies()
-    {
-        _gameTicker = _entityManager.System<ClientGameTicker>();
+        _gameTicker = EntityManager.System<ClientGameTicker>();
     }
 
     public void UpdateTimer()

@@ -18,7 +18,6 @@ public sealed partial class ReadyWidget : UIWidget
 {
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IClientPreferencesManager _preferences = default!;
-    [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
 
     private ClientGameTicker _gameTicker = default!;
@@ -33,13 +32,12 @@ public sealed partial class ReadyWidget : UIWidget
         ReadyButton.TooltipSupplier = GetReadyButtonTooltip;
         ReadyButton.OnPressed += OnReadyPressed;
         ReadyButton.OnToggled += OnReadyToggled;
+        _gameTicker = EntityManager.System<ClientGameTicker>();
         //UpdateButtons();
     }
 
     public void LoadDependencies()
     {
-        _gameTicker = _entityManager.System<ClientGameTicker>();
-        RoundTimer.LoadDependencies();
         UpdateButtons();
     }
 

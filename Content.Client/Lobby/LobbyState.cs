@@ -47,7 +47,6 @@ namespace Content.Client.Lobby
             }
             Lobby = (LobbyGui) _userInterfaceManager.ActiveScreen;
             //TODO: Jezi testing code
-            Lobby.Visible = false;  //hide old lobby
             Lobby.PushLayer<SLLobbyScreenTest>();
             Lobby.PushLayer<SLLobbyLayer>();
 
