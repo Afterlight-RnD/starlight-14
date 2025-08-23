@@ -22,7 +22,8 @@ public sealed partial class RoundTimerWidget : UIWidget
         _gameTicker = EntityManager.System<ClientGameTicker>();
     }
 
-    public void UpdateTimer()
+
+    protected override void FrameUpdate(FrameEventArgs args)
     {
         if (_gameTicker.IsGameStarted)
         {

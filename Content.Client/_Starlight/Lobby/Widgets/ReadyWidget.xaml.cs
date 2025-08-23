@@ -21,8 +21,6 @@ public sealed partial class ReadyWidget : UIWidget
     [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
 
     private ClientGameTicker _gameTicker = default!;
-    private bool _readyPossibleWithCharacters = false;
-
     public Action? OnLateJoinReady = null;
 
     public ReadyWidget()
@@ -30,15 +28,10 @@ public sealed partial class ReadyWidget : UIWidget
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
         ReadyButton.TooltipSupplier = GetReadyButtonTooltip;
+        JoinInProgressButton.TooltipSupplier = GetReadyButtonTooltip;
         ReadyButton.OnPressed += OnReadyPressed;
         ReadyButton.OnToggled += OnReadyToggled;
         _gameTicker = EntityManager.System<ClientGameTicker>();
-        //UpdateButtons();
-    }
-
-    public void LoadDependencies()
-    {
-        UpdateButtons();
     }
 
     private void OnReadyToggled(BaseButton.ButtonToggledEventArgs args)
@@ -62,59 +55,66 @@ public sealed partial class ReadyWidget : UIWidget
             return;
         }
         _consoleHost.ExecuteCommand($"toggleready {newReady}");
-        UpdateButtons();
     }
 
-    public void UpdateButtons()
+    //TODO jezi: do this via events instead of update
+    protected override void FrameUpdate(FrameEventArgs args)
     {
-        RoundTimer.UpdateTimer();
-         if (_gameTicker.IsGameStarted)
-         {
-             ReadyButton.Text = Loc.GetString("lobby-state-ready-button-join-state");
-             ReadyButton.ToggleMode = false;
-             ReadyButton.Pressed = false;
-             ReadyButton.Disabled = false;
-             ObserveButton.Disabled = false;
-         }
-         else
-         {
-             ReadyButton.Text = Loc.GetString(ReadyButton.Pressed ? "lobby-state-player-status-ready": "lobby-state-player-status-not-ready");
-             // If there is a tooltip showing, make sure to update the text in it as well!
-             if (ReadyButton.SuppliedTooltip is Tooltip tooltip)
-             {
-                 tooltip.Text = GetReadyButtonTooltipText();
-             }
-             ReadyButton.ToggleMode = true;
-             ReadyButton.Disabled = !_readyPossibleWithCharacters;
-             ReadyButton.Pressed = _gameTicker.AreWeReady;
-             ObserveButton.Disabled = true;
-         }
+        if (_gameTicker.IsGameStarted)
+        {
+            ReadyButton.Pressed = false;
+            ReadyButton.Disabled = false;
+            ReadyButton.Visible = false;
+
+            JoinInProgressButton.Visible = true;
+            JoinInProgressButton.Disabled = false;
+            if (JoinInProgressButton.SuppliedTooltip is Tooltip tooltip)
+            {
+                tooltip.Text = GetReadyButtonTooltipText();
+            }
+            ObserveButton.Disabled = false;
+        }
+        else
+        {
+            ReadyButton.Text = Loc.GetString(ReadyButton.Pressed ? "lobby-state-player-status-ready": "lobby-state-player-status-not-ready");
+            // If there is a tooltip showing, make sure to update the text in it as well!
+            if (ReadyButton.SuppliedTooltip is Tooltip tooltip)
+            {
+                tooltip.Text = GetReadyButtonTooltipText();
+            }
+            ReadyButton.ToggleMode = true;
+            ReadyButton.Disabled = (_preferences.Preferences?.JobPrioritiesFiltered().Count ?? 0) == 0;
+            ReadyButton.Pressed = _gameTicker.AreWeReady;
+            ObserveButton.Disabled = true;
+        }
 
 
-         // if (_gameTicker.ServerInfoBlob != null)
-         // {
-         //     Lobby!.ServerInfo.SetInfoBlob(_gameTicker.ServerInfoBlob);
-         // }
 
-         // var minutesToday = _playtimeTracking.PlaytimeMinutesToday;
-         // if (minutesToday > 60)
-         // {
-         //     Lobby!.PlaytimeComment.Visible = true;
-         //
-         //     var hoursToday = Math.Round(minutesToday / 60f, 1);
-         //
-         //     var chosenString = minutesToday switch
-         //     {
-         //         < 180 => "lobby-state-playtime-comment-normal",
-         //         < 360 => "lobby-state-playtime-comment-concerning",
-         //         < 720 => "lobby-state-playtime-comment-grasstouchless",
-         //         _ => "lobby-state-playtime-comment-selfdestructive"
-         //     };
-         //
-         //     //Lobby.PlaytimeComment.SetMarkup(Loc.GetString(chosenString, ("hours", hoursToday)));
-         // }
-         // else
-         //     //Lobby!.PlaytimeComment.Visible = false;
+        // if (_gameTicker.ServerInfoBlob != null)
+        // {
+        //     Lobby!.ServerInfo.SetInfoBlob(_gameTicker.ServerInfoBlob);
+        // }
+
+        //Seriously?
+        // var minutesToday = _playtimeTracking.PlaytimeMinutesToday;
+        // if (minutesToday > 60)
+        // {
+        //     Lobby!.PlaytimeComment.Visible = true;
+        //
+        //     var hoursToday = Math.Round(minutesToday / 60f, 1);
+        //
+        //     var chosenString = minutesToday switch
+        //     {
+        //         < 180 => "lobby-state-playtime-comment-normal",
+        //         < 360 => "lobby-state-playtime-comment-concerning",
+        //         < 720 => "lobby-state-playtime-comment-grasstouchless",
+        //         _ => "lobby-state-playtime-comment-selfdestructive"
+        //     };
+        //
+        //     //Lobby.PlaytimeComment.SetMarkup(Loc.GetString(chosenString, ("hours", hoursToday)));
+        // }
+        // else
+        //     //Lobby!.PlaytimeComment.Visible = false;
     }
 
     private string GetReadyButtonTooltipText()

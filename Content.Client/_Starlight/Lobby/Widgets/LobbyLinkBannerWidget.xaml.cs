@@ -16,6 +16,8 @@ public sealed partial class LobbyLinkBannerWidget : UIWidget
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly INullLinkPlayerRolesManager _playerRoles = default!;
+
+    public int ButtonColumns { get=> LinkBannerButtonGrid.Columns; set => LinkBannerButtonGrid.Columns = value; }
     public LobbyLinkBannerWidget()
     {
         RobustXamlLoader.Load(this);
