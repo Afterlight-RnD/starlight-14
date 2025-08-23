@@ -1,0 +1,16 @@
+﻿<controls:LobbyMenuBarWidget
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
+    xmlns:ui="clr-namespace:Content.Client.Voting.UI"
+    Orientation="Horizontal" MinSize="0 40" HorizontalAlignment="Right"
+    >
+    <Button Name="AHelpButton" Access="Public" Text="{Loc 'ui-lobby-ahelp-button'}"
+            StyleClasses="ButtonBig" />
+    <Button Name="MHelpButton" Access="Public" Text="{Loc 'ui-lobby-mhelp-button'}"
+            StyleClasses="ButtonBig" />
+    <ui:VoteCallMenuButton Name="CallVoteButton" StyleClasses="ButtonBig" />
+    <Button Name="OptionsButton" Access="Public" StyleClasses="ButtonBig"
+            Text="{Loc 'ui-lobby-options-button'}" />
+    <Button Name="LeaveButton" Access="Public" StyleClasses="ButtonBig"
+            Text="{Loc 'ui-lobby-leave-button'}" />
+</controls:LobbyMenuBarWidget>

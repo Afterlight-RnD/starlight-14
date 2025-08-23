@@ -25,10 +25,7 @@
                         <PanelContainer StyleClasses="AngleRect" HorizontalAlignment="Left" Name="LeftSideTop"
                                         VerticalAlignment="Top">
                             <BoxContainer Orientation="Vertical" HorizontalAlignment="Center" MaxWidth="800">
-                                <Label Name="ServerName" Access="Public" StyleClasses="LabelHeadingBigger"
-                                       VAlign="Center"
-                                       HorizontalExpand="True" HorizontalAlignment="Center"
-                                       Text="{Loc 'ui-lobby-welcome'}" />
+                                <slwidgets:LobbyServerNameWidget/>
                                 <controls:HLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
                                 <info:LinkBanner Name="LinkBanner" VerticalExpand="false" HorizontalAlignment="Center"
                                                  Margin="3 3 3 3" />

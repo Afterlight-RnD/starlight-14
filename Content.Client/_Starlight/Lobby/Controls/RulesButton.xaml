@@ -1,0 +1,6 @@
+﻿<controls:RulesButton
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Controls"
+    Text="{Loc 'server-info-rules-button'}">
+
+</controls:RulesButton>

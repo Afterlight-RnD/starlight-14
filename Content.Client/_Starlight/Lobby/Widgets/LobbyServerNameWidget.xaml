@@ -1,0 +1,8 @@
+﻿<controls:LobbyServerNameWidget
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Widgets">
+    <Label Name="ServerName" Access="Public" StyleClasses="LabelHeadingBigger"
+           VAlign="Center"
+           HorizontalExpand="True" HorizontalAlignment="Center"
+           Text="{Loc 'ui-lobby-welcome'}" />
+</controls:LobbyServerNameWidget>
