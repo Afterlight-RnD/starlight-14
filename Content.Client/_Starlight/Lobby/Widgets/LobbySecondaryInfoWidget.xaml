@@ -1,0 +1,25 @@
+﻿<controls:LobbySecondaryInfoWidget
+    xmlns="https://spacestation14.io"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
+    xmlns:nullLink="clr-namespace:Content.Client._NullLink"
+    xmlns:slcontrols="clr-namespace:Content.Client._Starlight.Lobby.Controls"
+    xmlns:credits="clr-namespace:Content.Client.Credits"
+    Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+    <nullLink:Hub />
+    <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+        <BoxContainer VerticalExpand="false" Margin="3 3 3 3">
+            <slcontrols:URIButton
+                Name="ReportButton" Access="Protected"
+                Text="{Loc 'server-info-report-button'}" HideWhenInvalid="False" />
+            <slcontrols:WindowButton
+                Name="CreditsButton" Access="Protected"
+                HorizontalAlignment="Left"
+                Text="{Loc 'server-info-credits-button'}"
+                WindowType="{x:Type credits:CreditsWindow}" />
+        </BoxContainer>
+        <PanelContainer StyleClasses="AngleRect">
+            <RichTextLabel Name="LobbySong" Access="Public" HorizontalAlignment="Center" Text="{Loc lobby-state-song-no-song-text}"/>
+        </PanelContainer>
+    </BoxContainer>
+</controls:LobbySecondaryInfoWidget>

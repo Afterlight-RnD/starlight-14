@@ -7,7 +7,6 @@
     xmlns:style="clr-namespace:Content.Client.Stylesheets"
     xmlns:lobbyUi="clr-namespace:Content.Client.Lobby.UI"
     xmlns:info="clr-namespace:Content.Client.Info"
-    xmlns:nulllink="clr-namespace:Content.Client._NullLink"
     xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
     xmlns:slwidgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
     HorizontalExpand="True" VerticalExpand="True"
@@ -42,19 +41,8 @@
                     <Control VerticalExpand="True" />
 
                     <!-- Left Bot Panel -->
-                    <!-- NullLink start -->
-                    <BoxContainer Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                    <slwidgets:LobbySecondaryInfoWidget Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
 
-                        <nulllink:Hub />
-
-                        <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                            <info:DevInfoBanner Name="DevInfoBanner" VerticalExpand="false" Margin="3 3 3 3" />
-                            <PanelContainer StyleClasses="AngleRect">
-                                <RichTextLabel Name="LobbySong" Access="Public" HorizontalAlignment="Center" />
-                            </PanelContainer>
-                        </BoxContainer>
-                    </BoxContainer>
-                    <!-- NullLink end -->
                 </Control>
             </BoxContainer>
             <!-- Right Panel -->
