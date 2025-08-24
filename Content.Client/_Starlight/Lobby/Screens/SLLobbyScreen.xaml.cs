@@ -9,6 +9,7 @@ using Robust.Client.UserInterface.XAML;
 
 namespace Content.Client._Starlight.Lobby.Screens;
 
+[DifferUIScreenCreation]
 [GenerateTypedNameReferences]
 public sealed partial class SLLobbyScreen : UIScreen
 {
@@ -19,9 +20,6 @@ public sealed partial class SLLobbyScreen : UIScreen
         RobustXamlLoader.Load(this);
         SetAnchorPreset(Background, LayoutPreset.Wide);
         _gameTicker = EntityManager.System<ClientGameTicker>();
-
-        RegisterLayer<SLLobbyLayer>();
-        RegisterLayer<SLCharacterEditorLayer>();
 
         _gameTicker.LobbyStatusUpdated += LobbyStatusUpdated;
         LobbyStatusUpdated();

@@ -10,7 +10,6 @@ namespace Content.Client._Starlight.Lobby.Screens;
 [GenerateTypedNameReferences]
 public sealed partial class SLCharacterEditorLayer : UIScreenLayer
 {
-    public override bool HideParentScreen => true; //TODO: Jezi testing
     public SLCharacterEditorLayer()
     {
         RobustXamlLoader.Load(this);

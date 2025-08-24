@@ -1,0 +1,4 @@
+﻿<controls:WindowButton
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Controls">
+</controls:WindowButton>

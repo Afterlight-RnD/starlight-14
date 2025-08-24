@@ -13,7 +13,6 @@ namespace Content.Client._Starlight.Lobby.Screens;
 public sealed partial class SLLobbyScreenTest : UIScreenLayer
 {
     [Dependency] private IResourceCache _resourceCache = default!;
-    public override bool HideParentScreen => true;
 
     private ClientGameTicker _gameTicker = default!;
     public SLLobbyScreenTest()

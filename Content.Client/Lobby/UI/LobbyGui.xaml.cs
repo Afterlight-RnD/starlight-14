@@ -9,6 +9,7 @@ using Robust.Shared.Configuration;
 
 namespace Content.Client.Lobby.UI
 {
+    [DifferUIScreenCreation]
     [GenerateTypedNameReferences]
     public sealed partial class LobbyGui : UIScreen
     {

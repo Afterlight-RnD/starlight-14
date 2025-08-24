@@ -13,9 +13,6 @@ namespace Content.Client._Starlight.Lobby.Screens;
 public sealed partial class SLLobbyLayer : UIScreenLayer
 {
     private ClientGameTicker _gameTicker = default!;
-
-    public override bool HideLayersBelow => false; //TODO: Jezi testing
-    public override bool HideParentScreen => true; //TODO: Jezi testing
     public SLLobbyLayer()
     {
         RobustXamlLoader.Load(this);
