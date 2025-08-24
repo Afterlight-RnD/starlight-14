@@ -13,18 +13,18 @@ public sealed partial class URIButton : Button
 {
     [Dependency] private readonly IUriOpener _uriOpener = default!;
 
-    private bool _visibleWithoutURI = true;
+    private bool _hideWhenInvalid = true;
 
-    public bool VisibleWithoutURI
+    public bool HideWhenInvalid
     {
-        get => _visibleWithoutURI;
+        get => _hideWhenInvalid;
         set
         {
-            if (value == _visibleWithoutURI)
+            if (value == _hideWhenInvalid)
                 return;
-            if (VisibleWithoutURI)
+            if (HideWhenInvalid)
                 Visible = true;
-            Visible = !VisibleWithoutURI && _uri != null;
+            Visible = !HideWhenInvalid && _uri != null;
         }
     }
 
@@ -37,7 +37,7 @@ public sealed partial class URIButton : Button
         {
             if (value == _uri)
                 return;
-            if (!VisibleWithoutURI)
+            if (HideWhenInvalid)
                 Visible = _uri != null;
         }
     }
@@ -47,7 +47,7 @@ public sealed partial class URIButton : Button
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
         OnPressed += HandlePressed;
-        Visible = VisibleWithoutURI;
+        Visible = !HideWhenInvalid && _uri != null;
     }
 
     private void HandlePressed(ButtonEventArgs obj)

@@ -6,15 +6,30 @@
     Orientation="Horizontal">
     <GridContainer Name="LinkBannerButtonGrid" Access="Public">
         <slcontrols:RulesButton Name="RulesButton" Access="Public"/>
-        <slcontrols:URIButton Name="DiscordButton" Access="Public" Text= "{Loc 'server-info-discord-button'}"/>
-        <slcontrols:URIButton Name="WebsiteButton" Access="Public" Text= "{Loc 'server-info-website-button'}"/>
-        <slcontrols:URIButton Name="WikiButton" Access="Public" Text= "{Loc 'server-info-wiki-button'}"/>
-        <slcontrols:URIButton Name="ForumButton" Access="Public" Text= "{Loc 'server-info-forum-button'}"/>
-        <slcontrols:URIButton Name="TelegramButton" Access="Public" Text= "{Loc 'server-info-telegram-button'}"/>
+        <slcontrols:URIButton
+            Name="DiscordButton" Access="Public"
+            Text= "{Loc 'server-info-discord-button'}"
+            HideWhenInvalid="False"/>
+        <slcontrols:URIButton
+            Name="WebsiteButton" Access="Public"
+            Text= "{Loc 'server-info-website-button'}"
+            HideWhenInvalid="False"/>
+        <slcontrols:URIButton
+            Name="WikiButton" Access="Public"
+            Text= "{Loc 'server-info-wiki-button'}"
+            HideWhenInvalid="False"/>
+        <slcontrols:URIButton
+            Name="ForumButton" Access="Public"
+            Text= "{Loc 'server-info-forum-button'}"
+            HideWhenInvalid="False"/>
+        <slcontrols:URIButton
+            Name="TelegramButton" Access="Public"
+            Text= "{Loc 'server-info-telegram-button'}"
+            HideWhenInvalid="False"/>
         <slcontrols:URIButton
             Name="LinkDiscord" Access="Public"
             Text="{Loc 'server-info-connect-discord-button'}"
-            VisibleWithoutURI="False"/>
+            HideWhenInvalid="False"/>
         <slcontrols:GuidebookButton/>
         <changelog:ChangelogButton Name="ChangelogButton" Access="Public"/>
     </GridContainer>
