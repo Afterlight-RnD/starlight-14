@@ -19,8 +19,6 @@ public sealed partial class SLLobbyLayer : UIScreenLayer
         RobustXamlLoader.Load(this);
 
         _gameTicker = EntityManager.System<ClientGameTicker>();
-
-        _gameTicker.LobbyStatusUpdated += LobbyStatusUpdated;
         SetAnchorPreset(MainContainer, LayoutPreset.Wide);
         SidePanel.SetWidth = Cfg.GetCVar(CCVars.ServerLobbyRightPanelWidth);
 
@@ -28,6 +26,16 @@ public sealed partial class SLLobbyLayer : UIScreenLayer
 
         CollapseButton.OnPressed += CollapseSideBar;
         ExpandButton.OnPressed += ExpandSideBar;
+    }
+
+    protected override void AddedToScreen()
+    {
+        _gameTicker.LobbyStatusUpdated += LobbyStatusUpdated;
+    }
+
+    protected override void RemovedFromScreen()
+    {
+        _gameTicker.LobbyStatusUpdated -= LobbyStatusUpdated;
     }
 
     private void ExpandSideBar(BaseButton.ButtonEventArgs obj)

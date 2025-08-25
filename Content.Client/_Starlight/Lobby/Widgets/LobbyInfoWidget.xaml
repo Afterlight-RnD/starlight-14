@@ -1,5 +1,9 @@
 ﻿<controls:LobbyInfoWidget
     xmlns="https://spacestation14.io"
-    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Widgets">
-
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
+    xmlns:maths="clr-namespace:Robust.Shared.Maths;assembly=Robust.Shared.Maths">
+    <RichTextLabel Name="ServerInfoText" Access="Protected"/>
+    <Label Name="StationTime" Access="Public" FontColorOverride="{x:Static maths:Color.LightGray}"
+           Margin="3 3 3 3" HorizontalAlignment="Left" />
 </controls:LobbyInfoWidget>

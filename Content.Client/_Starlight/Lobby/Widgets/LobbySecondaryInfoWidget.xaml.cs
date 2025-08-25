@@ -25,25 +25,24 @@ public sealed partial class LobbySecondaryInfoWidget : UIWidget
         _contentAudioSystem = EntityManager.System<ContentAudioSystem>();
     }
 
-    protected override void EnteredTree()
+    protected override void AddedToScreen()
     {
         _contentAudioSystem.LobbySoundtrackChanged += UpdateLobbySoundtrackInfo;
     }
 
-    protected override void ExitedTree()
+    protected override void RemovedFromScreen()
     {
         _contentAudioSystem.LobbySoundtrackChanged -= UpdateLobbySoundtrackInfo;
     }
 
-    private void UpdateLobbySoundtrackInfo(LobbySoundtrackChangedEvent ev)
+    private void UpdateLobbyTrackInfo(string? filename)
     {
-        if (ev.SoundtrackFilename == null)
+        if (filename == null)
         {
             LobbySong.SetMarkup(Loc.GetString("lobby-state-song-no-song-text"));
         }
         else if (
-            ev.SoundtrackFilename != null
-            && _resourceCache.TryGetResource<AudioResource>(ev.SoundtrackFilename, out var lobbySongResource)
+            _resourceCache.TryGetResource<AudioResource>(filename, out var lobbySongResource)
         )
         {
             var lobbyStream = lobbySongResource.AudioStream;
@@ -62,5 +61,11 @@ public sealed partial class LobbySecondaryInfoWidget : UIWidget
 
             LobbySong.SetMarkup(markup);
         }
+    }
+
+    //TODO: eventually this won't be needed when the lobby soundtrack system gets rewritten to not be terrible
+    private void UpdateLobbySoundtrackInfo(LobbySoundtrackChangedEvent ev)
+    {
+        UpdateLobbyTrackInfo(ev.SoundtrackFilename);
     }
 }
