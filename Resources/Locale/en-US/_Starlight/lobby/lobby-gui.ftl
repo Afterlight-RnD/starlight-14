@@ -1,1 +1,2 @@
 ﻿ui-lobby-mhelp-button = MHelp
+ui-lobby-job-matrix-title = Job Preferences

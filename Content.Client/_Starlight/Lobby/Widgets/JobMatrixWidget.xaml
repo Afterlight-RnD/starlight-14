@@ -1,4 +1,4 @@
-﻿<widgets:JobPreferencesWidget
+﻿<widgets:JobMatrixWidget
     xmlns="https://spacestation14.io"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:widgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
@@ -9,14 +9,13 @@
     Orientation="Vertical">
     <!-- Header and the checkbox for locking/unlocking priority icons -->
     <BoxContainer>
-        <controls:NanoHeading Name="Header" Text="{Loc 'lobby-character-preview-panel-header'}" />
+        <controls:NanoHeading Name="Header" Text="{Loc 'ui-lobby-job-matrix-title'}" />
         <CheckBox Name="PriorityLock" Text="{Loc 'ui-lobby-lock-priorities-checkbox-label'}"
                   HorizontalExpand="True" HorizontalAlignment="Right" VerticalAlignment="Center"
                   ToolTip="{Loc 'ui-lobby-lock-priorities-checkbox-tooltip'}"/>
     </BoxContainer>
     <!-- This is the main bit, only shows once we have preferences from the server -->
         <BoxContainer Name="Loaded" Orientation="Vertical" Visible="False">
-
             <!-- Where we show ALL the jobs, separated into priorities -->
             <BoxContainer Name="JobGrid"
                           VerticalExpand="True"
@@ -58,13 +57,6 @@
                 <ui:DraggableJobTarget Name="HighBox" Priority="High" />
 
             </BoxContainer> <!-- End job grids -->
-
-            <controls:VSpacer/>
-
-            <!-- Character setup button -->
-            <Button Name="CharacterSetup" Text="{Loc 'lobby-character-preview-panel-character-setup-button'}"
-                    HorizontalAlignment="Center"
-                    Margin="0 5 0 0"/>
         </BoxContainer>
         <Label Name="Unloaded" Text="{Loc 'lobby-character-preview-panel-unloaded-preferences-label'}"/>
-</widgets:JobPreferencesWidget>
+</widgets:JobMatrixWidget>

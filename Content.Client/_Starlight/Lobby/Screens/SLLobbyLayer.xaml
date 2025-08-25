@@ -66,7 +66,7 @@
                     <controls:NanoHeading Text="{Loc 'ui-lobby-server-info-block'}" />
                     <slwidgets:LobbyInfoWidget/>
                     <controls:HSpacer Spacing="5" />
-                    <slwidgets:JobPreferencesWidget Name="JobPreferences" Access="Public" />
+                    <slwidgets:JobMatrixWidget Name="JobPreferences" Access="Public" />
                     <controls:HSpacer Spacing="5" />
                     <BoxContainer MinHeight="10" />
                     <!-- Gold line -->

@@ -20,7 +20,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._Starlight.Lobby.Widgets;
 
 [GenerateTypedNameReferences]
-public sealed partial class JobPreferencesWidget : UIWidget
+public sealed partial class JobMatrixWidget : UIWidget
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IClientPreferencesManager _preferences = default!;
@@ -33,7 +33,7 @@ public sealed partial class JobPreferencesWidget : UIWidget
     /// </summary>
     public event Action? PrioritiesUpdated;
 
-    public JobPreferencesWidget()
+    public JobMatrixWidget()
     {
         RobustXamlLoader.Load(this);
 
