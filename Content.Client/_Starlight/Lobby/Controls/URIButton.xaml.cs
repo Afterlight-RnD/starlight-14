@@ -8,8 +8,9 @@ using Robust.Client.UserInterface.XAML;
 
 namespace Content.Client._Starlight.Lobby.Controls;
 
+[Virtual]
 [GenerateTypedNameReferences]
-public sealed partial class URIButton : Button
+public partial class URIButton : Button
 {
     [Dependency] private readonly IUriOpener _uriOpener = default!;
 

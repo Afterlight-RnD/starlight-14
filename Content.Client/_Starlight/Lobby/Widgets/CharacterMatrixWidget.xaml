@@ -1,0 +1,10 @@
+﻿<widgets:CharacterMatrixWidget
+    xmlns="https://spacestation14.io"
+    xmlns:widgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets">
+    <ScrollContainer>
+        <BoxContainer
+            VerticalExpand="True" HorizontalExpand="True"
+            HorizontalAlignment="Center" VerticalAlignment="Top">
+        </BoxContainer>
+    </ScrollContainer>
+</widgets:CharacterMatrixWidget>

@@ -7,9 +7,9 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 
 namespace Content.Client._Starlight.Lobby.Controls;
-
+[Virtual]
 [GenerateTypedNameReferences]
-public sealed partial class WindowButton : Button
+public partial class WindowButton : Button
 {
     [Dependency] private readonly IDynamicTypeFactory _typeFact = default!;
     public Type? WindowType { get; set; }
