@@ -7,19 +7,20 @@ using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.XAML;
 
-namespace Content.Client._Starlight.Lobby.Screens;
+namespace Content.Client._Starlight.Lobby;
 
+[DifferUIScreenCreation]
 [GenerateTypedNameReferences]
-public sealed partial class SLLobbyScreenTest : UIScreenLayer
+public sealed partial class SLLobbyScreen : UIScreen
 {
     [Dependency] private IResourceCache _resourceCache = default!;
-
     private ClientGameTicker _gameTicker = default!;
-    public SLLobbyScreenTest()
+    public SLLobbyScreen()
     {
         RobustXamlLoader.Load(this);
         SetAnchorPreset(Background, LayoutPreset.Wide);
         _gameTicker = EntityManager.System<ClientGameTicker>();
+
         _gameTicker.LobbyStatusUpdated += LobbyStatusUpdated;
         LobbyStatusUpdated();
     }

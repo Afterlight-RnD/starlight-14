@@ -1,0 +1,6 @@
+﻿<slcontrols:LobbyLeaveButton
+    xmlns="https://spacestation14.io"
+    xmlns:slcontrols="clr-namespace:Content.Client._Starlight.Lobby.Controls"
+    StyleClasses="StyleClassButton">
+    <Label Name="ConfirmLabel" Access="Protected" StyleClasses="StyleClassButton" Visible="False"/>
+</slcontrols:LobbyLeaveButton>

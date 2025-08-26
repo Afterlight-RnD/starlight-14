@@ -1,11 +1,11 @@
-﻿<slcontrols:SLLobbyLayer
+﻿<layer:SLLobbyLayer
     xmlns="https://spacestation14.io"
-    xmlns:slcontrols="clr-namespace:Content.Client._Starlight.Lobby.Screens"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
     xmlns:style="clr-namespace:Content.Client.Stylesheets"
     xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
     xmlns:slwidgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
+    xmlns:layer="clr-namespace:Content.Client._Starlight.Lobby.Layers"
     HorizontalExpand="True" VerticalExpand="True"
     HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <BoxContainer Name="MainContainer" VerticalExpand="True" HorizontalExpand="True" Orientation="Horizontal"
@@ -100,4 +100,4 @@
                            Scale="0.5 0.5" />
         </PanelContainer>
     </BoxContainer>
-</slcontrols:SLLobbyLayer>
+</layer:SLLobbyLayer>

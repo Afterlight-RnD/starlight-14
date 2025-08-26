@@ -8,7 +8,7 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 
-namespace Content.Client._Starlight.Lobby.Screens;
+namespace Content.Client._Starlight.Lobby.Layers;
 
 [GenerateTypedNameReferences]
 public sealed partial class SLLobbyLayer : UIScreenLayer

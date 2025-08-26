@@ -1,12 +1,11 @@
-﻿<controls:CharacterEditorMenuBarWidget
+﻿<widgets:CharacterEditorMenuBarWidget
     xmlns="https://spacestation14.io"
-    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
     xmlns:cc="clr-namespace:Content.Client.Administration.UI.CustomControls"
     xmlns:slcontrols="clr-namespace:Content.Client._Starlight.Lobby.Controls"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:info="clr-namespace:Content.Client.Info"
-    xmlns:screens="clr-namespace:Content.Client._Starlight.Lobby.Screens"
     xmlns:stats="clr-namespace:Content.Client.Info.PlaytimeStats"
+    xmlns:widgets="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets"
     Orientation="Horizontal">
     <slcontrols:WindowButton
         Name="StatsButton" HorizontalExpand="True"
@@ -24,11 +23,9 @@
         Text="{Loc 'server-info-rules-button'}"
         WindowType="{x:Type info:RulesAndInfoWindow}"
         StyleClasses="ButtonBig" />
-    <slcontrols:UILayerButton
+    <Button
         Name="CloseButton"
         Access="Public"
         Text="{Loc 'character-setup-gui-character-setup-close-button'}"
-        StyleClasses="ButtonBig"
-        LayerType="{x:Type screens:SLCharacterEditorLayer}"
-        OperationMode="DeactivateLayer" />
-</controls:CharacterEditorMenuBarWidget>
+        StyleClasses="ButtonBig"/>
+</widgets:CharacterEditorMenuBarWidget>

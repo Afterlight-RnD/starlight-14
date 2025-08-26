@@ -1,4 +1,4 @@
-using Content.Client._Starlight.Lobby.Screens;
+using Content.Client._Starlight.Lobby.Layers;
 using Content.Client.Audio;
 using Content.Client.GameTicking.Managers;
 using Content.Client.Lobby.UI;

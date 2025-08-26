@@ -7,11 +7,13 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Client.UserInterface.XAML;
 
 namespace Content.Client._Starlight.Lobby.Controls;
+
 [Virtual]
 [GenerateTypedNameReferences]
 public partial class WindowButton : Button
 {
     [Dependency] private readonly IDynamicTypeFactory _typeFact = default!;
+    public bool CloseWindowsWhenRemoved { get; set; } = true;
     public Type? WindowType { get; set; }
     public bool SingletonWindow { get; set; } = true;
     private BaseWindow? _window;
@@ -21,13 +23,22 @@ public partial class WindowButton : Button
         if (WindowType == null)
             return;
         if (!SingletonWindow || _window == null)
-            _window = (BaseWindow) _typeFact.CreateInstance(WindowType);
+            _window = (BaseWindow)_typeFact.CreateInstance(WindowType);
         _window?.OpenCentered();
     }
+
     public WindowButton()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
         OnPressed += HandlePressed;
+    }
+
+    protected override void ExitedTree()
+    {
+        base.ExitedTree();
+        if (!CloseWindowsWhenRemoved) return;
+        _window?.Close();
+        _window = null;
     }
 }
