@@ -62,8 +62,8 @@ public sealed partial class CCVars
     /// <summary>
     ///     Controls the maximum number of character slots a player is allowed to have.
     /// </summary>
-    public static readonly CVarDef<int>
-        GameMaxCharacterSlots = CVarDef.Create("game.maxcharacterslots", 30, CVar.ARCHIVE | CVar.SERVERONLY);
+    public static readonly CVarDef<int> //Starlight, changed Server Only to Server to allow client to read
+        GameMaxCharacterSlots = CVarDef.Create("game.maxcharacterslots", 30, CVar.ARCHIVE | CVar.SERVER);
 
     /// <summary>
     ///     Controls the game map prototype to load. SS14 stores these prototypes in Prototypes/Maps.

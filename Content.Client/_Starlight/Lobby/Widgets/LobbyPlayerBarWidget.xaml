@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:widgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
     xmlns:slcontrols="clr-namespace:Content.Client._Starlight.Lobby.Controls"
-    xmlns:layers="clr-namespace:Content.Client._Starlight.CharacterEditor.Layers"
+    xmlns:layers="clr-namespace:Content.Client._Starlight.Character.Editor.Layers"
     Orientation="Vertical">
     <GridContainer Name="PlayerButtonGrid" Access="Protected">
         <slcontrols:UILayerButton

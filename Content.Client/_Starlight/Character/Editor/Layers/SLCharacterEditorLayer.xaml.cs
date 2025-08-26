@@ -6,7 +6,7 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.XAML;
 using SLLobbyLayer = Content.Client._Starlight.Lobby.Layers.SLLobbyLayer;
 
-namespace Content.Client._Starlight.CharacterEditor.Layers;
+namespace Content.Client._Starlight.Character.Editor.Layers;
 
 [GenerateTypedNameReferences]
 public sealed partial class SLCharacterEditorLayer : UIScreenLayer

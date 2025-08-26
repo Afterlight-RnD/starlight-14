@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: ASL-1.0
 
 using System.Linq;
-using Content.Client._Starlight.CharacterViewVisualizer.Components;
+using Content.Client._Starlight.Character.UIView.Components;
 using Content.Client.Humanoid;
 using Content.Shared.Body.Part;
 using Content.Shared.Humanoid;
@@ -11,7 +11,7 @@ using Content.Shared.Starlight;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 
-namespace Content.Client._Starlight.CharacterUIView;
+namespace Content.Client._Starlight.Character.UIView.Systems;
 
 /// <summary>
 /// Clientside system for visualizing characters in UI controls
