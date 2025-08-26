@@ -16,7 +16,7 @@ public partial class WindowButton : Button
     public bool SingletonWindow { get; set; } = true;
     private BaseWindow? _window;
 
-    private void Execute(ButtonEventArgs obj)
+    private void HandlePressed(ButtonEventArgs obj)
     {
         if (WindowType == null)
             return;
@@ -28,6 +28,6 @@ public partial class WindowButton : Button
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
-        OnPressed += Execute;
+        OnPressed += HandlePressed;
     }
 }

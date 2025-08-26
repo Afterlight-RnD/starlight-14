@@ -2,11 +2,8 @@
     xmlns="https://spacestation14.io"
     xmlns:slcontrols="clr-namespace:Content.Client._Starlight.Lobby.Screens"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:maths="clr-namespace:Robust.Shared.Maths;assembly=Robust.Shared.Maths"
     xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
     xmlns:style="clr-namespace:Content.Client.Stylesheets"
-    xmlns:lobbyUi="clr-namespace:Content.Client.Lobby.UI"
-    xmlns:info="clr-namespace:Content.Client.Info"
     xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
     xmlns:slwidgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
     HorizontalExpand="True" VerticalExpand="True"
@@ -69,6 +66,8 @@
                     <controls:HSpacer Spacing="5" />
                     <controls:NanoHeading Text="{Loc 'lobby-character-preview-panel-header'}" />
                     <slwidgets:CharacterMatrixWidget />
+                    <controls:HSpacer Spacing="5" />
+                    <slwidgets:LobbyPlayerBarWidget />
                     <controls:HSpacer Spacing="5" />
                     <slwidgets:JobMatrixWidget Name="JobPreferences" Access="Public" />
                     <controls:HSpacer Spacing="5" />
