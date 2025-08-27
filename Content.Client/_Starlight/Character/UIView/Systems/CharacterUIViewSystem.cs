@@ -4,6 +4,7 @@
 using System.Linq;
 using Content.Client._Starlight.Character.UIView.Components;
 using Content.Client.Humanoid;
+using Content.Client.Lobby;
 using Content.Shared.Body.Part;
 using Content.Shared.Humanoid;
 using Content.Shared.Preferences;
@@ -20,6 +21,7 @@ public sealed class CharacterUIViewSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly HumanoidAppearanceSystem _appearanceSystem = default!;
+    [Dependency] private readonly IClientPreferencesManager _preferences = default!;
 
     private EntityQuery<CharacterUIViewComponent> _viewQuery;
     private EntityQuery<HumanoidAppearanceComponent> _humanoidQuery;
@@ -36,6 +38,14 @@ public sealed class CharacterUIViewSystem : EntitySystem
             return true;
         EntityManager.DeleteEntity(viewEntity);
         return true;
+    }
+
+    public HumanoidCharacterProfile? GetProfileForSlot(int slot)
+    {
+        if (_preferences.Preferences == null)
+            return null;
+        _preferences.Preferences.TryGetHumanoidInSlot(slot, out var profile);
+        return profile;
     }
 
     public bool UpdateBaseView(Entity<CharacterUIViewComponent?, HumanoidAppearanceComponent?> viewEntity,

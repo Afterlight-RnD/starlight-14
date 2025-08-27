@@ -20,6 +20,7 @@ public sealed partial class CharacterEditorProfileList : UIWidget
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
     private SLCharacterProfileSystem _profileSystem = default!;
+
     public CharacterEditorProfileList()
     {
         RobustXamlLoader.Load(this);
@@ -49,6 +50,7 @@ public sealed partial class CharacterEditorProfileList : UIWidget
         if (!_preferences.ServerDataLoaded) //cannot create a slot if no data is loaded!
             return;
         _profileSystem.CreateNewCharacter(HumanoidCharacterProfile.Random());
+        UpdateCreateCharacterButtonLock();
     }
 
     private void OnValueChanged(int newValue)
@@ -58,14 +60,19 @@ public sealed partial class CharacterEditorProfileList : UIWidget
                 CharactersList.RemoveChild(i);
 
         if (newValue <= CharactersList.ChildCount) return;
-
         for (var i = CharactersList.ChildCount - 1; i < newValue; i++)
         {
-            var newEntry = new CharacterEditorListEntry();
-            CharactersList.AddChild(newEntry);
-            if (_preferences.Preferences == null || !_preferences.Preferences.TryGetHumanoidInSlot(i, out var profile))
-                continue;
-            newEntry.UpdateCharacterProfile(profile);
+            CharactersList.AddChild(new CharacterEditorListEntry());
         }
+    }
+
+    private CharacterEditorListEntry GetEntryForSlot(int slot)
+    {
+        return (CharacterEditorListEntry)CharactersList.GetChild(slot);
+    }
+
+    private void UpdateCreateCharacterButtonLock()
+    {
+        NewSlotButton.Disabled = _profileSystem.SlotsFull;
     }
 }

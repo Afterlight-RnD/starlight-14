@@ -4,6 +4,7 @@
 using System.Linq;
 using Content.Client.Lobby;
 using Content.Shared.Preferences;
+using Robust.Client.UserInterface;
 using Robust.Shared.Utility;
 
 namespace Content.Client._Starlight.Character.ProfileSlots;
@@ -14,8 +15,20 @@ namespace Content.Client._Starlight.Character.ProfileSlots;
 public sealed class SLCharacterProfileSystem : EntitySystem
 {
     [Dependency] private readonly IClientPreferencesManager _preferences = default!;
+    [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
 
     public Action<int, HumanoidCharacterProfile>? OnSlotUpdated = null;
+
+    public bool SlotsFull
+    {
+        get
+        {
+            //if pref data is not loaded, we can't check slots, so we assume full
+            if (_preferences.Preferences == null || _preferences.Settings == null)
+                return true;
+            return _preferences.Preferences.Characters.Count >= _preferences.Settings.MaxCharacterSlots;
+        }
+    }
 
     public override void Initialize()
     {
@@ -39,7 +52,7 @@ public sealed class SLCharacterProfileSystem : EntitySystem
             return;
         }
         _preferences.CreateCharacter(profile);
-        OnSlotUpdated?.Invoke(nextSlot.Value, profile);
+        _uiManager.RaiseGlobalUIEvent(new CharacterSlotUpdatedUIEvent(nextSlot.Value, profile));
     }
 
 
@@ -49,7 +62,7 @@ public sealed class SLCharacterProfileSystem : EntitySystem
         {
             if (profile is HumanoidCharacterProfile characterProfile)
             {
-                OnSlotUpdated?.Invoke(slot, characterProfile);
+                _uiManager.RaiseGlobalUIEvent(new CharacterSlotUpdatedUIEvent(slot, characterProfile));
             }
         }
 
