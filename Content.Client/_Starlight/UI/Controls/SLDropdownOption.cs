@@ -6,7 +6,7 @@ using Robust.Client.UserInterface.Controls;
 namespace Content.Client._Starlight.UI.Controls;
 
 [Virtual]
-public class SLDropdownOption : ContainerButton
+public class SLDropdownOption : ContainerButton, IDropdownControlOption
 {
     
 }

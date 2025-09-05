@@ -3,22 +3,23 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.UI.Controls;
 
-public abstract class SLDropdownBase: ContainerButton
+[Virtual]
+public class SLDropdown: ContainerButton
 {
-    private SLDropdownOptions? _dropdown = null;
+    private SLDropdownPopout? _dropdown = null;
 
-    SLDropdownBase()
+    public SLDropdown()
     {
         ToggleMode = true;
         OnToggled += HandleToggled;
 
     }
 
-    private SLDropdownOptions EnsureDropdown()
+    private SLDropdownPopout EnsureDropdown()
     {
         if (_dropdown != null)
             return _dropdown;
-        _dropdown = new SLDropdownOptions();
+        _dropdown = new SLDropdownPopout();
         _dropdown.Visible = false;
         return _dropdown;
     }
@@ -44,10 +45,8 @@ public abstract class SLDropdownBase: ContainerButton
     protected override void ChildAdded(Control newChild)
     {
         var dropDown = EnsureDropdown();
-        if (newChild is SLDropdownOption option)
-        {
-            dropDown.Orphan();
-            dropDown.AddChild(option);
-        }
+        if (newChild is not IDropdownControlOption) return;
+        newChild.Orphan();
+        dropDown.AddChild(newChild);
     }
 }

@@ -5,9 +5,9 @@ using Robust.Client.UserInterface.XAML;
 namespace Content.Client._Starlight.UI.Controls;
 
 [GenerateTypedNameReferences]
-public sealed partial class SLDropdownOptions : Popup
+public sealed partial class SLDropdownPopout : Popup
 {
-    public SLDropdownOptions()
+    public SLDropdownPopout()
     {
         RobustXamlLoader.Load(this);
     }

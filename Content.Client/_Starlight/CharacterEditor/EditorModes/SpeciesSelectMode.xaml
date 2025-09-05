@@ -1,0 +1,5 @@
+﻿<controls:SpeciesSelectMode
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.CharacterEditor.EditorModes">
+    <Label Text="BLAH BLAH BLAH BLAH BLAH BLAH"  HorizontalExpand="True"/>
+</controls:SpeciesSelectMode>

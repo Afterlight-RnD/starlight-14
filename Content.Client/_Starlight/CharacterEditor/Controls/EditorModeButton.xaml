@@ -1,0 +1,12 @@
+﻿<controls:EditorModeButton
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.CharacterEditor.Controls"
+    StyleClasses="BigButton">
+    <BoxContainer Orientation="Horizontal" Margin="5">
+        <TextureRect Name="ModeIcon" Access="Private"/>
+        <BoxContainer Orientation="Vertical" Margin="2">
+            <Label Name="ModeLabel" Access="Protected" Text="Unknown Mode"/>
+            <Label Name="ModeSublabel" Access="Protected" Text="Undefined" Visible="False"/>
+        </BoxContainer>
+    </BoxContainer>
+</controls:EditorModeButton>
