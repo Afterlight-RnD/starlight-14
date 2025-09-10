@@ -21,7 +21,7 @@
                        StyleClasses="LabelHeadingBigger"
                        HorizontalAlignment="Left" />
                 <Control HorizontalExpand="True" HorizontalAlignment="Stretch" /> <!-- Spacer -->
-                <widgets2:CharacterEditorMenuBarWidget
+                <widgets1:CharacterEditorMenuBarWidget
                     Name="MenuBar" Access="Protected"
                     HorizontalAlignment="Right" />
             </BoxContainer>
@@ -48,40 +48,51 @@
                     HorizontalExpand="True" VerticalExpand="True"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <BoxContainer
-                        Name="LeftPopoutPanel" Access="Protected"
+                        Name="PopoutPanel" Access="Protected"
                         Orientation="Vertical" Visible="False"
                         HorizontalExpand="True" VerticalExpand="True"
                         HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
-                    <BoxContainer Orientation="Vertical" MinHeight="400"
-                                  VerticalExpand="True" HorizontalExpand="True"
-                                  HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                    <BoxContainer Orientation="Vertical"
+                                  VerticalExpand="True" HorizontalExpand="True">
                         <Label Text="Urist McPlaceholder"
                                VerticalExpand="True" HorizontalExpand="True"
                                HorizontalAlignment="Center" VerticalAlignment="Top" />
-                        <controls:HLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
-                        <BoxContainer
-                            Name="EditingPanel" Access="Protected"
-                            HorizontalExpand="True" VerticalExpand="False"
-                            HorizontalAlignment="Stretch" />
+                        <controls:HLine
+                            HorizontalExpand="True" HorizontalAlignment="Stretch"
+                            Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
+                        <ScrollContainer HScrollEnabled="False"
+                                         VerticalExpand="True" HorizontalExpand="True">
+                            <BoxContainer
+                                Name="EditingPanel" Access="Protected"
+                                HorizontalExpand="True" VerticalExpand="False"
+                                HorizontalAlignment="Stretch" />
+                        </ScrollContainer>
                     </BoxContainer>
-                    <slcontrols:VLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
-                    <BoxContainer Orientation="Vertical"
+                    <BoxContainer Orientation="Horizontal"
                                   HorizontalExpand="True" VerticalExpand="True"
-                                  VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                        <BoxContainer
-                            Name="DetailsPanel" Access="Protected"
-                            HorizontalExpand="True" VerticalExpand="true"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                  VerticalAlignment="Stretch">
+                        <slcontrols:VLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
+                        <BoxContainer Orientation="Vertical" MinWidth="150"
+                                      HorizontalExpand="True" VerticalExpand="True"
+                                      VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                            <ScrollContainer HScrollEnabled="False"
+                                             VerticalExpand="True" HorizontalExpand="True">
+                                <BoxContainer
+                                            Name="DetailsPanel" Access="Protected"
+                                            HorizontalExpand="True" VerticalExpand="true"
+                                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            </ScrollContainer>
 
-                        <BoxContainer Orientation="Vertical"
-                                      VerticalExpand="True" HorizontalExpand="True"
-                                      HorizontalAlignment="Stretch" VerticalAlignment="Bottom" >
-                            <controls:HLine VerticalAlignment="Bottom"
-                                            Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
-                            <widgets3:ChatBox
-                                Name="Chat" Access="Public"
-                                VerticalExpand="True" Margin="3 3 3 3" MinHeight="150"
-                                VerticalAlignment="Stretch"/>
+                            <BoxContainer Orientation="Vertical"
+                                          VerticalExpand="True" HorizontalExpand="True"
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Bottom" >
+                                <controls:HLine VerticalAlignment="Bottom"
+                                                Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
+                                <widgets3:ChatBox
+                                    Name="Chat" Access="Public"
+                                    VerticalExpand="True" Margin="3 3 3 3" MinSize="300 150"
+                                    VerticalAlignment="Stretch"/>
+                            </BoxContainer>
                         </BoxContainer>
                     </BoxContainer>
                 </BoxContainer>

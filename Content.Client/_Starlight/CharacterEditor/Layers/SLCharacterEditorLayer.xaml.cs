@@ -17,9 +17,27 @@ public sealed partial class SLCharacterEditorLayer : UIScreenLayer
 {
     [Dependency] private readonly IDynamicTypeFactory _typeFactory = default!;
 
-    private Dictionary<Type, EditorModeWidget> _editorModes = new();
+    private Dictionary<Type, EditorModeWidget> _editorWidgetLookup = new();
+    private EditorModeButton? _activeEditorModeButton = null;
 
-    private EditorModeWidget? _activeMode = null;
+    public EditorModeButton ActiveEditorButton
+    {
+        get
+        {
+            if (_activeEditorModeButton == null)
+                throw new Exception($"tried to get active EditorModeButton on {this} but no EditorModeButtons were present!");
+            return _activeEditorModeButton;
+        }
+        private set
+        {
+            if (_activeEditorModeButton == value)
+                return;
+            if (_activeEditorModeButton != null)
+                SetEditorWidgetsVisibility(_activeEditorModeButton, false);
+            _activeEditorModeButton = value;
+            SetEditorWidgetsVisibility(value, true);
+        }
+    }
 
     public SLCharacterEditorLayer()
     {
@@ -28,8 +46,6 @@ public sealed partial class SLCharacterEditorLayer : UIScreenLayer
         SetAnchorPreset(BackgroundPanel, LayoutPreset.Wide, true);
 
         EditorModeSelector.OnModeButtonPressed += OnModeButtonPressed;
-        EditorModeSelector.OnChildAdded += ModeSelectorChildAdded;
-        EditorModeSelector.OnChildRemoved += ModeSelectorChildRemoved;
         SetupInitialState();
     }
 
@@ -37,65 +53,19 @@ public sealed partial class SLCharacterEditorLayer : UIScreenLayer
     {
         foreach (var button in EditorModeSelector.EnumerateButtons())
         {
-            if (button.ModeWidgetType == null)
-                continue;
-            var modeWidget = CreateEditorModePane(button.ModeWidgetType);
-            modeWidget.OnSecondaryLabelUpdated += secondaryString =>
-            {
-                button.ModeName = secondaryString;
-            };
+            EnsureEditorPanel(button, button.PopoutPanelType, PopoutPanel);
+            EnsureEditorPanel(button, button.EditingPanelType, EditingPanel);
+            EnsureEditorPanel(button, button.DetailsPanelType, DetailsPanel);
+            if (_activeEditorModeButton != null) continue;
+            _activeEditorModeButton = button;
+            SetEditorWidgetsVisibility(button, true);
         }
-
-        if (EditorModeSelector.SelectedMode?.ModeWidgetType == null)
-            return;
-        if (!_editorModes.TryGetValue(EditorModeSelector.SelectedMode.ModeWidgetType, out var mode))
-            throw new Exception($"Mode of type:{mode} was not found!");
-        mode.Visible = true;
-        _activeMode = mode;
     }
 
     private void OnModeButtonPressed(EditorModeButton editorModeButton)
     {
-        if (editorModeButton.ModeWidgetType == _activeMode?.GetType())
-            return;
-        if (_activeMode != null)
-            _activeMode.Visible = false;
-        if (editorModeButton.ModeWidgetType == null
-            || !_editorModes.TryGetValue(editorModeButton.ModeWidgetType, out var editorMode))
-        {
-            _activeMode = null;
-            return;
-        }
-        editorMode.Visible = true;
-        _activeMode = editorMode;
+        ActiveEditorButton = editorModeButton;
     }
-
-    private void ModeSelectorChildRemoved(Control child)
-    {
-        if (child is not EditorModeButton { ModeWidgetType: not null } button) return;
-        if (button.ModeWidgetType == null)
-            return;
-        if (!_editorModes.TryGetValue(button.ModeWidgetType, out var editorMode))
-            return;
-        editorMode.Orphan();
-        _editorModes.Remove(button.ModeWidgetType);
-        editorMode.OnSecondaryLabelUpdated = null;
-        if (_activeMode?.GetType() == button.ModeWidgetType)
-            _activeMode = null;
-    }
-
-    private void ModeSelectorChildAdded(Control newChild)
-    {
-        if (newChild is not EditorModeButton { ModeWidgetType: not null } button) return;
-        if (button.ModeWidgetType == null)
-            return;
-        var modeWidget = CreateEditorModePane(button.ModeWidgetType);
-        modeWidget.OnSecondaryLabelUpdated += secondaryString =>
-        {
-            button.ModeName = secondaryString;
-        };
-    }
-
     protected override void AddedToScreen()
     {
         if (ParentScreen == null || !ParentScreen.TryGetLayer<SLLobbyLayer>(out var lobbyLayer, true))
@@ -116,14 +86,35 @@ public sealed partial class SLCharacterEditorLayer : UIScreenLayer
         lobbyLayer.Visible = true;
     }
 
-    private EditorModeWidget CreateEditorModePane(Type widgetType)
+    private void SetEditorWidgetsVisibility(EditorModeButton modeButton, bool visible)
     {
-        if (_editorModes.ContainsKey(widgetType))
-            throw new ArgumentException($"Mode for widget of type:{widgetType} already exists!");
-        var modeWidget = (EditorModeWidget)_typeFactory.CreateInstance(widgetType);
-        modeWidget.Visible = false;
-        EditingPanel.AddChild(modeWidget);
-        _editorModes.Add(widgetType, modeWidget);
-        return modeWidget;
+        if (modeButton.PopoutPanelType != null)
+        {
+            _editorWidgetLookup[modeButton.PopoutPanelType].Visible = visible;
+        }
+        if (modeButton.EditingPanelType != null)
+        {
+            _editorWidgetLookup[modeButton.EditingPanelType].Visible = visible;
+        }
+        if (modeButton.PopoutPanelType != null)
+        {
+            _editorWidgetLookup[modeButton.PopoutPanelType].Visible = visible;
+        }
+    }
+
+    private void EnsureEditorPanel(EditorModeButton button, Type? widgetType, Control panelParent)
+    {
+        if (widgetType != null)
+        {
+            if (!_editorWidgetLookup.TryGetValue(widgetType, out var modeWidget))
+            {
+                modeWidget = (EditorModeWidget)_typeFactory.CreateInstance(widgetType);
+                modeWidget.Visible = false;
+                panelParent.AddChild(modeWidget);
+                _editorWidgetLookup.Add(widgetType, modeWidget);
+            }
+
+            modeWidget.LinkButton(button);
+        }
     }
 }

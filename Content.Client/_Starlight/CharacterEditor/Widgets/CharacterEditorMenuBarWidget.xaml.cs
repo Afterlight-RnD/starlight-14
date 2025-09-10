@@ -7,7 +7,7 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using SLCharacterEditorLayer = Content.Client._Starlight.CharacterEditor.Layers.SLCharacterEditorLayer;
 
-namespace Content.Client._Starlight.Character.Editor.Widgets;
+namespace Content.Client._Starlight.CharacterEditor.Widgets;
 
 [GenerateTypedNameReferences]
 public sealed partial class CharacterEditorMenuBarWidget : UIWidget

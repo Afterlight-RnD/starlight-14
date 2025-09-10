@@ -9,7 +9,7 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.UIEvents;
 using Robust.Client.UserInterface.XAML;
 
-namespace Content.Client._Starlight.Character.Editor.Controls;
+namespace Content.Client._Starlight.CharacterEditor.Controls;
 
 [GenerateTypedNameReferences]
 public sealed partial class CharacterEditorListEntry : ContainerButton, IUIEventSubscriber

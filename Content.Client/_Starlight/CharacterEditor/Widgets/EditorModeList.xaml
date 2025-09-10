@@ -7,8 +7,8 @@
     Orientation="Vertical">
     <controls:EditorModeButton
         ModeName="{Loc 'character-editor-select-slot-button'}"
-        ModeWidgetType="{x:Type 'editorModes:CharacterSlotSelectionMode'}"/>
+        EditingPanelType="{x:Type 'editorModes:CharacterSlotSelectionMode'}"/>
     <controls:EditorModeButton
         ModeName="{Loc 'character-editor-select-species-button'}"
-        ModeWidgetType="{x:Type 'editorModes:SpeciesSelectMode'}"/>
+        EditingPanelType="{x:Type 'editorModes:SpeciesSelectMode'}"/>
 </widgets:EditorModeList>
