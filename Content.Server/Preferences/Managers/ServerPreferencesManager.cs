@@ -22,7 +22,7 @@ namespace Content.Server.Preferences.Managers
     /// Receives <see cref="MsgSetCharacterEnable"/>, <see cref="MsgUpdateCharacter"/>,
     /// <see cref="MsgDeleteCharacter"/>, and <see cref="MsgUpdateJobPriorities"/> at any time.
     /// </summary>
-    public sealed class ServerPreferencesManager : IServerPreferencesManager, IPostInjectInit
+    public sealed partial class ServerPreferencesManager : IServerPreferencesManager, IPostInjectInit
     {
         [Dependency] private readonly IServerNetManager _netManager = default!;
         [Dependency] private readonly IConfigurationManager _cfg = default!;
@@ -299,12 +299,14 @@ namespace Content.Server.Preferences.Managers
             {
                 MaxCharacterSlots = MaxCharacterSlots
             };
+            SLFinishLoad(session, prefsData.Prefs);//starlight-edit
             _netManager.ServerSendMessage(msg, session.Channel);
         }
 
         public void OnClientDisconnected(ICommonSession session)
         {
             _cachedPlayerPrefs.Remove(session.UserId);
+            SLUnload(session); //starlight-edit
         }
 
         public bool HavePreferencesLoaded(ICommonSession session)
