@@ -26,15 +26,12 @@ public sealed class HumanoidViewSystem : EntitySystem, IUIEventSubscriber
     [Dependency] private readonly CharacterProfileSystem _profileSystem = default!;
     [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
-
-    private Dictionary<int, Entity<HumanoidAppearanceComponent>> _viewEntities = new();
-
     public override void Initialize()
     {
-        _uiMan.SubscribeUIEvent<CharacterSlotView, CharacterViewSlotChangedUIEvent>(this, OnViewSlotChanged);
+        _uiMan.SubscribeUIEvent<CharacterSlotView, RefreshProfilePreviewUIEvent>(this, RefreshCharacterView);
     }
 
-    private void OnViewSlotChanged(CharacterSlotView control, CharacterViewSlotChangedUIEvent ev)
+    private void RefreshCharacterView(CharacterSlotView control, RefreshProfilePreviewUIEvent ev)
     {
         control.SetEntity(null);
         if (control.Slot >= 0 &&
@@ -92,15 +89,15 @@ public sealed class HumanoidViewSystem : EntitySystem, IUIEventSubscriber
         }).Where(p => p.Item1 != HumanoidVisualLayers.Special).ToDictionary();
         _humanoidSystem.AddCustomBaseLayers(humanoidAppearance, cyberLayers);
     }
-    private Entity<HumanoidAppearanceComponent> EnsureViewEntity(Entity<CharacterProfileComponent> profileEnt)
+    public Entity<HumanoidAppearanceComponent> EnsureViewEntity(Entity<CharacterProfileComponent> profileEnt)
     {
-        if (_viewEntities.TryGetValue(profileEnt.Comp.Slot, out var existing))
-            return existing;
+        if (profileEnt.Comp.PreviewEntity != null)
+            return profileEnt.Comp.PreviewEntity.Value;
         //Profile is already checked before this gets called so we suppress the nullable
         var newEnt = EntityManager.SpawnEntity(_protoMan.Index(profileEnt.Comp.Data.Profile!.Species).DollPrototype,
             MapCoordinates.Nullspace);
         Entity<HumanoidAppearanceComponent> newView = (newEnt, Comp<HumanoidAppearanceComponent>(newEnt));
-        _viewEntities.Add(profileEnt.Comp.Slot, newView);
+        profileEnt.Comp.PreviewEntity = newView;
         return newView;
     }
 }

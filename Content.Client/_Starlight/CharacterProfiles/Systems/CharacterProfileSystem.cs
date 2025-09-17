@@ -64,4 +64,9 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
     {
         RaiseNetworkEvent(new CharacterProfileDataUpdateRequest(GetNetEntity(target), target.Comp.Data, target.Comp.Slot));
     }
+
+    private void EnsurePreviewEntity(Entity<CharacterProfileComponent> target)
+    {
+
+    }
 }
