@@ -20,7 +20,6 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
     [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
     [Dependency] private readonly IServerPreferencesManager _preferences = default!;
     [Dependency] private readonly IDependencyCollection _dependencies = default!;
-    [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
 
     private Dictionary<NetUserId, Dictionary<int,Entity<CharacterProfileComponent>>> _profiles = new();
 
@@ -118,7 +117,6 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
             Slot = slot
         };
         AddComp(newEnt,newComp);
-        _humanoidSystem.LoadProfile(newEnt, newData.Profile);
         _pvsOverride.AddSessionOverride(newEnt, session);
         var profileEnt = new Entity<CharacterProfileComponent>(newEnt, newComp);
         Dirty(profileEnt);

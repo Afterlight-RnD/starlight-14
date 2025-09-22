@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using Content.Client._Starlight.CharacterEditor.Controls;
 using Content.Client._Starlight.CharacterProfiles.Systems;
 using Content.Shared._Starlight.CharacterProfileSystem.Components;
 using Content.Shared.Humanoid;
@@ -20,6 +21,19 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
     public override void Initialize()
     {
         _uiMan.SubscribeGlobalUIEvent<CharacterProfileSelectedUIEvent>(this, OnSlotSelected);
+        _uiMan.SubscribeUIEvent<ProfileSelectorButton, ControlAddedUIEvent>(this, OnProfileSelectorAdded);
+    }
+
+    private void OnProfileSelectorAdded(ProfileSelectorButton control, ControlAddedUIEvent ev)
+    {
+        if (_profileSystem.TryGetCharacterInSlot(control.Slot, out var profileEnt, out _))
+        {
+            control.UpdateCharacterProfile(profileEnt);
+        }
+        else
+        {
+            control.UpdateCharacterProfile(null);
+        }
     }
 
     private void OnSlotSelected(CharacterProfileSelectedUIEvent ev)
