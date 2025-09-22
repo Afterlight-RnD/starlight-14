@@ -7,8 +7,6 @@ using Robust.Shared.Player;
 namespace Content.Server.Preferences.Managers;
 
 
-[ByRefEvent]
 public record struct PlayerPreferencesLoadedEvent(ICommonSession Session, PlayerPreferences? Preferences);
 
-[ByRefEvent]
 public record struct PlayerPreferencesUnloadedEvent(ICommonSession Session);

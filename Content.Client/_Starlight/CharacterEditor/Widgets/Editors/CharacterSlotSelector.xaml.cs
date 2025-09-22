@@ -32,7 +32,7 @@ public sealed partial class CharacterSlotSelector : EditorModeWidget
 
         for (var i = 0; i < newMaxCharacters - ChildCount; i++)
         {
-            ListEntries.AddChild(new ProfileSelectorButton());
+            ListEntries.AddChild(new ProfileSelectorButton { Slot = ChildCount });
         }
     }
 }

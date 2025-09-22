@@ -1,32 +1,87 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using Content.Server.Humanoid;
 using Content.Server.Preferences.Managers;
 using Content.Shared._Starlight.CharacterProfileSystem;
 using Content.Shared._Starlight.CharacterProfileSystem.Components;
 using Content.Shared._Starlight.CharacterProfileSystem.Systems;
+using Content.Shared.Humanoid;
 using Content.Shared.Preferences;
 using Robust.Server.GameStates;
-using Robust.Shared.GameStates;
 using Robust.Shared.Map;
+using Robust.Shared.Network;
 using Robust.Shared.Player;
 
 namespace Content.Server._Starlight.CharacterProfiles.Systems;
 
-/// <summary>
-/// This handles...
-/// </summary>
 public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
 {
     [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
     [Dependency] private readonly IServerPreferencesManager _preferences = default!;
+    [Dependency] private readonly IDependencyCollection _dependencies = default!;
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
+
+    private Dictionary<NetUserId, Dictionary<int,Entity<CharacterProfileComponent>>> _profiles = new();
 
     public override void Initialize()
     {
-        SubscribeLocalEvent<CharacterProfileComponent, ComponentGetStateAttemptEvent>(OnAttemptGetState);
-        SubscribeLocalEvent<PlayerPreferencesLoadedEvent>(OnPrefsLoadedForSession);
-        SubscribeLocalEvent<PlayerPreferencesUnloadedEvent>(OnPrefsUnloadedForSession);
+        base.Initialize();
         SubscribeNetworkEvent<CharacterProfileDataUpdateRequest>(HandleProfileUpdateRequest);
+        SubscribeLocalEvent<PlayerPreferencesLoadedEvent>(OnPlayerPrefsLoaded);
+        SubscribeLocalEvent<PlayerPreferencesUnloadedEvent>(OnPlayerPrefsUnloaded);
+    }
+
+    private void OnPlayerPrefsUnloaded(PlayerPreferencesUnloadedEvent ev)
+    {
+        if (!_profiles.Remove(ev.Session.UserId, out var profiles))
+            return;
+        foreach (var (_, profileEnt) in profiles)
+            EntityManager.DeleteEntity(profileEnt);
+    }
+
+    private void OnPlayerPrefsLoaded(PlayerPreferencesLoadedEvent ev)
+    {
+        if (ev.Preferences == null)
+            return;
+        foreach (var (slot, profile) in ev.Preferences.Characters)
+            LoadProfile(ev.Session,slot, new CharacterProfileData((HumanoidCharacterProfile)profile));
+    }
+
+    public void SetCharacterProfileData(ICommonSession owningSession, int slot, CharacterProfileData? newData)
+    {
+        if (MaxProfileSlots >= slot)
+        {
+            Log.Error($"UserId:{owningSession.UserId} tried to set profile data on slot out of range!");
+            return;
+        }
+
+        var profileDict = _profiles[owningSession.UserId];
+
+        if (newData == null)
+        {
+            if (profileDict.Remove(slot, out var removedProfile))
+                EntityManager.DeleteEntity(removedProfile);
+            _preferences.DeleteProfile(owningSession.UserId, slot);
+            return;
+        }
+
+        var validate = new ValidateCharacterProfileEvent(newData);
+        RaiseLocalEvent(ref validate);
+
+        newData.Profile.EnsureValid(owningSession, _dependencies); //TODO: eventually replace with event-based validation
+        if (!profileDict.TryGetValue(slot, out var profile))
+        {
+            profile = CreateNewProfileEntity(owningSession, slot, newData);
+            profileDict.Add(slot, profile);
+        }
+        else profile.Comp.Data = newData;
+
+        Dirty(profile);
+        RaiseNetworkEvent(new ReceiveUpdatedCharacterProfileEvent(slot, GetNetEntity(profile)));
+
+        //apply profile changes to the db
+        _preferences.SetProfile(owningSession.UserId, slot, profile.Comp.Data.Profile);
     }
 
     private void HandleProfileUpdateRequest(CharacterProfileDataUpdateRequest msg, EntitySessionEventArgs args)
@@ -35,83 +90,38 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         var profileComp = ProfileQuery.Comp(profileEnt);
         if (args.SenderSession.UserId != profileComp.OwnerNetId)
         {
-            Log.Warning($"CharacterProfileComponent update owner-mismatch! Expected:{args.SenderSession.UserId} got: {profileComp.OwnerNetId}");
+            Log.Warning($"CharacterProfileComponent update owner-mismatch! Expected:{args.SenderSession.UserId} got: " +
+                        $"{profileComp.OwnerNetId}");
             return;
         }
-        var validate = new ValidateCharacterProfileEvent(msg.Data);
-        if (msg.Data.Profile == null)
-        {
-            Log.Warning($"{args.SenderSession.UserId} tried to sync null character profile!");
-            return;
-        }
-        RaiseLocalEvent(ref validate);
-        if (validate.InvalidData)
-        {
-            Log.Warning($"Character Profile owned by: {args.SenderSession.UserId} in slot: {msg.Slot} failed validation!");
-            Dirty(profileEnt, profileComp); //resync the profile with the valid server data,
-                                            //this should only ever happen if the client bypasses local validation
-
-            //TODO: possibly raise a network event to display an error message to the user without resetting to match the server data?
-            return;
-        }
-
-        if (msg.Data == profileComp.Data)
-            return;
-        _preferences.SetProfile(args.SenderSession.UserId, msg.Slot, msg.Data.Profile);
-        //profileComp.Data = msg.Data;
-        //TODO Need to update comp data in this roundabout way because existing validation code is done in SetProfile
-        profileComp.Data =
-            new CharacterProfileData
-            {
-                Profile = (HumanoidCharacterProfile)_preferences.GetPreferences(args.SenderSession.UserId).GetProfile(msg.Slot)
-            };
-        Dirty(profileEnt, profileComp);
-
-        var updatedEv = new CharacterProfileUpdatedEvent((profileEnt, profileComp));
-        RaiseLocalEvent(ref updatedEv);
+        SetCharacterProfileData(args.SenderSession, msg.Slot, msg.Data);
     }
 
-    private Entity<CharacterProfileComponent> CreateNewProfile(ICommonSession session, int slot,
-        HumanoidCharacterProfile characterProfile)
+    public Entity<CharacterProfileComponent> LoadProfile(ICommonSession session, int slot,
+        CharacterProfileData profileData)
+    {
+        var validate = new ValidateCharacterProfileEvent(profileData);
+        RaiseLocalEvent(ref validate);
+        profileData.Profile.EnsureValid(session, _dependencies); //TODO: eventually replace with event-based validation
+        return CreateNewProfileEntity(session, slot, profileData);
+    }
+
+
+    public Entity<CharacterProfileComponent> CreateNewProfileEntity(ICommonSession session, int slot,
+        CharacterProfileData newData)
     {
         var newEnt = EntityManager.SpawnEntity(null, MapCoordinates.Nullspace);
         var newComp = new CharacterProfileComponent
         {
+            Data = newData,
             OwnerNetId = session.UserId,
-            Data = new CharacterProfileData{Profile = characterProfile},
             Slot = slot
         };
         AddComp(newEnt,newComp);
+        _humanoidSystem.LoadProfile(newEnt, newData.Profile);
         _pvsOverride.AddSessionOverride(newEnt, session);
-        return (newEnt, newComp);
-    }
-
-    private void OnPrefsUnloadedForSession(ref PlayerPreferencesUnloadedEvent ev)
-    {
-        var enumerator = EntityQueryEnumerator<CharacterProfileComponent>();
-        while (enumerator.MoveNext(out var ent,out var comp))
-        {
-            if (comp.OwnerNetId == ev.Session.UserId)
-                EntityManager.QueueDeleteEntity(ent);
-        }
-
-    }
-
-    private void OnPrefsLoadedForSession(ref PlayerPreferencesLoadedEvent ev)
-    {
-        if (ev.Preferences == null)
-            throw new Exception("TEST");
-        foreach (var (slot, character) in ev.Preferences.Characters)
-        {
-            if (character is not HumanoidCharacterProfile humanoidCharacter)
-                throw new Exception("Only HumanoidCharacterProfiles are supported!");
-            CreateNewProfile(ev.Session, slot, humanoidCharacter);
-            return;
-        }
-    }
-
-    private void OnAttemptGetState(Entity<CharacterProfileComponent> ent, ref ComponentGetStateAttemptEvent args)
-    {
-        args.Cancelled = ent.Comp.OwnerNetId != args.Player?.UserId;
+        var profileEnt = new Entity<CharacterProfileComponent>(newEnt, newComp);
+        Dirty(profileEnt);
+        return profileEnt;
     }
 }

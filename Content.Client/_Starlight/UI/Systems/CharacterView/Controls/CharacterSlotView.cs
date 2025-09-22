@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Client._Starlight.CharacterProfiles;
+using Content.Shared._Starlight.CharacterProfileSystem.Components;
+using Content.Shared.Humanoid;
+using Robust.Client.GameObjects;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.UIEvents;
 
@@ -10,6 +13,10 @@ namespace Content.Client._Starlight.UI.Systems.CharacterView.Controls;
 public sealed class CharacterSlotView : SpriteView, IUIEventSubscriber
 {
     private int _slot = -1;
+
+    public Entity<CharacterProfileComponent>? LinkedProfileSlot = null;
+
+    public Entity<SpriteComponent, HumanoidAppearanceComponent>? LinkedPreview = null;
 
     [ViewVariables]
     public int Slot
@@ -20,29 +27,8 @@ public sealed class CharacterSlotView : SpriteView, IUIEventSubscriber
             if (_slot == value)
                 return;
             _slot = value;
-            UserInterfaceManager.RaiseUIEvent(this, new RefreshProfilePreviewUIEvent());
+            UserInterfaceManager.RaiseUIEvent(this, new SlotChangedEvent());
         }
     }
-
-    protected override void EnteredTree()
-    {
-        base.EnteredTree();
-        UserInterfaceManager.SubscribeGlobalUIEvent<CharacterProfileUpdatedUIEvent>(this, OnCharacterProfileUpdated);
-        UserInterfaceManager.RaiseUIEvent(this, new RefreshProfilePreviewUIEvent());
-    }
-
-    private void OnCharacterProfileUpdated(CharacterProfileUpdatedUIEvent ev)
-    {
-        if (ev.Slot != Slot)
-            return;
-        UserInterfaceManager.RaiseUIEvent(this, new RefreshProfilePreviewUIEvent());
-    }
-
-    protected override void ExitedTree()
-    {
-        base.ExitedTree();
-        UserInterfaceManager.UnSubscribeAllUIEvents(this);
-    }
+    public record struct SlotChangedEvent();
 }
-
-public record struct RefreshProfilePreviewUIEvent();

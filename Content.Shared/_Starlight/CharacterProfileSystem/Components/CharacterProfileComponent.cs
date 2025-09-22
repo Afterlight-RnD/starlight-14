@@ -11,27 +11,21 @@ namespace Content.Shared._Starlight.CharacterProfileSystem.Components;
 
 
 /// <summary>
-/// This is used for...
+/// Stores Character profile data
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(raiseAfterAutoHandleState:true)]
 public sealed partial class CharacterProfileComponent : Component
 {
-    public override bool SessionSpecific => true;
-
-    /// <summary>
-    /// Entity that provides the sprite preview for this profile. This will always be null on the server
-    /// </summary>
-    public Entity<HumanoidAppearanceComponent>? PreviewEntity = null;
+    [DataField(required:true), AutoNetworkedField]
+    public CharacterProfileData Data;
 
     [DataField, AutoNetworkedField] public int Slot = -1;
-
-    [DataField, AutoNetworkedField] public CharacterProfileData Data;
 
     [DataField(serverOnly:true)] public NetUserId? OwnerNetId = null;
 }
 
 [Serializable, NetSerializable]
-public sealed partial class CharacterProfileData
+public sealed partial class CharacterProfileData(HumanoidCharacterProfile profile)
 {
-    [DataField] public HumanoidCharacterProfile? Profile;
+    [DataField(required:true)] public HumanoidCharacterProfile Profile = profile;
 }

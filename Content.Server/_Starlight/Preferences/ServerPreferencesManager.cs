@@ -12,13 +12,11 @@ public sealed partial class ServerPreferencesManager
 
     private void SLFinishLoad(ICommonSession session, PlayerPreferences? preferences)
     {
-        var ev = new PlayerPreferencesLoadedEvent(session, preferences);
-        _entMan.EventBus.RaiseEvent(EventSource.Local,ref ev);
+        _entMan.EventBus.RaiseEvent(EventSource.Local,new PlayerPreferencesLoadedEvent(session, preferences));
     }
 
     private void SLUnload(ICommonSession session)
     {
-        var ev = new PlayerPreferencesUnloadedEvent(session);
-        _entMan.EventBus.RaiseEvent(EventSource.Local,ref ev);
+        _entMan.EventBus.RaiseEvent(EventSource.Local,new PlayerPreferencesUnloadedEvent(session));
     }
 }

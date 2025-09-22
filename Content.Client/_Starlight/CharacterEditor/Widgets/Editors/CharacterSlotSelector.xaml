@@ -2,7 +2,7 @@
     xmlns="https://spacestation14.io"
     xmlns:editors="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets.Editors"
     Orientation="Vertical" HorizontalAlignment="Stretch">
-    <ScrollContainer HScrollEnabled="False" HorizontalExpand="True">
+    <ScrollContainer VerticalExpand="True">
         <BoxContainer Name="ListEntries" Access="Protected" Orientation="Vertical"/>
     </ScrollContainer>
 </editors:CharacterSlotSelector>
