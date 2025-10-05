@@ -11,10 +11,9 @@ namespace Content.Client._Starlight.CharacterEditor.Systems;
 public record struct CharacterProfileSelectedUIEvent(int Slot);
 
 //UIEvents
-public record struct ActiveCharacterProfileUpdatedUIEvent(
+public record struct LiveCharacterProfileUpdatedUIEvent(
     int Slot,
-    Entity<CharacterProfileComponent> Profile,
-    Entity<SpriteComponent, HumanoidAppearanceComponent> Preview);
+    Entity<CharacterProfileComponent, HumanoidAppearanceComponent, SpriteComponent> Profile);
 
 public record struct CharacterProfileEnabledUIEvent(int Slot);
 

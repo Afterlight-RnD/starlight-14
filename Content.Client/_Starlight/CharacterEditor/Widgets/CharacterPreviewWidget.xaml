@@ -1,0 +1,34 @@
+﻿<widgets:CharacterPreviewWidget
+    xmlns="https://spacestation14.io"
+    xmlns:widgets="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets"
+    Orientation="Vertical">
+    <Label
+        Name="CharacterName" Access="Protected"
+        Text="Urist McPlaceholder"
+        VerticalExpand="True" HorizontalExpand="True"
+        HorizontalAlignment="Center" VerticalAlignment="Top" />
+    <SpriteView
+        Name="CharacterSpritePreview" Access="Protected"
+        VerticalExpand="True" HorizontalExpand="True"
+        HorizontalAlignment="Center" VerticalAlignment="Center"
+        Scale="8 8" Margin="4" SizeFlagsStretchRatio="1" SetSize="256 384"
+        />
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True"
+                      VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                      Margin="0 5">
+            <TextureButton
+                Name="ViewLeft" Access="Protected"
+                TexturePath="filled_left_arrow.svg.192dpi"
+                ModulateSelfOverride="#DEDEDE"
+                Scale="0.5 0.5"/>
+            <ContainerButton
+                Name="ViewSelector" Access="Protected" Margin = "5 0">
+                <Label Text="Naked"></Label>
+            </ContainerButton>
+            <TextureButton
+                Name="ViewRight" Access="Protected"
+                TexturePath="filled_right_arrow.svg.192dpi"
+                ModulateSelfOverride="#DEDEDE"
+                Scale="0.5 0.5"/>
+        </BoxContainer>
+</widgets:CharacterPreviewWidget>

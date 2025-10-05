@@ -16,8 +16,7 @@ namespace Content.Shared._Starlight.CharacterProfileSystem.Components;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(raiseAfterAutoHandleState:true)]
 public sealed partial class CharacterProfileComponent : Component
 {
-    [DataField(required:true), AutoNetworkedField]
-    public CharacterProfileData Data;
+    [DataField, AutoNetworkedField] public CharacterProfileData Data;
 
     [DataField, AutoNetworkedField] public int Slot = -1;
 

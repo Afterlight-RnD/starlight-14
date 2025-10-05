@@ -3,6 +3,7 @@
 
 using Content.Client._Starlight.CharacterEditor.Controls;
 using Content.Client._Starlight.CharacterProfiles.Systems;
+using Content.Client.Humanoid;
 using Content.Shared._Starlight.CharacterProfileSystem.Components;
 using Content.Shared.Humanoid;
 using Robust.Client.GameObjects;
@@ -15,12 +16,33 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
 {
     [Dependency] private readonly IUserInterfaceManager _uiMan = default!;
     [Dependency] private readonly CharacterProfileSystem _profileSystem = default!;
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
 
-    private (Entity<CharacterProfileComponent> Profile,
-        Entity<SpriteComponent, HumanoidAppearanceComponent> Preview)? _activeProfile = null;
+    private Entity<CharacterProfileComponent, HumanoidAppearanceComponent, SpriteComponent>? _liveProfile = null;
+
+    private int _liveSlot = -1;
+    public int LiveSlot => _liveSlot;
+    public Entity<CharacterProfileComponent, HumanoidAppearanceComponent, SpriteComponent> LiveProfile
+    {
+        get
+        {
+            if (_liveProfile.HasValue) return _liveProfile.Value;
+            var ent = EntityManager.Spawn(null, MapCoordinates.Nullspace);
+            var profileComp = AddComp<CharacterProfileComponent>(ent);
+            var humanoidComp = AddComp<HumanoidAppearanceComponent>(ent);
+            var spriteComp = AddComp<SpriteComponent>(ent);
+            _liveProfile = (ent, profileComp, humanoidComp,spriteComp);
+            return _liveProfile.Value;
+        }
+        set
+        {
+            _liveProfile = value;
+        }
+    }
+
     public override void Initialize()
     {
-        _uiMan.SubscribeGlobalUIEvent<CharacterProfileSelectedUIEvent>(this, OnSlotSelected);
+        _uiMan.SubscribeGlobalUIEvent<CharacterProfileSelectedUIEvent>(this, OnProfileSelected);
         _uiMan.SubscribeUIEvent<ProfileSelectorButton, ControlAddedUIEvent>(this, OnProfileSelectorAdded);
     }
 
@@ -28,49 +50,49 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
     {
         if (_profileSystem.TryGetCharacterInSlot(control.Slot, out var profileEnt, out _))
         {
-            control.UpdateCharacterProfile(profileEnt);
+            control.SetFromProfile(profileEnt);
         }
         else
         {
-            control.UpdateCharacterProfile(null);
+            control.SetFromProfile(null);
         }
     }
 
-    private void OnSlotSelected(CharacterProfileSelectedUIEvent ev)
+    private void OnProfileSelected(CharacterProfileSelectedUIEvent ev)
     {
-        if (!_profileSystem.TryGetCharacterInSlot(ev.Slot,
-                out var newProfile,
-                out var newPreview))
-        {
-            Log.Error($"Tried to activate invalid slot!");
-            return;
-        }
-        if (_activeProfile.HasValue)
-        {
-            if (_activeProfile.Value.Profile.Comp.Slot == ev.Slot)
-            {
-                Log.Warning($"Tried to select profile in slot:{ev.Slot} that was already active!");
-                return;
-            }
-            CopyComp(newProfile, _activeProfile.Value.Profile, newProfile.Comp);
-            CopyComps(newPreview, _activeProfile.Value.Preview, null,
-                newPreview.Comp1, newPreview.Comp2);
-        }
-        else
-        {
-            var newProfileEnt = Spawn(null, MapCoordinates.Nullspace);
-            var profileComp = AddComp<CharacterProfileComponent>(newProfileEnt);
-            var newPreviewEnt = Spawn(null, MapCoordinates.Nullspace);
-            var spriteComp = AddComp<SpriteComponent>(newPreviewEnt);
-            var previewComp = AddComp<HumanoidAppearanceComponent>(newPreviewEnt);
-            _activeProfile =
-                new (
-                    (newProfileEnt, profileComp),(newPreviewEnt, spriteComp, previewComp));
-        }
+        CreateLiveProfile(ev.Slot);
+    }
 
-        CopyComp(newProfile, _activeProfile.Value.Profile, newProfile.Comp);
-        CopyComps(newPreview, _activeProfile.Value.Preview, null,
-            newPreview.Comp1, newPreview.Comp2);
-        _uiMan.RaiseGlobalUIEvent(new ActiveCharacterProfileUpdatedUIEvent(ev.Slot, _activeProfile.Value.Profile, _activeProfile.Value.Preview) );
+
+    public void CreateLiveProfile(int slot)
+    {
+        if (_liveSlot == slot || !_profileSystem.TryGetCharacterInSlot(slot, out var profileEnt,
+                out _))
+            return;
+        var profile = LiveProfile;
+        profile.Comp1.Slot = slot;
+        profile.Comp1.Data = profileEnt.Comp.Data;
+        _humanoidSystem.LoadProfile(profile, profileEnt.Comp.Data.Profile, profile.Comp2);
+        _uiMan.RaiseGlobalUIEvent(new LiveCharacterProfileUpdatedUIEvent(slot, LiveProfile));
+    }
+
+    public bool ApplyLiveProfile()
+    {
+        if (_liveSlot < 0
+            || !_liveProfile.HasValue
+            || !_profileSystem.TryGetCharacterInSlot(_liveSlot, out var profileEnt, out _))
+            return false;
+
+        profileEnt.Comp.Data = _liveProfile.Value.Comp1.Data;
+        _profileSystem.DirtyCharacter((profileEnt, profileEnt.Comp));
+        return true;
+    }
+
+    public void ClearLiveProfile()
+    {
+        _liveSlot = -1;
+        if (!_liveProfile.HasValue)
+            return;
+        EntityManager.DeleteEntity(_liveProfile);
     }
 }
