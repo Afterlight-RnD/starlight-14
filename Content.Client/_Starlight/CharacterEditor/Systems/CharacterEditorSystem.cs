@@ -37,7 +37,7 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
     [Dependency] private readonly CyberneticsSystem _cybernetics = default!;
     [Dependency] private readonly SharedStationSpawningSystem _spawningSystem = default!;
     [Dependency] private readonly InventorySystem _inventorySystem = default!;
-    [Dependency] private readonly PrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private Entity<CharacterProfileComponent, HumanoidAppearanceComponent, SpriteComponent>? _liveProfile = null;
 
