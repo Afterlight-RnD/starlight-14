@@ -1,5 +1,5 @@
 ﻿<controls:SLDropdownPopout
     xmlns="https://spacestation14.io"
     xmlns:controls="clr-namespace:Content.Client._Starlight.UI.Controls">
-    
+<BoxContainer Name="Contents" Access="Public" Orientation="Vertical"/>
 </controls:SLDropdownPopout>

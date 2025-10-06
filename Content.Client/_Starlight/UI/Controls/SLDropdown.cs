@@ -1,4 +1,5 @@
-﻿using Robust.Client.UserInterface;
+﻿using System.Numerics;
+using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.UI.Controls;
@@ -7,12 +8,40 @@ namespace Content.Client._Starlight.UI.Controls;
 public class SLDropdown: ContainerButton
 {
     private SLDropdownPopout? _dropdown = null;
+    public Vector2 DropdownOffset { get; set; } = new(0, 5);
 
     public SLDropdown()
     {
-        ToggleMode = true;
-        OnToggled += HandleToggled;
+        OnPressed += HandlePressed;
+    }
 
+    private void HandlePressed(ButtonEventArgs args)
+    {
+        var dropdown = EnsureDropdown();
+        if (dropdown.Visible)
+            return;
+        dropdown.Open(GetPopupPos(dropdown));
+    }
+
+    private UIBox2 GetPopupPos(SLDropdownPopout dropdown)
+    {
+        var globalLeft = GlobalPosition.X;
+        var globalBot = GlobalPosition.Y + Height;
+        return UIBox2.FromDimensions(
+            new Vector2(globalLeft, globalBot),
+            new Vector2(Width + DropdownOffset.X, DropdownOffset.Y));
+    }
+
+    protected override void EnteredTree()
+    {
+        if (_dropdown == null)
+            return;
+        UserInterfaceManager.ModalRoot.AddChild(_dropdown);
+    }
+
+    protected override void ExitedTree()
+    {
+        _dropdown?.Orphan();
     }
 
     private SLDropdownPopout EnsureDropdown()
@@ -20,26 +49,20 @@ public class SLDropdown: ContainerButton
         if (_dropdown != null)
             return _dropdown;
         _dropdown = new SLDropdownPopout();
-        _dropdown.Visible = false;
         return _dropdown;
     }
 
-    private void HandleToggled(ButtonToggledEventArgs args)
-    {
-        var dropdown = EnsureDropdown();
-        if (args.Pressed)
-        {
-            dropdown.Visible = true;
-            return;
-        }
-        dropdown.Visible = false;
-    }
-
-    public void AddDropdownOption(SLDropdownOption option)
+    public void AddDropdownOption<T>(T option) where T: BaseButton, IDropdownControlOption
     {
         option.Orphan();
         var dropDown = EnsureDropdown();
-        dropDown.AddChild(option);
+        option.OnPressed += HandleOptionPressed;
+        dropDown.Contents.AddChild(option);
+    }
+
+    private void HandleOptionPressed(ButtonEventArgs obj)
+    {
+        _dropdown?.Close();
     }
 
     protected override void ChildAdded(Control newChild)
@@ -47,6 +70,6 @@ public class SLDropdown: ContainerButton
         var dropDown = EnsureDropdown();
         if (newChild is not IDropdownControlOption) return;
         newChild.Orphan();
-        dropDown.AddChild(newChild);
+        dropDown.Contents.AddChild(newChild);
     }
 }

@@ -15,6 +15,8 @@ public record struct LiveCharacterProfileUpdatedUIEvent(
     int Slot,
     Entity<CharacterProfileComponent, HumanoidAppearanceComponent, SpriteComponent> Profile);
 
+public record struct LiveCharacterPreviewModeUpdatedUIEvent(CharacterPreviewMode NewMode);
+
 public record struct CharacterProfileEnabledUIEvent(int Slot);
 
 public record struct CharacterProfileDisabledUIEvent(int Slot);
