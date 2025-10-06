@@ -9,8 +9,7 @@ namespace Content.Shared.Preferences.Loadouts;
 [Serializable, NetSerializable, DataDefinition]
 public sealed partial class Loadout : IEquatable<Loadout>
 {
-    [DataField]
-    public ProtoId<LoadoutPrototype> Prototype;
+    [DataField] public ProtoId<LoadoutPrototype> Prototype;
 
     public bool Equals(Loadout? other)
     {

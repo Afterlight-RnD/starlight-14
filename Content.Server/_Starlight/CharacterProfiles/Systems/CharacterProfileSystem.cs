@@ -1,13 +1,14 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using Content.Server.Humanoid;
 using Content.Server.Preferences.Managers;
+using Content.Server.Preferences.Managers.Systems;
 using Content.Shared._Starlight.CharacterProfileSystem;
 using Content.Shared._Starlight.CharacterProfileSystem.Components;
 using Content.Shared._Starlight.CharacterProfileSystem.Systems;
-using Content.Shared.Humanoid;
+using Content.Shared._Starlight.Preferences.Components;
 using Content.Shared.Preferences;
+using Robust.Server.GameObjects;
 using Robust.Server.GameStates;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
@@ -21,33 +22,14 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
     [Dependency] private readonly IServerPreferencesManager _preferences = default!;
     [Dependency] private readonly IDependencyCollection _dependencies = default!;
 
-    private Dictionary<NetUserId, Dictionary<int,Entity<CharacterProfileComponent>>> _profiles = new();
-
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeNetworkEvent<CharacterProfileDataUpdateRequest>(HandleProfileUpdateRequest);
-        SubscribeLocalEvent<PlayerPreferencesLoadedEvent>(OnPlayerPrefsLoaded);
-        SubscribeLocalEvent<PlayerPreferencesUnloadedEvent>(OnPlayerPrefsUnloaded);
+        SubscribeNetworkEvent<MsgRequestCharacterProfileDataUpdate>(HandleProfileUpdateRequest);
     }
 
-    private void OnPlayerPrefsUnloaded(PlayerPreferencesUnloadedEvent ev)
-    {
-        if (!_profiles.Remove(ev.Session.UserId, out var profiles))
-            return;
-        foreach (var (_, profileEnt) in profiles)
-            EntityManager.DeleteEntity(profileEnt);
-    }
-
-    private void OnPlayerPrefsLoaded(PlayerPreferencesLoadedEvent ev)
-    {
-        if (ev.Preferences == null)
-            return;
-        foreach (var (slot, profile) in ev.Preferences.Characters)
-            LoadProfile(ev.Session,slot, new CharacterProfileData((HumanoidCharacterProfile)profile));
-    }
-
-    public void SetCharacterProfileData(ICommonSession owningSession, int slot, CharacterProfileData? newData)
+    public void SetCharacterProfileData(ICommonSession owningSession, Entity<PlayerPreferencesComponent> playerPrefs,
+        int slot, CharacterProfileData? newData)
     {
         if (MaxProfileSlots >= slot)
         {
@@ -55,13 +37,11 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
             return;
         }
 
-        var profileDict = _profiles[owningSession.UserId];
-
         if (newData == null)
         {
-            if (profileDict.Remove(slot, out var removedProfile))
+            if (playerPrefs.Comp.CharacterProfiles.Remove(slot, out var removedProfile))
                 EntityManager.DeleteEntity(removedProfile);
-            _preferences.DeleteProfile(owningSession.UserId, slot);
+            _preferences.DeleteProfile(owningSession.UserId, slot); //TODO: legacy prefs
             return;
         }
 
@@ -69,23 +49,22 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         RaiseLocalEvent(ref validate);
 
         newData.Profile.EnsureValid(owningSession, _dependencies); //TODO: eventually replace with event-based validation
-        if (!profileDict.TryGetValue(slot, out var profile))
-        {
-            profile = CreateNewProfileEntity(owningSession, slot, newData);
-            profileDict.Add(slot, profile);
-        }
-        else profile.Comp.Data = newData;
+
+        var profile = playerPrefs.Comp.CharacterProfiles.TryGetValue(slot, out var profileEnt)
+            ? (profileEnt, ProfileQuery.Comp(profileEnt))
+            : CreateNewProfileEntity(owningSession, slot, playerPrefs, newData);
 
         Dirty(profile);
-        RaiseNetworkEvent(new ReceiveUpdatedCharacterProfileEvent(slot, GetNetEntity(profile)));
+        RaiseNetworkEvent(new MsgReceiveUpdatedCharacterProfile(slot, GetNetEntity(profile)));
 
         //apply profile changes to the db
         _preferences.SetProfile(owningSession.UserId, slot, profile.Comp.Data.Profile);
     }
 
-    private void HandleProfileUpdateRequest(CharacterProfileDataUpdateRequest msg, EntitySessionEventArgs args)
+    private void HandleProfileUpdateRequest(MsgRequestCharacterProfileDataUpdate msg, EntitySessionEventArgs args)
     {
         var profileEnt = GetEntity(msg.ProfileEnt);
+        var preferencesEnt = GetEntity(msg.PreferencesEnt);
         var profileComp = ProfileQuery.Comp(profileEnt);
         if (args.SenderSession.UserId != profileComp.OwnerNetId)
         {
@@ -93,32 +72,41 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
                         $"{profileComp.OwnerNetId}");
             return;
         }
-        SetCharacterProfileData(args.SenderSession, msg.Slot, msg.Data);
+        SetCharacterProfileData(args.SenderSession, (preferencesEnt, PlayerPrefQuery.Comp(preferencesEnt)),msg.Slot, msg.Data);
     }
 
-    public Entity<CharacterProfileComponent> LoadProfile(ICommonSession session, int slot,
+    public Entity<CharacterProfileComponent> LoadProfile(ICommonSession session,
+        Entity<PlayerPreferencesComponent> playerPrefs,
+        int slot,
         CharacterProfileData profileData)
     {
         var validate = new ValidateCharacterProfileEvent(profileData);
         RaiseLocalEvent(ref validate);
         profileData.Profile.EnsureValid(session, _dependencies); //TODO: eventually replace with event-based validation
-        return CreateNewProfileEntity(session, slot, profileData);
+        return CreateNewProfileEntity(session, slot, playerPrefs, profileData);
     }
 
 
-    public Entity<CharacterProfileComponent> CreateNewProfileEntity(ICommonSession session, int slot,
+    private Entity<CharacterProfileComponent> CreateNewProfileEntity(
+        ICommonSession session, int slot,
+        Entity<PlayerPreferencesComponent> playerPrefs,
         CharacterProfileData newData)
     {
         var newEnt = EntityManager.SpawnEntity(null, MapCoordinates.Nullspace);
         var newComp = new CharacterProfileComponent
         {
             Data = newData,
+            EnabledJobs = [..newData.Profile.JobPreferences],
+            JobLoadouts = new(newData.Profile.Loadouts.Count),
             OwnerNetId = session.UserId,
             Slot = slot
         };
+        foreach (var (key, loadout) in newData.Profile.Loadouts)
+            newComp.JobLoadouts.Add(key, loadout);
         AddComp(newEnt,newComp);
-        _pvsOverride.AddSessionOverride(newEnt, session);
         var profileEnt = new Entity<CharacterProfileComponent>(newEnt, newComp);
+        playerPrefs.Comp.CharacterProfiles.Add(slot, profileEnt);
+        TransformSystem.SetParent(profileEnt, playerPrefs);
         Dirty(profileEnt);
         return profileEnt;
     }

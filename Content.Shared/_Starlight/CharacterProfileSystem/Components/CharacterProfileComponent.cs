@@ -3,8 +3,11 @@
 
 using Content.Shared.Humanoid;
 using Content.Shared.Preferences;
+using Content.Shared.Preferences.Loadouts;
+using Content.Shared.Roles;
 using Robust.Shared.GameStates;
 using Robust.Shared.Network;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Starlight.CharacterProfileSystem.Components;
@@ -21,10 +24,15 @@ public sealed partial class CharacterProfileComponent : Component
     [DataField, AutoNetworkedField] public int Slot = -1;
 
     [DataField(serverOnly:true)] public NetUserId? OwnerNetId = null;
+
+    [DataField, AutoNetworkedField] public Dictionary<ProtoId<AntagPrototype>, RoleLoadout> AntagLoadouts = new();
+    [DataField, AutoNetworkedField] public HashSet<ProtoId<AntagPrototype>> EnabledAntags = new();
+
+    [DataField, AutoNetworkedField] public Dictionary<ProtoId<JobPrototype>, RoleLoadout> JobLoadouts = new();
+    [DataField, AutoNetworkedField] public HashSet<ProtoId<JobPrototype>> EnabledJobs = new();
+
+    [DataField, AutoNetworkedField] public ProtoId<JobPrototype> PreviewJob;
 }
 
-[Serializable, NetSerializable]
-public sealed partial class CharacterProfileData(HumanoidCharacterProfile profile)
-{
-    [DataField(required:true)] public HumanoidCharacterProfile Profile = profile;
-}
+[DataRecord, Serializable, NetSerializable]
+public sealed partial record CharacterProfileData(HumanoidCharacterProfile Profile);

@@ -10,13 +10,18 @@ public sealed partial class ServerPreferencesManager
 {
     [Dependency] private readonly IEntityManager _entMan = default!;
 
+    private void SLStartLoad(ICommonSession session)
+    {
+        _entMan.EventBus.RaiseEvent(EventSource.Local, new LegacyPlayerPreferencesLoadStartedEvent(session));
+    }
+
     private void SLFinishLoad(ICommonSession session, PlayerPreferences? preferences)
     {
-        _entMan.EventBus.RaiseEvent(EventSource.Local,new PlayerPreferencesLoadedEvent(session, preferences));
+        _entMan.EventBus.RaiseEvent(EventSource.Local,new LegacyPlayerPreferencesLoadedEvent(session, preferences));
     }
 
     private void SLUnload(ICommonSession session)
     {
-        _entMan.EventBus.RaiseEvent(EventSource.Local,new PlayerPreferencesUnloadedEvent(session));
+        _entMan.EventBus.RaiseEvent(EventSource.Local,new LegacyPlayerPreferencesUnloadedEvent(session));
     }
 }

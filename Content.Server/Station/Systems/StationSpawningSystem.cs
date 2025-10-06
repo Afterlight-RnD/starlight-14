@@ -21,6 +21,7 @@ using Content.Shared.PDA;
 using Content.Shared.Preferences;
 using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Roles;
+using Content.Shared.Starlight.CCVar;
 using Content.Shared.Starlight.TextToSpeech;
 using Content.Shared.Station;
 using JetBrains.Annotations;
@@ -58,7 +59,7 @@ public sealed class StationSpawningSystem : SharedStationSpawningSystem
     #region Starlight
     [Dependency] private readonly GameTicker _gameTicker = default!;
     private static readonly ProtoId<SpeciesPrototype> FallbackSpecies = "Human";
-    private static readonly ProtoId<JobPrototype> FallbackJob = "Assistant";
+    private ProtoId<JobPrototype> FallbackJob;
     private static readonly Gauge _speciesJobsSpawns = Metrics.CreateGauge(
         "sl_species_jobs_spawns",
         "Contains info on species and jobs spawned at and during the round.",
@@ -71,6 +72,12 @@ public sealed class StationSpawningSystem : SharedStationSpawningSystem
     {
         base.Initialize();
         _allCybernetics = CyberneticImplant.GetAllCybernetics(_prototypeManager);
+        _configurationManager.OnValueChanged(StarlightCCVars.FallbackJob, OnFallbackJobChanged, true); //starlight edit
+    }
+
+    private void OnFallbackJobChanged(string newFallbackJob)
+    {
+        FallbackJob = newFallbackJob;
     }
 
     /// <summary>

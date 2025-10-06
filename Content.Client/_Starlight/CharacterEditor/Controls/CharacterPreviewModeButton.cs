@@ -9,5 +9,5 @@ namespace Content.Client._Starlight.CharacterEditor.Controls;
 
 public sealed class CharacterPreviewModeButton : SLButton, IDropdownControlOption
 {
-    public CharacterPreviewMode PreviewMode { get; set; } = CharacterPreviewMode.Job;
+    public CharacterPreviewMode PreviewMode { get; set; } = default;
 }

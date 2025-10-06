@@ -5,7 +5,8 @@ using Content.Shared._Starlight.CharacterProfileSystem.Components;
 
 namespace Content.Client._Starlight.CharacterProfiles;
 
-public record struct CharacterProfileUpdatedUIEvent(Entity<CharacterProfileComponent> CharacterProfile)
+public record struct CharacterProfileUpdatedUIEvent(
+    Entity<CharacterProfileComponent> CharacterProfile)
 {
     public int Slot => CharacterProfile.Comp.Slot;
 };

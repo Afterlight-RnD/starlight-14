@@ -6,6 +6,7 @@ using Content.Client.Lobby;
 using Content.Shared._Starlight.CharacterProfileSystem;
 using Content.Shared._Starlight.CharacterProfileSystem.Components;
 using Content.Shared._Starlight.CharacterProfileSystem.Systems;
+using Content.Shared.Clothing;
 using Content.Shared.Humanoid;
 using Content.Shared.Preferences;
 using Robust.Client.GameObjects;
@@ -24,11 +25,11 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
     [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
     [Dependency] private readonly IClientPreferencesManager _preferences = default!;
     [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
-    [Dependency] private readonly IPrototypeManager _protoMan = default!;
     [Dependency] private readonly CyberneticsSystem _cyberSystem = default!;
+    [Dependency] private readonly LoadoutSystem _loadoutSystem = default!;
 
-    private Dictionary<int, (Entity<CharacterProfileComponent> Profile,
-        Entity<SpriteComponent, HumanoidAppearanceComponent> Preview)> _slotToEntLookup = new();
+    private Dictionary<int, Entity<CharacterProfileComponent>> _slotToProfile = new();
+    private Dictionary<int, Entity<SpriteComponent, HumanoidAppearanceComponent>> _slotToPreview = new();
 
     public bool SlotsFull
     {
@@ -46,46 +47,52 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
         SubscribeLocalEvent<CharacterProfileComponent, AfterAutoHandleStateEvent>(OnReceivedUpdatedCharacter);
     }
 
+    private void OnReceivedUpdatedCharacter(Entity<CharacterProfileComponent> ent, ref AfterAutoHandleStateEvent ev)
+    {
+        _slotToProfile[ent.Comp.Slot] = ent;
+        EnsurePreviewEntity(ent);
+        _uiManager.RaiseGlobalUIEvent( new CharacterProfileUpdatedUIEvent(ent));
+    }
+
     public bool TryGetCharacterInSlot(int slot,
         out Entity<CharacterProfileComponent> profileEnt,
         out Entity<SpriteComponent, HumanoidAppearanceComponent> previewEnt)
     {
 
-        if (!_slotToEntLookup.TryGetValue(slot, out var data))
+        if (!_slotToProfile.TryGetValue(slot, out var profile))
         {
             profileEnt = default;
             previewEnt = default;
             return false;
         }
-        profileEnt = data.Profile;
-        previewEnt = data.Preview;
+        profileEnt = profile;
+        previewEnt = _slotToPreview[slot];
         return true;
     }
 
-    private void OnReceivedUpdatedCharacter(Entity<CharacterProfileComponent> ent, ref AfterAutoHandleStateEvent args)
+    private void EnsurePreviewEntity(Entity<CharacterProfileComponent> ent)
     {
         Entity<SpriteComponent, HumanoidAppearanceComponent> previewSprite;
-        if (!_slotToEntLookup.TryGetValue(ent.Comp.Slot, out var existing))
+        if (!_slotToPreview.TryGetValue(ent.Comp.Slot, out var existing))
         {
             var newEnt = EntityManager.SpawnEntity(null, MapCoordinates.Nullspace);
             var spriteComp =  AddComp<SpriteComponent>(newEnt);
             var humanoidAppearance =  AddComp<HumanoidAppearanceComponent>(newEnt);
             previewSprite = (newEnt, spriteComp, humanoidAppearance);
-            _slotToEntLookup[ent.Comp.Slot] = (ent, previewSprite);
+            _loadoutSystem.ApplyJobClothes(previewSprite, ent);
+            _slotToPreview[ent.Comp.Slot] = previewSprite;
         }
         else
         {
-            previewSprite = existing.Preview;
+            previewSprite = existing;
         }
         UpdatePreviewEntity(previewSprite, ent);
-        _uiManager.RaiseGlobalUIEvent( new CharacterProfileUpdatedUIEvent(ent));
     }
 
-    public void DirtyCharacter(Entity<CharacterProfileComponent?> ent)
+    public void DirtyCharacter(Entity<CharacterProfileComponent> ent)
     {
-        if (!ProfileQuery.Resolve(ref ent))
-            throw new ArgumentException($"{ToPrettyString(ent)} must have a CharacterProfileComponent!");
-        _uiManager.RaiseGlobalUIEvent(new CharacterProfileUpdatedUIEvent{CharacterProfile = new(ent.Owner, ent.Comp!)});
+        _uiManager.RaiseGlobalUIEvent(new CharacterProfileUpdatedUIEvent{CharacterProfile = new
+            (ent.Owner, ent.Comp!)});
     }
 
     public void CreateNewCharacter()
@@ -95,7 +102,10 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
 
     public void SaveCharacterChanges(Entity<CharacterProfileComponent> target)
     {
-        RaiseNetworkEvent(new CharacterProfileDataUpdateRequest(GetNetEntity(target), target.Comp.Data, target.Comp.Slot));
+        RaiseNetworkEvent(new MsgRequestCharacterProfileDataUpdate(
+            GetNetEntity(target),
+            GetOwningPlayerPrefsNet(target),
+            target.Comp.Data, target.Comp.Slot));
     }
 
     private void UpdatePreviewEntity(Entity<SpriteComponent, HumanoidAppearanceComponent> previewEntity, Entity<CharacterProfileComponent> profileEntity)
