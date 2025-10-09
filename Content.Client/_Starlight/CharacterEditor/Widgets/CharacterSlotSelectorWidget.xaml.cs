@@ -11,10 +11,10 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Configuration;
 
-namespace Content.Client._Starlight.CharacterEditor.Widgets.Editors;
+namespace Content.Client._Starlight.CharacterEditor.Widgets;
 
 [GenerateTypedNameReferences]
-public sealed partial class CharacterSlotSelector : EditorModeWidget
+public sealed partial class CharacterSlotSelectorWidget : UIWidget
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
@@ -22,7 +22,7 @@ public sealed partial class CharacterSlotSelector : EditorModeWidget
     private ProfileSelectorButton? _selectedButton = null;
     private int SlotCount => ListEntries.ChildCount;
 
-    public CharacterSlotSelector()
+    public CharacterSlotSelectorWidget()
     {
         RobustXamlLoader.Load(this);
         Orientation = LayoutOrientation.Vertical;
@@ -47,6 +47,9 @@ public sealed partial class CharacterSlotSelector : EditorModeWidget
             ListEntries.AddChild(newSelector);
             newSelector.OnPressed += OnSlotSelected;
         }
+
+        if (_selectedButton == null && SlotCount > 0)
+            SelectSlot(0);
     }
 
     private void OnSlotSelected(BaseButton.ButtonEventArgs args)
@@ -58,11 +61,10 @@ public sealed partial class CharacterSlotSelector : EditorModeWidget
     public void SelectSlot(int slot)
     {
         if (_selectedSlot == slot
-            || SlotCount >= slot
-            || GetChild(slot) is not ProfileSelectorButton button)
+            || SlotCount <= slot
+            || ListEntries.GetChild(slot) is not ProfileSelectorButton button)
             return;
         SelectSlot(button);
-
     }
 
     private void SelectSlot(ProfileSelectorButton slotButton)
@@ -73,7 +75,9 @@ public sealed partial class CharacterSlotSelector : EditorModeWidget
         {
             _selectedButton.Pressed = false;
             _selectedButton.Disabled = false;
+            _selectedButton.ToggleAllowDelete(true);
         }
+        slotButton.ToggleAllowDelete(false);
         _selectedButton = slotButton;
         _selectedButton.Pressed = true;
         _selectedButton.Disabled = true;
@@ -93,13 +97,8 @@ public sealed partial class CharacterSlotSelector : EditorModeWidget
             Log.Warning("Tried to update CharacterProfile whose slot was out of range");
             return;
         }
-        UpdateCharacterProfile(ev.Slot, ev.CharacterProfile);
-    }
-
-    public void UpdateCharacterProfile(int slot, Entity<CharacterProfileComponent>? profile)
-    {
-        if (GetChild(slot) is not ProfileSelectorButton button)
+        if (GetChild(ev.Slot) is not ProfileSelectorButton button)
             return;
-        button.SetFromProfile(profile);
+        button.SetFromProfile(ev.CharacterProfile, ev.PreviewJob);
     }
 }

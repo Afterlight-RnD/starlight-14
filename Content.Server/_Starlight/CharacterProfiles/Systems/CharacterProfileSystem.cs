@@ -2,16 +2,12 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Server.Preferences.Managers;
-using Content.Server.Preferences.Managers.Systems;
 using Content.Shared._Starlight.CharacterProfileSystem;
 using Content.Shared._Starlight.CharacterProfileSystem.Components;
 using Content.Shared._Starlight.CharacterProfileSystem.Systems;
 using Content.Shared._Starlight.Preferences.Components;
-using Content.Shared.Preferences;
-using Robust.Server.GameObjects;
 using Robust.Server.GameStates;
 using Robust.Shared.Map;
-using Robust.Shared.Network;
 using Robust.Shared.Player;
 
 namespace Content.Server._Starlight.CharacterProfiles.Systems;
@@ -99,6 +95,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
             EnabledJobs = [..newData.Profile.JobPreferences],
             JobLoadouts = new(newData.Profile.Loadouts.Count),
             OwnerNetId = session.UserId,
+            PreviewJob = FallbackJob,
             Slot = slot
         };
         foreach (var (key, loadout) in newData.Profile.Loadouts)

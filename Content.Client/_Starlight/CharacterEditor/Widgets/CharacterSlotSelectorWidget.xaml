@@ -1,8 +1,8 @@
-﻿<editors:CharacterSlotSelector
+﻿<widgets:CharacterSlotSelectorWidget
     xmlns="https://spacestation14.io"
-    xmlns:editors="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets.Editors"
+    xmlns:widgets="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets"
     Orientation="Vertical" HorizontalAlignment="Stretch">
     <ScrollContainer VerticalExpand="True">
         <BoxContainer Name="ListEntries" Access="Protected" Orientation="Vertical"/>
     </ScrollContainer>
-</editors:CharacterSlotSelector>
+</widgets:CharacterSlotSelectorWidget>

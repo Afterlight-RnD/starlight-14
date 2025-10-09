@@ -32,7 +32,7 @@
             <BoxContainer Name="ButtonBox" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Right" VerticalExpand="True"
                           SeparationOverride="4" SetWidth="80" Margin="8 0 0 0">
                 <!-- Enabled button -->
-                <PanelContainer Name="EnabledCheckOutline">
+                <PanelContainer Name="EnabledCheckOutline" Access="Protected">
                     <PanelContainer.PanelOverride>
                         <gfx:StyleBoxTexture />
                     </PanelContainer.PanelOverride>
@@ -40,9 +40,8 @@
                             ToggleMode="True" HorizontalAlignment="Stretch"
                             Text="{Loc 'character-setup-gui-character-picker-button-enabled-button'}"/>
                 </PanelContainer>
-
                 <!-- Delete button -->
-                <PanelContainer Name="DeleteButtonOutline" Visible="False">
+                <PanelContainer Name="DeleteButtonOutline" Access="Protected">
                     <PanelContainer.PanelOverride>
                         <gfx:StyleBoxTexture/>
                     </PanelContainer.PanelOverride>

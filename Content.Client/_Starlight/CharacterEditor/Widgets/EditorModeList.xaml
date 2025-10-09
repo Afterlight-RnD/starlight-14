@@ -6,9 +6,6 @@
     xmlns:editors="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets.Editors"
     Orientation="Vertical">
     <controls:EditorModeButton
-        ModeName="{Loc 'character-editor-select-slot-button'}"
-        PopoutPanelType="{x:Type 'editors:CharacterSlotSelector'}"/>
-    <controls:EditorModeButton
         ModeName="{Loc 'character-editor-select-species-button'}"
         EditingPanelType="{x:Type 'editors:SpeciesEditor'}"/>
 </widgets:EditorModeList>

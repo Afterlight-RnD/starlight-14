@@ -8,10 +8,6 @@ using Content.Client._Starlight.Medical.Cybernetics.Systems;
 using Content.Client.Humanoid;
 using Content.Shared._Starlight.CharacterProfileSystem.Components;
 using Content.Shared.Humanoid;
-using Content.Shared.Inventory;
-using Content.Shared.Preferences;
-using Content.Shared.Roles;
-using Content.Shared.Station;
 using Robust.Client.GameObjects;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.UIEvents;
@@ -32,9 +28,11 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
     [Dependency] private readonly CharacterProfileSystem _profileSystem = default!;
     [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
     [Dependency] private readonly CyberneticsSystem _cybernetics = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
 
     private Entity<CharacterProfileComponent, HumanoidAppearanceComponent, SpriteComponent>? _liveProfile = null;
+    private bool _liveProfileDirty = false;
 
     private int _liveSlot = -1;
     public int LiveSlot => _liveSlot;
@@ -68,12 +66,27 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
     {
         if (_profileSystem.TryGetCharacterInSlot(control.Slot, out var profileEnt, out _))
         {
-            control.SetFromProfile(profileEnt);
+            control.SetFromProfile(profileEnt, _protoManager.Index(profileEnt.Comp.PreviewJob));
         }
         else
         {
-            control.SetFromProfile(null);
+            control.SetFromProfile(null, null);
         }
+    }
+
+    public void MarkLiveProfileAsDirty()
+    {
+        if (_liveProfileDirty)
+            return;
+        _liveProfileDirty = true;
+        _uiMan.RaiseGlobalUIEvent(new CharacterProfileDirtiedUIEvent(LiveProfile));
+    }
+
+    public void SaveLiveCharacterChanges()
+    {
+        if (!_liveProfileDirty)
+            return;
+        _profileSystem.SaveCharacterChanges(LiveProfile);
     }
 
     private void OnProfileSelected(CharacterProfileSelectedUIEvent ev)

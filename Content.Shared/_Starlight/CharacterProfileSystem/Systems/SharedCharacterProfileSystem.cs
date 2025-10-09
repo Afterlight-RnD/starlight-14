@@ -25,7 +25,7 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
 
     protected int MaxProfileSlots = -1;
 
-    private ProtoId<JobPrototype> _fallbackJob;
+    protected ProtoId<JobPrototype> FallbackJob;
 
     public override void Initialize()
     {
@@ -47,7 +47,7 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
 
     private void OnFallbackJobChanged(string job)
     {
-        _fallbackJob = new ProtoId<JobPrototype>(job);
+        FallbackJob = new ProtoId<JobPrototype>(job);
     }
 
     // private void UpdatePreviewJob(ref JobPrioritiesUpdatedEvent ev)

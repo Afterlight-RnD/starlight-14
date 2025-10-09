@@ -72,26 +72,6 @@ public sealed partial class EditorModeButton : ContainerButton
             _detailsPanelType = value;
         }
     }
-
-    private Type? _popoutPanelType = null;
-
-    public Type? PopoutPanelType
-    {
-        get => _popoutPanelType;
-        set
-        {
-            if (value == null)
-            {
-                _popoutPanelType = value;
-                return;
-            }
-            if (value.IsAbstract || !value.IsAssignableTo(typeof(EditorModeWidget)))
-                throw new ArgumentException(
-                    $"CharacterEditorMode Type:{value} must be child of" +
-                    $" {typeof(EditorModeWidget)} and non-abstract");
-            _popoutPanelType = value;
-        }
-    }
     public EditorModeButton()
     {
         RobustXamlLoader.Load(this);

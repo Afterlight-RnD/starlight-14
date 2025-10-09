@@ -1,0 +1,11 @@
+﻿<controls:CharacterMenuWidget
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets" Orientation="Vertical">
+    <BoxContainer Orientation="Horizontal" HorizontalExpand="True" HorizontalAlignment="Center">
+        <Button Name="SelectCharacter" Access="Public" Text="{Loc 'character-editor-open-character-list-button'}"/>
+        <Button Name="CreateCharacter" Access="Protected" Text="{Loc 'character-editor-create-character-button'}"/>
+        <Button Name="SaveChanges" Access="Protected"
+                Disabled="True"
+                Text="{Loc 'character-editor-save-character-button'}"/>
+    </BoxContainer>
+</controls:CharacterMenuWidget>

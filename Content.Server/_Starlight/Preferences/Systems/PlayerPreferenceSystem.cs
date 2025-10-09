@@ -81,7 +81,6 @@ public sealed class PlayerPreferenceSystem : SharedPlayerPreferenceSystem
         if (preferences != null)
             ConvertLegacyPrefs(playerSession, prefs, preferences);
         prefs.Comp.Loaded = true;
-
         Dirty(prefs);
         RaiseLocalEvent(new PlayerPreferencesLoadedEvent(playerSession, prefs));
     }
@@ -106,16 +105,16 @@ public sealed class PlayerPreferenceSystem : SharedPlayerPreferenceSystem
         {
             switch (priority)
             {
-                case JobPriority.Low:
-                    prefs.Comp.JobPreferences.Low ??= new();
-                    prefs.Comp.JobPreferences.Low.Add(jobId);
+                case JobPriority.High:
+                    prefs.Comp.JobPreferences.High = jobId;
                     break;
                 case JobPriority.Medium:
                     prefs.Comp.JobPreferences.Medium ??= new();
                     prefs.Comp.JobPreferences.Medium.Add(jobId);
                     break;
-                case JobPriority.High:
-                    prefs.Comp.JobPreferences.High = jobId;
+                case JobPriority.Low:
+                    prefs.Comp.JobPreferences.Low ??= new();
+                    prefs.Comp.JobPreferences.Low.Add(jobId);
                     break;
                 case JobPriority.Never:
                     {

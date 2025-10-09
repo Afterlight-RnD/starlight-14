@@ -38,8 +38,8 @@
                         <widgets:RoundTimerWidget HorizontalAlignment="Center" HorizontalExpand="True" />
                     </controls:StripeBack>
                     <!-- Horizontal rule -->
+                    <widgets1:CharacterMenuWidget Name="CharacterSelectorButtons" Access="Protected"/>
                     <controls:HLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
-                    <!-- <widgets2:CharacterEditorProfileList/> -->
                     <widgets1:EditorModeList Name="EditorModeSelector" Access="Protected" />
                 </BoxContainer> <!-- End "Left side of the window" -->
                 <slcontrols:VLine Thickness="2" Color="{x:Static style:StyleNano.NanoGold}" />
@@ -103,6 +103,7 @@
                         <PanelContainer.PanelOverride>
                             <graphics:StyleBoxFlat BackgroundColor="#1B1B1E"/>
                         </PanelContainer.PanelOverride>
+                        <widgets1:CharacterSlotSelectorWidget/>
                     </PanelContainer>
                 </Control>
             </BoxContainer>

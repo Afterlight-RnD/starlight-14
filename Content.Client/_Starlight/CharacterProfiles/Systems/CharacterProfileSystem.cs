@@ -27,6 +27,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
     [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
     [Dependency] private readonly CyberneticsSystem _cyberSystem = default!;
     [Dependency] private readonly LoadoutSystem _loadoutSystem = default!;
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
     private Dictionary<int, Entity<CharacterProfileComponent>> _slotToProfile = new();
     private Dictionary<int, Entity<SpriteComponent, HumanoidAppearanceComponent>> _slotToPreview = new();
@@ -51,7 +52,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
     {
         _slotToProfile[ent.Comp.Slot] = ent;
         EnsurePreviewEntity(ent);
-        _uiManager.RaiseGlobalUIEvent( new CharacterProfileUpdatedUIEvent(ent));
+        _uiManager.RaiseGlobalUIEvent( new CharacterProfileUpdatedUIEvent(ent, _protoManager.Index(ent.Comp.PreviewJob)));
     }
 
     public bool TryGetCharacterInSlot(int slot,
@@ -75,11 +76,11 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
         Entity<SpriteComponent, HumanoidAppearanceComponent> previewSprite;
         if (!_slotToPreview.TryGetValue(ent.Comp.Slot, out var existing))
         {
-            var newEnt = EntityManager.SpawnEntity(null, MapCoordinates.Nullspace);
-            var spriteComp =  AddComp<SpriteComponent>(newEnt);
-            var humanoidAppearance =  AddComp<HumanoidAppearanceComponent>(newEnt);
+            var newEnt = EntityManager.SpawnEntity(_protoManager.Index(ent.Comp.Data.Profile.Species).DollPrototype,
+                MapCoordinates.Nullspace);
+            var spriteComp =  Comp<SpriteComponent>(newEnt);
+            var humanoidAppearance =  Comp<HumanoidAppearanceComponent>(newEnt);
             previewSprite = (newEnt, spriteComp, humanoidAppearance);
-            _loadoutSystem.ApplyJobClothes(previewSprite, ent);
             _slotToPreview[ent.Comp.Slot] = previewSprite;
         }
         else
@@ -91,12 +92,17 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
 
     public void DirtyCharacter(Entity<CharacterProfileComponent> ent)
     {
-        _uiManager.RaiseGlobalUIEvent(new CharacterProfileUpdatedUIEvent{CharacterProfile = new
-            (ent.Owner, ent.Comp!)});
+        _uiManager.RaiseGlobalUIEvent(new CharacterProfileUpdatedUIEvent
+        {
+            CharacterProfile = new
+            (ent.Owner, ent.Comp!),
+            PreviewJob = _protoManager.Index(ent.Comp.PreviewJob)
+        });
     }
 
     public void CreateNewCharacter()
     {
+        //Legacy profile stuff
         _preferences.CreateCharacter(HumanoidCharacterProfile.Random());
     }
 
@@ -112,5 +118,6 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
     {
         _humanoidSystem.LoadProfile(previewEntity, profileEntity.Comp.Data.Profile, previewEntity.Comp2);
         _cyberSystem.ApplyCyberneticVisuals((previewEntity, previewEntity.Comp2), profileEntity.Comp.Data.Profile);
+        _loadoutSystem.ApplyJobClothes(previewEntity, profileEntity);
     }
 }
