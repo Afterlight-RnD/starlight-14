@@ -22,8 +22,8 @@ public sealed class SpeciesEditorSystem : UISystem
     private SpeciesSelectorButton? _selectedButton = null;
     public override void Initialize()
     {
-        SubscribeUIEvent<GroupedSpeciesList, ControlAddedUIEvent>(OnSpeciesGroupUIAdded);
-        SubscribeUIEvent<GroupedSpeciesList, ControlRemovedUIEvent>(OnSpeciesGroupUIRemoved);
+        SubscribeUIEvent<SpeciesGroupList, ControlAddedUIEvent>(OnSpeciesGroupUIAdded);
+        SubscribeUIEvent<SpeciesGroupList, ControlOrphanedUIEvent>(OnSpeciesGroupUIRemoved);
         SubscribeUIEvent<SpeciesSelectorButton, SpeciesSelectorButton.SelectedUIEvent>(OnButtonSelect);
     }
 
@@ -34,18 +34,18 @@ public sealed class SpeciesEditorSystem : UISystem
         //TODO apply species change to live profile
     }
 
-    private void OnSpeciesGroupUIAdded(GroupedSpeciesList speciesList, ControlAddedUIEvent ev)
+    private void OnSpeciesGroupUIAdded(SpeciesGroupList speciesGroupList, ControlAddedUIEvent ev)
     {
         foreach (var species in _prototypeManager.EnumeratePrototypes<SpeciesPrototype>())
         {
             if (!species.RoundStart)
                 continue;
-            speciesList.AddSpecies(species, _spriteSystem.Frame0(species.SpeciesIcon), Loc.GetString(species.Name));
+            speciesGroupList.AddSpecies(species, _spriteSystem.Frame0(species.SpeciesIcon), Loc.GetString(species.Name));
         }
     }
 
-    private void OnSpeciesGroupUIRemoved(GroupedSpeciesList speciesList, ControlRemovedUIEvent ev)
+    private void OnSpeciesGroupUIRemoved(SpeciesGroupList speciesGroupList, ControlOrphanedUIEvent ev)
     {
-        speciesList.ClearSpecies();
+        speciesGroupList.ClearSpecies();
     }
 }

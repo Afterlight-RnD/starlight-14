@@ -3,5 +3,5 @@
     xmlns:species="clr-namespace:Content.Client._Starlight.CharacterEditor.Editors.Species"
     xmlns:controls="clr-namespace:Content.Client._Starlight.CharacterEditor.Editors.Species.Controls" Orientation="Vertical">
     <Label Text="Species"  HorizontalExpand="True" HorizontalAlignment="Center"/>
-    <controls:GroupedSpeciesList GroupName="Biological" Columns="6" HorizontalAlignment="Center"/>
+    <controls:SpeciesGroupList GroupName="Biological" Columns="6" HorizontalAlignment="Center"/>
 </species:SpeciesSelector>

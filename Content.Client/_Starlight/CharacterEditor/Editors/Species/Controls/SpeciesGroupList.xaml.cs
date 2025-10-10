@@ -11,13 +11,13 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._Starlight.CharacterEditor.Editors.Species.Controls;
 
 [GenerateTypedNameReferences]
-public sealed partial class GroupedSpeciesList : BoxContainer
+public sealed partial class SpeciesGroupList : BoxContainer
 {
     public string? GroupName { get => SpeciesGroupLabel.Text; set => SpeciesGroupLabel.Text = value; }
     public int Columns { get => SpeciesGrid.Columns; set => SpeciesGrid.Columns = value; }
 
     private Dictionary<ProtoId<SpeciesPrototype>, SpeciesSelectorButton> _speciesSelectors = new();
-    public GroupedSpeciesList()
+    public SpeciesGroupList()
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);

@@ -16,17 +16,17 @@ public sealed class CharacterSlotViewSystem : EntitySystem, IUIEventSubscriber
     public override void Initialize()
     {
         _uiManager.SubscribeUIEvent<CharacterSlotView, CharacterSlotView.SlotChangedEvent>(this, OnSlotChanged);
-        _uiManager.SubscribeUIEvent<CharacterSlotView, ControlAddedUIEvent>(this, OnPreviewAdded);
-        _uiManager.SubscribeUIEvent<CharacterSlotView, ControlRemovedUIEvent>(this, OnPreviewRemoved);
+        _uiManager.SubscribeUIEvent<CharacterSlotView, ControlEnteredTreeUIEvent>(this, OnPreviewAdded);
+        _uiManager.SubscribeUIEvent<CharacterSlotView, ControlExitedTreeUIEvent>(this, OnPreviewRemoved);
     }
 
-    private void OnPreviewRemoved(CharacterSlotView viewControl, ControlRemovedUIEvent ev)
+    private void OnPreviewRemoved(CharacterSlotView viewControl, ControlExitedTreeUIEvent ev)
     {
         viewControl.LinkedProfileSlot = null;
         viewControl.SetEntity(null);
     }
 
-    private void OnPreviewAdded(CharacterSlotView viewControl, ControlAddedUIEvent ev)
+    private void OnPreviewAdded(CharacterSlotView viewControl, ControlEnteredTreeUIEvent ev)
     {
         UpdateLinkedEntity(viewControl, viewControl.Slot);
     }

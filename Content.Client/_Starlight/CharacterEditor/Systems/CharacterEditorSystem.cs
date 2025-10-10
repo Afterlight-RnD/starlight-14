@@ -59,10 +59,10 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
     public override void Initialize()
     {
         _uiMan.SubscribeUIEvent<CharacterProfileSelectedUIEvent>(this, OnProfileSelected);
-        _uiMan.SubscribeUIEvent<ProfileSelectorButton, ControlAddedUIEvent>(this, OnProfileSelectorAdded);
+        _uiMan.SubscribeUIEvent<ProfileSelectorButton, ControlEnteredTreeUIEvent>(this, OnProfileSelectorAdded);
     }
 
-    private void OnProfileSelectorAdded(ProfileSelectorButton control, ControlAddedUIEvent ev)
+    private void OnProfileSelectorAdded(ProfileSelectorButton control, ControlEnteredTreeUIEvent ev)
     {
         if (_profileSystem.TryGetCharacterInSlot(control.Slot, out var profileEnt, out _))
         {
