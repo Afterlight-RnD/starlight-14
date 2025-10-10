@@ -22,10 +22,8 @@
                 TexturePath="filled_left_arrow.svg.192dpi"
                 ModulateSelfOverride="#DEDEDE"
                 Scale="0.5 0.5"/>
-            <controls:SLDropdown
-                Name="ViewSelector" Access="Protected" Margin = "5 0">
-                <Label Name="SelectedView" Access="Protected" />
-            </controls:SLDropdown>
+            <widgets:CharacterPreviewModeValueDropdown Margin = "5 0">
+            </widgets:CharacterPreviewModeValueDropdown>
             <TextureButton
                 Name="ViewRight" Access="Protected"
                 TexturePath="filled_right_arrow.svg.192dpi"

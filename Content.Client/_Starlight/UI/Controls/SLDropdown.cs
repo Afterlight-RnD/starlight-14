@@ -4,6 +4,12 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.UI.Controls;
 
+
+public interface IDropdownControlOption
+{
+}
+
+
 [Virtual]
 public class SLDropdown: ContainerButton
 {
@@ -32,6 +38,7 @@ public class SLDropdown: ContainerButton
             new Vector2(Width + DropdownOffset.X, DropdownOffset.Y));
     }
 
+    [MustCallBase(true)]
     protected override void EnteredTree()
     {
         if (_dropdown == null)
@@ -39,6 +46,7 @@ public class SLDropdown: ContainerButton
         UserInterfaceManager.ModalRoot.AddChild(_dropdown);
     }
 
+    [MustCallBase(true)]
     protected override void ExitedTree()
     {
         _dropdown?.Orphan();
@@ -49,8 +57,11 @@ public class SLDropdown: ContainerButton
         if (_dropdown != null)
             return _dropdown;
         _dropdown = new SLDropdownPopout();
+        DropdownCreated(_dropdown);
         return _dropdown;
     }
+
+    protected virtual void DropdownCreated(SLDropdownPopout popout) {}
 
     public void AddDropdownOption<T>(T option) where T: BaseButton, IDropdownControlOption
     {
@@ -72,4 +83,10 @@ public class SLDropdown: ContainerButton
         newChild.Orphan();
         dropDown.Contents.AddChild(newChild);
     }
+}
+
+[Virtual]
+public class SLDropdownOption : ContainerButton, IDropdownControlOption
+{
+
 }
