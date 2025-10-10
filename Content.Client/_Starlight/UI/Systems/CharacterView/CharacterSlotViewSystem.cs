@@ -22,7 +22,7 @@ public sealed class CharacterSlotViewSystem : EntitySystem, IUIEventSubscriber
 
     private void OnPreviewRemoved(CharacterSlotView viewControl, ControlExitedTreeUIEvent ev)
     {
-        viewControl.LinkedProfileSlot = null;
+        viewControl.LinkedProfile = null;
         viewControl.SetEntity(null);
     }
 
@@ -41,13 +41,13 @@ public sealed class CharacterSlotViewSystem : EntitySystem, IUIEventSubscriber
 
         if (_characterProfileSystem.TryGetCharacterInSlot(slot, out var profile, out var preview))
         {
-            viewControl.LinkedProfileSlot = profile;
+            viewControl.LinkedProfile = profile;
             viewControl.SetEntity(preview);
             viewControl.LinkedPreview = preview;
         }
         else
         {
-            viewControl.LinkedProfileSlot = null;
+            viewControl.LinkedProfile = null;
             viewControl.SetEntity(null);
             viewControl.LinkedPreview = null;
         }

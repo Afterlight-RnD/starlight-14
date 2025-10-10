@@ -73,10 +73,10 @@ public sealed partial class SLCharacterEditorLayer : UIScreenLayer
 
     protected override void EnteredTree()
     {
-        SubscribeGlobalUIEvent<CharacterProfileSelectedUIEvent>(OnCharacterSelected);
+        SubscribeUIEvent<ProfileSelectorButton, ButtonPressedUIEvent>(OnCharacterSelected);
     }
 
-    private void OnCharacterSelected(CharacterProfileSelectedUIEvent ev)
+    private void OnCharacterSelected(ProfileSelectorButton button, ButtonPressedUIEvent ev)
     {
         TogglePopoutPanel(false);
         CharacterSelectorButtons.SelectCharacter.Pressed = false;

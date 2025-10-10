@@ -95,7 +95,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
             EnabledJobs = [..newData.Profile.JobPreferences],
             JobLoadouts = new(newData.Profile.Loadouts.Count),
             OwnerNetId = session.UserId,
-            PreviewJob = FallbackJob,
+            FavoriteJob = FallbackJob,
             Slot = slot
         };
         foreach (var (key, loadout) in newData.Profile.Loadouts)

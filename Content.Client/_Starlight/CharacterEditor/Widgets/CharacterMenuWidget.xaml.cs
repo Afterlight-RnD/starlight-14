@@ -30,10 +30,10 @@ public sealed partial class CharacterMenuWidget : UIWidget
 
     protected override void EnteredTree()
     {
-        SubscribeGlobalUIEvent<CharacterProfileDirtiedUIEvent>(OnCharacterDirtied);
+        SubscribeUIEvent<LiveCharacterProfileDirtiedUIEvent>(OnCharacterDirtied);
     }
 
-    private void OnCharacterDirtied(CharacterProfileDirtiedUIEvent ev)
+    private void OnCharacterDirtied(LiveCharacterProfileDirtiedUIEvent ev)
     {
         SaveChanges.Disabled = false;
     }

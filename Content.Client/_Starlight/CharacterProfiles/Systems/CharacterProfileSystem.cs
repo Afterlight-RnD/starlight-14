@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 using Content.Client._Starlight.Medical.Cybernetics.Systems;
+using Content.Client._Starlight.Preferences.Systems;
 using Content.Client.Humanoid;
 using Content.Client.Lobby;
 using Content.Shared._Starlight.CharacterProfileSystem;
@@ -17,9 +18,6 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client._Starlight.CharacterProfiles.Systems;
 
-/// <summary>
-/// This handles...
-/// </summary>
 public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEventSubscriber
 {
     [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
@@ -28,10 +26,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
     [Dependency] private readonly CyberneticsSystem _cyberSystem = default!;
     [Dependency] private readonly LoadoutSystem _loadoutSystem = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
-
-    private Dictionary<int, Entity<CharacterProfileComponent>> _slotToProfile = new();
-    private Dictionary<int, Entity<SpriteComponent, HumanoidAppearanceComponent>> _slotToPreview = new();
-
+    [Dependency] private readonly PlayerPreferencesSystem _preferencesSystem = default!;
     public bool SlotsFull
     {
         get
@@ -42,61 +37,79 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
             return _preferences.Preferences.Characters.Count >= _preferences.Settings.MaxCharacterSlots;
         }
     }
+
+    public Entity<CharacterProfileComponent>? GetCharacterInSlot(int slot)
+    {
+        var preferencesEnt = _preferencesSystem.EnsurePlayerPreferences();
+        if (!preferencesEnt.Comp.CharacterProfiles.TryGetValue(slot, out var profileEntity))
+            return null;
+        return (profileEntity,
+            ProfileQuery.Comp(profileEntity));
+    }
+
+    public Entity<CharacterProfileComponent> GetFirstCharacterProfile()
+    {
+        var preferencesEnt = _preferencesSystem.EnsurePlayerPreferences();
+        for (var i = 0; i < MaxProfileSlots; i++)
+        {
+            if (preferencesEnt.Comp.CharacterProfiles.TryGetValue(i, out var profileEnt))
+                return (profileEnt, Comp<CharacterProfileComponent>(profileEnt));
+        }
+        throw new InvalidOperationException("No profiles found! At least one should be present!");
+    }
+
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<CharacterProfileComponent, AfterAutoHandleStateEvent>(OnReceivedUpdatedCharacter);
+        SubscribeLocalEvent<CharacterProfileComponent, ComponentShutdown>(OnProfileShutdown);
+    }
+
+    private void OnProfileShutdown(Entity<CharacterProfileComponent> ent, ref ComponentShutdown args)
+    {
+        _uiManager.RaiseUIEvent(new CharacterProfileRemovedUIEvent(ent));
+        EntityManager.DeleteEntity(ent.Comp.Doll);
     }
 
     private void OnReceivedUpdatedCharacter(Entity<CharacterProfileComponent> ent, ref AfterAutoHandleStateEvent ev)
     {
-        _slotToProfile[ent.Comp.Slot] = ent;
-        EnsurePreviewEntity(ent);
-        _uiManager.RaiseUIEvent( new CharacterProfileUpdatedUIEvent(ent, _protoManager.Index(ent.Comp.PreviewJob)));
+        if (ent.Comp.Doll == null)
+        {
+            ent.Comp.Doll = EntityManager.Spawn(_protoManager.Index(ent.Comp.Data.Profile.Species).DollPrototype,
+                MapCoordinates.Nullspace);
+            _uiManager.RaiseUIEvent( new CharacterProfileAddedUIEvent(ent,
+                (ent.Comp.Doll.Value,
+                    Comp<SpriteComponent>(ent.Comp.Doll.Value),
+                    Comp<HumanoidAppearanceComponent>(ent.Comp.Doll.Value))));
+        }
+        else
+            _uiManager.RaiseUIEvent(new CharacterProfileUpdatedEvent(ent));
     }
 
     public bool TryGetCharacterInSlot(int slot,
         out Entity<CharacterProfileComponent> profileEnt,
-        out Entity<SpriteComponent, HumanoidAppearanceComponent> previewEnt)
+        out Entity<SpriteComponent, HumanoidAppearanceComponent> previewEntity)
     {
-
-        if (!_slotToProfile.TryGetValue(slot, out var profile))
+        var profile = GetCharacterInSlot(slot);
+        if (profile?.Comp.Doll == null)
         {
             profileEnt = default;
-            previewEnt = default;
+            previewEntity = default;
             return false;
         }
-        profileEnt = profile;
-        previewEnt = _slotToPreview[slot];
+        profileEnt = profile.Value;
+        previewEntity =
+            (profile.Value.Comp.Doll.Value,
+            Comp<SpriteComponent>(profile.Value.Comp.Doll.Value),
+            Comp<HumanoidAppearanceComponent>(profile.Value.Comp.Doll.Value));
         return true;
-    }
-
-    private void EnsurePreviewEntity(Entity<CharacterProfileComponent> ent)
-    {
-        Entity<SpriteComponent, HumanoidAppearanceComponent> previewSprite;
-        if (!_slotToPreview.TryGetValue(ent.Comp.Slot, out var existing))
-        {
-            var newEnt = EntityManager.SpawnEntity(_protoManager.Index(ent.Comp.Data.Profile.Species).DollPrototype,
-                MapCoordinates.Nullspace);
-            var spriteComp =  Comp<SpriteComponent>(newEnt);
-            var humanoidAppearance =  Comp<HumanoidAppearanceComponent>(newEnt);
-            previewSprite = (newEnt, spriteComp, humanoidAppearance);
-            _slotToPreview[ent.Comp.Slot] = previewSprite;
-        }
-        else
-        {
-            previewSprite = existing;
-        }
-        UpdatePreviewEntity(previewSprite, ent);
     }
 
     public void DirtyCharacter(Entity<CharacterProfileComponent> ent)
     {
         _uiManager.RaiseUIEvent(new CharacterProfileUpdatedUIEvent
         {
-            CharacterProfile = new
-            (ent.Owner, ent.Comp!),
-            PreviewJob = _protoManager.Index(ent.Comp.PreviewJob)
+            CharacterProfile = new(ent.Owner, ent.Comp!)
         });
     }
 

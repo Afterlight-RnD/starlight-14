@@ -25,4 +25,12 @@ public sealed class PlayerPreferencesSystem : SharedPlayerPreferenceSystem
         Log.Error("Player preferences not loaded yet!");
         return null;
     }
+
+    public Entity<PlayerPreferencesComponent> EnsurePlayerPreferences()
+    {
+        if (EntityQueryEnumerator<PlayerPreferencesComponent>().MoveNext(out var entId, out var preferences))
+            return (entId, preferences);
+        Log.Fatal("Player preferences not loaded yet!");
+        throw new InvalidOperationException("PlayerPreferences Not Loaded Yet!");
+    }
 }

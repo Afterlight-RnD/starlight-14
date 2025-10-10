@@ -14,7 +14,7 @@ public sealed class CharacterSlotView : SpriteView, IUIEventSubscriber
 {
     private int _slot = -1;
 
-    public Entity<CharacterProfileComponent>? LinkedProfileSlot = null;
+    public Entity<CharacterProfileComponent>? LinkedProfile = null;
 
     public Entity<SpriteComponent, HumanoidAppearanceComponent>? LinkedPreview = null;
 

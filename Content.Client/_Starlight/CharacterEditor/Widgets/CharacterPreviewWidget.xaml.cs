@@ -76,7 +76,7 @@ public sealed partial class CharacterPreviewWidget : UIWidget
 
     protected override void EnteredTree()
     {
-        SubscribeGlobalUIEvent<LiveCharacterProfileUpdatedUIEvent>(OnLiveProfileUpdated);
+        SubscribeUIEvent<LiveCharacterProfileUpdatedUIEvent>(OnLiveProfileUpdated);
     }
 
     private void OnLiveProfileUpdated(LiveCharacterProfileUpdatedUIEvent ev)

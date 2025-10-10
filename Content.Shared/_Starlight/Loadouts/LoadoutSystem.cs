@@ -69,7 +69,7 @@ public sealed partial class LoadoutSystem : EntitySystem
         if (!_inventorySystem.TryGetSlots(target, out var slots))
             return;
 
-        var jobProto = jobOverride ?? profile.Comp.PreviewJob;
+        var jobProto = jobOverride ?? profile.Comp.FavoriteJob;
         var job = _protoMan.Index(jobProto);
         if (!profile.Comp.JobLoadouts.TryGetValue(jobProto, out var data))
         {

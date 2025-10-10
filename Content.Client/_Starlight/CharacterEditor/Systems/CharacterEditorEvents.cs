@@ -7,21 +7,13 @@ using Robust.Client.GameObjects;
 
 namespace Content.Client._Starlight.CharacterEditor.Systems;
 
-//UIEvents
-public record struct CharacterProfileSelectedUIEvent(int Slot);
-
-//UIEvents
-public record struct LiveCharacterProfileUpdatedUIEvent(
-    int Slot,
-    Entity<CharacterProfileComponent, HumanoidAppearanceComponent, SpriteComponent> Profile);
-
-public record struct LiveCharacterPreviewModeUpdatedUIEvent(CharacterPreviewMode NewMode);
-
-public record struct CharacterProfileDirtiedUIEvent(Entity<CharacterProfileComponent> Profile)
+public readonly record struct LiveCharacterProfileUpdatedUIEvent(
+    Entity<CharacterProfileComponent, HumanoidAppearanceComponent, SpriteComponent> Profile)
 {
-    public int Slot => Profile.Comp.Slot;
+    public int Slot => Profile.Comp1.Slot;
 }
 
-public record struct CharacterProfileEnabledUIEvent(int Slot);
-
-public record struct CharacterProfileDisabledUIEvent(int Slot);
+public record struct LiveCharacterProfileDirtiedUIEvent(Entity<CharacterProfileComponent, HumanoidAppearanceComponent, SpriteComponent> Profile)
+{
+    public int Slot => Profile.Comp1.Slot;
+}

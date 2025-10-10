@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: ASL-1.0
 
 using System.Numerics;
+using Content.Client._Starlight.CharacterProfiles;
 using Content.Client.Stylesheets;
 using Content.Shared._Starlight.CharacterProfileSystem.Components;
 using Content.Shared.Roles;
@@ -10,25 +11,65 @@ using Robust.Client.Graphics;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.UIEvents;
 using Robust.Client.UserInterface.XAML;
+using Robust.Shared.Prototypes;
 
 namespace Content.Client._Starlight.CharacterEditor.Controls;
 
 [GenerateTypedNameReferences]
 public sealed partial class ProfileSelectorButton : ContainerButton, IUIEventSubscriber
 {
-    public int Slot { get => CharacterView.Slot; set => CharacterView.Slot = value; }
+    [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    public int Slot { get; init; } = -1;
+
+    private Entity<CharacterProfileComponent>? _profile = null;
+
+    public Entity<CharacterProfileComponent>? Profile
+    {
+        get => _profile;
+        set
+        {
+            _profile = value;
+            UpdateFromProfile();
+        }
+    }
 
     public ProfileSelectorButton()
     {
         RobustXamlLoader.Load(this);
         AddStyleClass(StyleClassButton);
         SetupButtonOutlines();
+        EnabledCheck.OnToggled += OnActivateToggled;
     }
 
-    public void ToggleAllowDelete(bool newAllow)
+    private void OnActivateToggled(ButtonToggledEventArgs args)
     {
-        DeleteButtonOutline.Visible = newAllow;
-        DeleteButton.Disabled = !newAllow;
+        if (!_profile.HasValue)
+            return;
+        if (args.Pressed)
+            UserInterfaceManager.RaiseUIEvent(new CharacterProfileEnabledUIEvent(_profile.Value));
+        else
+            UserInterfaceManager.RaiseUIEvent(new CharacterProfileDisabledUIEvent(_profile.Value));
+    }
+
+    public void ToggleDeleteButton(bool visible)
+    {
+        DeleteButtonOutline.Visible = visible;
+        DeleteButton.Disabled = !visible;
+    }
+
+    private void UpdateFromProfile()
+    {
+        if (_profile == null)
+        {
+            CharacterName.Text = "Urist McPlaceholder";
+            CharacterJob.Text = "PlaceholderJob";
+            Visible = false;
+            return;
+        }
+        var favoriteJob = _protoManager.Index(_profile.Value.Comp.FavoriteJob);
+        CharacterName.Text = _profile.Value.Comp.Data.Profile.Name;
+        CharacterJob.Text = favoriteJob.LocalizedName;
+        Visible = true;
     }
 
     public void SetFromProfile(Entity<CharacterProfileComponent>? profile, JobPrototype? jobProto)
@@ -38,11 +79,9 @@ public sealed partial class ProfileSelectorButton : ContainerButton, IUIEventSub
             CharacterName.Text = "Urist McPlaceholder";
             CharacterJob.Text = "PlaceholderJob";
             Visible = false;
-            Slot = -1;
             return;
         }
         CharacterName.Text = profile.Value.Comp.Data.Profile.Name;
-        Slot = profile.Value.Comp.Slot;
         CharacterJob.Text = jobProto?.Name;
         Visible = true;
     }

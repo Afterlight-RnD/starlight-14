@@ -19,7 +19,10 @@ namespace Content.Shared._Starlight.CharacterProfileSystem.Components;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(raiseAfterAutoHandleState:true)]
 public sealed partial class CharacterProfileComponent : Component
 {
-    [DataField, AutoNetworkedField] public CharacterProfileData Data;
+    [DataField("data"), AutoNetworkedField]
+    private CharacterProfileData? _data = null;
+    //Serialization kludge for copying, this should never be null
+    public CharacterProfileData Data { get => _data!; set => _data = value; }
 
     [DataField, AutoNetworkedField] public int Slot = -1;
 
@@ -31,7 +34,9 @@ public sealed partial class CharacterProfileComponent : Component
     [DataField, AutoNetworkedField] public Dictionary<ProtoId<JobPrototype>, RoleLoadout> JobLoadouts = new();
     [DataField, AutoNetworkedField] public HashSet<ProtoId<JobPrototype>> EnabledJobs = new();
 
-    [DataField, AutoNetworkedField] public ProtoId<JobPrototype> PreviewJob;
+    [DataField, AutoNetworkedField] public ProtoId<JobPrototype> FavoriteJob = "";
+
+    [DataField] public EntityUid? Doll = null;
 }
 
 [DataRecord, Serializable, NetSerializable]
