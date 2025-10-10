@@ -52,7 +52,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
     {
         _slotToProfile[ent.Comp.Slot] = ent;
         EnsurePreviewEntity(ent);
-        _uiManager.RaiseGlobalUIEvent( new CharacterProfileUpdatedUIEvent(ent, _protoManager.Index(ent.Comp.PreviewJob)));
+        _uiManager.RaiseUIEvent( new CharacterProfileUpdatedUIEvent(ent, _protoManager.Index(ent.Comp.PreviewJob)));
     }
 
     public bool TryGetCharacterInSlot(int slot,
@@ -92,7 +92,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
 
     public void DirtyCharacter(Entity<CharacterProfileComponent> ent)
     {
-        _uiManager.RaiseGlobalUIEvent(new CharacterProfileUpdatedUIEvent
+        _uiManager.RaiseUIEvent(new CharacterProfileUpdatedUIEvent
         {
             CharacterProfile = new
             (ent.Owner, ent.Comp!),

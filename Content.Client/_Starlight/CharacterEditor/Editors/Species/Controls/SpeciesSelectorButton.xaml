@@ -1,0 +1,12 @@
+﻿<controls:SpeciesSelectorButton
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.CharacterEditor.Editors.Species.Controls"
+    ToggleMode="True">
+    <BoxContainer Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True">
+        <TextureRect Name="SpeciesIcon" Access="Protected"
+                     HorizontalAlignment="Center" Stretch="Scale" SetSize="64 64" TextureScale="2 2"/>
+        <Label Name="SpeciesLabel" Access="Protected"
+               HorizontalAlignment="Center" Text="Unknown"/>
+    </BoxContainer>
+
+</controls:SpeciesSelectorButton>

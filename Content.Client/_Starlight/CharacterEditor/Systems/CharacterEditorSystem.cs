@@ -58,7 +58,7 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
 
     public override void Initialize()
     {
-        _uiMan.SubscribeGlobalUIEvent<CharacterProfileSelectedUIEvent>(this, OnProfileSelected);
+        _uiMan.SubscribeUIEvent<CharacterProfileSelectedUIEvent>(this, OnProfileSelected);
         _uiMan.SubscribeUIEvent<ProfileSelectorButton, ControlAddedUIEvent>(this, OnProfileSelectorAdded);
     }
 
@@ -79,7 +79,7 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
         if (_liveProfileDirty)
             return;
         _liveProfileDirty = true;
-        _uiMan.RaiseGlobalUIEvent(new CharacterProfileDirtiedUIEvent(LiveProfile));
+        _uiMan.RaiseUIEvent(new CharacterProfileDirtiedUIEvent(LiveProfile));
     }
 
     public void SaveLiveCharacterChanges()
@@ -101,7 +101,7 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
         PreviewMode = newMode;
         //TODO: update clothing
         var JobPref = LiveProfile.Comp1.Data.Profile.JobPreferences.First();
-        _uiMan.RaiseGlobalUIEvent(new LiveCharacterPreviewModeUpdatedUIEvent(PreviewMode));
+        _uiMan.RaiseUIEvent(new LiveCharacterPreviewModeUpdatedUIEvent(PreviewMode));
     }
 
 
@@ -116,7 +116,7 @@ public sealed class CharacterEditorSystem : EntitySystem, IUIEventSubscriber
         profile.Comp1.Data = profileEnt.Comp.Data;
         _humanoidSystem.LoadProfile(profile, profileEnt.Comp.Data.Profile, profile.Comp2);
         _cybernetics.ApplyCyberneticVisuals((profile, profile.Comp2), profileEnt.Comp.Data.Profile);
-        _uiMan.RaiseGlobalUIEvent(new LiveCharacterProfileUpdatedUIEvent(slot, LiveProfile));
+        _uiMan.RaiseUIEvent(new LiveCharacterProfileUpdatedUIEvent(slot, LiveProfile));
     }
 
     public bool ApplyLiveProfile()

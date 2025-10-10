@@ -115,6 +115,10 @@ public sealed partial class SLCharacterEditorLayer : UIScreenLayer
         {
             _editorWidgetLookup[modeButton.EditingPanelType].Visible = visible;
         }
+        if (modeButton.DetailsPanelType != null)
+        {
+            _editorWidgetLookup[modeButton.DetailsPanelType].Visible = visible;
+        }
     }
 
     private void EnsureEditorPanel(EditorModeButton button, Type? widgetType, Control panelParent)

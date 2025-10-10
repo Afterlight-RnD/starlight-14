@@ -3,9 +3,11 @@
     xmlns:widgets="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:Content.Client._Starlight.CharacterEditor.Controls"
-    xmlns:editors="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets.Editors"
+    xmlns:species="clr-namespace:Content.Client._Starlight.CharacterEditor.Editors.Species"
+    xmlns:bodyTypeEditor="clr-namespace:Content.Client._Starlight.CharacterEditor.Editors.BodyTypeEditor"
     Orientation="Vertical">
     <controls:EditorModeButton
         ModeName="{Loc 'character-editor-select-species-button'}"
-        EditingPanelType="{x:Type 'editors:SpeciesEditor'}"/>
+        EditingPanelType="{x:Type 'bodyTypeEditor:BodyTypeEditor'}"
+        DetailsPanelType="{x:Type 'species:SpeciesSelector'}"/>
 </widgets:EditorModeList>

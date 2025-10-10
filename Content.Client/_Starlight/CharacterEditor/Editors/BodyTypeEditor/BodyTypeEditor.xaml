@@ -1,0 +1,5 @@
+﻿<bodyTypeEditor:BodyTypeEditor
+    xmlns="https://spacestation14.io"
+    xmlns:bodyTypeEditor="clr-namespace:Content.Client._Starlight.CharacterEditor.Editors.BodyTypeEditor">
+    <Label Text="Blah blah blah blah"/>
+</bodyTypeEditor:BodyTypeEditor>

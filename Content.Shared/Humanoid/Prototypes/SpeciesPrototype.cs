@@ -2,6 +2,7 @@ using Content.Shared.Dataset;
 using Content.Shared.Humanoid.Markings;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
+using Robust.Shared.Utility;
 
 namespace Content.Shared.Humanoid.Prototypes;
 
@@ -33,6 +34,11 @@ public sealed partial class SpeciesPrototype : IPrototype
     /// </summary>
     [DataField(required: true)]
     public bool RoundStart { get; private set; } = false;
+
+    [DataField]
+    public SpriteSpecifier SpeciesIcon { get; set; } = new SpriteSpecifier.Rsi(
+        new ResPath("/Textures/_Starlight/Interface/Species/species_icons.rsi"),
+        "unknown");
 
     // The below two are to avoid fetching information about the species from the entity
     // prototype.

@@ -1,5 +1,0 @@
-﻿<editors:SpeciesEditor
-    xmlns="https://spacestation14.io"
-    xmlns:editors="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets.Editors">
-    <Label Text="BLAH BLAH BLAH BLAH BLAH BLAH"  HorizontalExpand="True"/>
-</editors:SpeciesEditor>
