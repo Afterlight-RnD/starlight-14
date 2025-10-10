@@ -19,43 +19,17 @@ public sealed partial class SpeciesSelectorButton : ContainerButton, IUIEventSub
     {
         RobustXamlLoader.Load(this);
         AddStyleClass(StyleClassButton);
-        OnToggled += OnSelected;
     }
 
-    private void OnSelected(ButtonToggledEventArgs args)
+    public SpeciesSelectorButton(ProtoId<SpeciesPrototype> newSpecies, Texture newIcon, string localizedName, ButtonGroup buttonGroup) : this()
     {
-        Disabled = true;
-        UserInterfaceManager.RaiseUIEvent(this,new SelectedUIEvent(Species));
-    }
-
-    public SpeciesSelectorButton(ProtoId<SpeciesPrototype> newSpecies, Texture newIcon, string localizedName) : this()
-    {
+        Group = buttonGroup;
         SetData(newSpecies, newIcon, localizedName);
     }
-
-    public void Select()
-    {
-        if (Pressed)
-            return;
-        Pressed = true;
-        Disabled = true;
-        UserInterfaceManager.RaiseUIEvent(this,new SelectedUIEvent(Species));
-    }
-
-    public void Deselect()
-    {
-        if (!Pressed)
-            return;
-        Pressed = false;
-        Disabled = false;
-    }
-
     public void SetData(ProtoId<SpeciesPrototype> newSpecies, Texture newIcon, string localizedName)
     {
         SpeciesIcon.Texture = newIcon;
         SpeciesLabel.Text = localizedName;
         Species = newSpecies;
     }
-
-    public record struct SelectedUIEvent(ProtoId<SpeciesPrototype> Species);
 }

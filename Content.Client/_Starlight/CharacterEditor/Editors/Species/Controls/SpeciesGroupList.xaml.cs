@@ -17,6 +17,8 @@ public sealed partial class SpeciesGroupList : BoxContainer
     public int Columns { get => SpeciesGrid.Columns; set => SpeciesGrid.Columns = value; }
 
     private Dictionary<ProtoId<SpeciesPrototype>, SpeciesSelectorButton> _speciesSelectors = new();
+
+    private ButtonGroup _speciesButtonGroup = new (false);
     public SpeciesGroupList()
     {
         RobustXamlLoader.Load(this);
@@ -30,7 +32,7 @@ public sealed partial class SpeciesGroupList : BoxContainer
 
     public void AddSpecies(ProtoId<SpeciesPrototype> species, Texture icon, string localizedName)
     {
-        var newSpeciesSelector = new SpeciesSelectorButton(species, icon, localizedName);
+        var newSpeciesSelector = new SpeciesSelectorButton(species, icon, localizedName, _speciesButtonGroup);
         SpeciesGrid.AddChild(newSpeciesSelector);
         _speciesSelectors.Add(species, newSpeciesSelector);
     }
