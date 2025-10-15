@@ -75,7 +75,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
     {
         if (ent.Comp.Doll == null)
         {
-            ent.Comp.Doll = EntityManager.Spawn(_protoManager.Index(ent.Comp.Data.Profile.Species).DollPrototype,
+            ent.Comp.Doll = EntityManager.Spawn(_protoManager.Index(ent.Comp.Data.LegacyProfile.Species).DollPrototype,
                 MapCoordinates.Nullspace);
             _uiManager.RaiseUIEvent( new CharacterProfileAddedUIEvent(ent,
                 (ent.Comp.Doll.Value,
@@ -129,8 +129,8 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
 
     private void UpdatePreviewEntity(Entity<SpriteComponent, HumanoidAppearanceComponent> previewEntity, Entity<CharacterProfileComponent> profileEntity)
     {
-        _humanoidSystem.LoadProfile(previewEntity, profileEntity.Comp.Data.Profile, previewEntity.Comp2);
-        _cyberSystem.ApplyCyberneticVisuals((previewEntity, previewEntity.Comp2), profileEntity.Comp.Data.Profile);
+        _humanoidSystem.LoadProfile(previewEntity, profileEntity.Comp.Data.LegacyProfile, previewEntity.Comp2);
+        _cyberSystem.ApplyCyberneticVisuals((previewEntity, previewEntity.Comp2), profileEntity.Comp.Data.LegacyProfile);
         _loadoutSystem.ApplyJobClothes(previewEntity, profileEntity);
     }
 }

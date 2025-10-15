@@ -1,110 +1,105 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Server.Preferences.Managers;
-using Content.Shared._Starlight.CharacterProfileSystem;
-using Content.Shared._Starlight.CharacterProfileSystem.Components;
-using Content.Shared._Starlight.CharacterProfileSystem.Systems;
-using Content.Shared._Starlight.Preferences.Components;
-using Robust.Server.GameStates;
-using Robust.Shared.Map;
-using Robust.Shared.Player;
+using Content.Shared._Starlight.CharacterProfiles;
+using Content.Shared._Starlight.CharacterProfiles.Systems;
+using Content.Shared.Preferences;
+using Robust.Shared.Network;
 
 namespace Content.Server._Starlight.CharacterProfiles.Systems;
 
 public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
 {
-    [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
-    [Dependency] private readonly IServerPreferencesManager _preferences = default!;
-    [Dependency] private readonly IDependencyCollection _dependencies = default!;
+    [Dependency] private readonly IServerPreferencesManager _preferencesManager = default!;
+
+    private Dictionary<NetUserId, CharacterProfileRegistry> _characterProfiles = new();
 
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeNetworkEvent<MsgRequestCharacterProfileDataUpdate>(HandleProfileUpdateRequest);
+        SubscribeLocalEvent<PlayerPreferencesLoadedEvent>(OnPlayerPrefsLoaded);
+        SubscribeNetworkEvent<MsgUpdateCharacterProfile>(HandleCharacterUpdate);
+        SubscribeNetworkEvent<MsgDeleteCharacterProfile>(HandleDeleteCharacter);
+        SubscribeNetworkEvent<MsgCreateCharacterProfile>(HandleCreateCharacter);
     }
 
-    public void SetCharacterProfileData(ICommonSession owningSession, Entity<PlayerPreferencesComponent> playerPrefs,
-        int slot, CharacterProfileData? newData)
+    private void HandleCreateCharacter(MsgCreateCharacterProfile msg, EntitySessionEventArgs args)
     {
-        if (MaxProfileSlots >= slot)
-        {
-            Log.Error($"UserId:{owningSession.UserId} tried to set profile data on slot out of range!");
+        if (!TryGetCharacterRegistry(args.SenderSession.UserId, out var registry))
             return;
-        }
+        CharacterProfile? newProfile;
+        if (!registry.TryGetCharacterProfile(msg.Slot, out newProfile))
+            newProfile = CreateRandomProfile();
+        RaiseNetworkEvent(new MsgLoadCharacterProfile(msg.Slot, newProfile.GetData(false)), args.SenderSession);
+    }
 
-        if (newData == null)
-        {
-            if (playerPrefs.Comp.CharacterProfiles.Remove(slot, out var removedProfile))
-                EntityManager.DeleteEntity(removedProfile);
-            _preferences.DeleteProfile(owningSession.UserId, slot); //TODO: legacy prefs
+    private void HandleDeleteCharacter(MsgDeleteCharacterProfile msg, EntitySessionEventArgs args)
+    {
+        //TODO: Raise DB delete
+        if (!_characterProfiles.TryGetValue(args.SenderSession.UserId, out var registry))
             return;
-        }
-
-        var validate = new ValidateCharacterProfileEvent(newData);
-        RaiseLocalEvent(ref validate);
-
-        newData.Profile.EnsureValid(owningSession, _dependencies); //TODO: eventually replace with event-based validation
-
-        var profile = playerPrefs.Comp.CharacterProfiles.TryGetValue(slot, out var profileEnt)
-            ? (profileEnt, ProfileQuery.Comp(profileEnt))
-            : CreateNewProfileEntity(owningSession, slot, playerPrefs, newData);
-
-        Dirty(profile);
-        RaiseNetworkEvent(new MsgReceiveUpdatedCharacterProfile(slot, GetNetEntity(profile)));
-
-        //apply profile changes to the db
-        _preferences.SetProfile(owningSession.UserId, slot, profile.Comp.Data.Profile);
+        registry.DeleteProfile(msg.Slot);
     }
 
-    private void HandleProfileUpdateRequest(MsgRequestCharacterProfileDataUpdate msg, EntitySessionEventArgs args)
+    private bool TryGetCharacterRegistry(NetUserId userId, [NotNullWhen(true)] out CharacterProfileRegistry? registry)
     {
-        var profileEnt = GetEntity(msg.ProfileEnt);
-        var preferencesEnt = GetEntity(msg.PreferencesEnt);
-        var profileComp = ProfileQuery.Comp(profileEnt);
-        if (args.SenderSession.UserId != profileComp.OwnerNetId)
-        {
-            Log.Warning($"CharacterProfileComponent update owner-mismatch! Expected:{args.SenderSession.UserId} got: " +
-                        $"{profileComp.OwnerNetId}");
+        if (_characterProfiles.TryGetValue(userId, out registry)) return true;
+        Log.Warning($"Could not find character registry for user:{userId}, or it is not loaded yet!");
+        return false;
+    }
+
+    private bool TryGetCharacterInRegistry(CharacterProfileRegistry registry,
+        int slot, NetUserId userId,
+        [NotNullWhen(true)] out CharacterProfile? profile)
+    {
+        if (registry.TryGetCharacterProfile(slot, out profile)) return true;
+        Log.Warning($"Could not find character registry for user:{userId}, or it is not loaded yet!");
+        return false;
+    }
+
+    private void HandleCharacterUpdate(MsgUpdateCharacterProfile msg, EntitySessionEventArgs args)
+    {
+        if (!TryGetCharacterRegistry(args.SenderSession.UserId, out var registry)
+            || !TryGetCharacterInRegistry(registry, msg.Slot, args.SenderSession.UserId, out var profile))
             return;
-        }
-        SetCharacterProfileData(args.SenderSession, (preferencesEnt, PlayerPrefQuery.Comp(preferencesEnt)),msg.Slot, msg.Data);
+        profile.SetFromList(msg.Data);
     }
 
-    public Entity<CharacterProfileComponent> LoadProfile(ICommonSession session,
-        Entity<PlayerPreferencesComponent> playerPrefs,
-        int slot,
-        CharacterProfileData profileData)
+    public bool TryGetCharacterProfile(NetUserId userId, int slot, [NotNullWhen(true)] out CharacterProfile? profile)
     {
-        var validate = new ValidateCharacterProfileEvent(profileData);
-        RaiseLocalEvent(ref validate);
-        profileData.Profile.EnsureValid(session, _dependencies); //TODO: eventually replace with event-based validation
-        return CreateNewProfileEntity(session, slot, playerPrefs, profileData);
+        profile = null;
+        return TryGetCharacterRegistry(userId, out var registry) && registry.TryGetCharacterProfile(slot ,out profile);
+    }
+
+    private CharacterProfileRegistry EnsureRegistry(NetUserId userId)
+    {
+        if (_characterProfiles.TryGetValue(userId, out var existing))
+            return existing;
+        var newRegistry = new CharacterProfileRegistry();
+        _characterProfiles.Add(userId,newRegistry);
+        return newRegistry;
     }
 
 
-    private Entity<CharacterProfileComponent> CreateNewProfileEntity(
-        ICommonSession session, int slot,
-        Entity<PlayerPreferencesComponent> playerPrefs,
-        CharacterProfileData newData)
+    private void OnPlayerPrefsLoaded(PlayerPreferencesLoadedEvent ev)
     {
-        var newEnt = EntityManager.SpawnEntity(null, MapCoordinates.Nullspace);
-        var newComp = new CharacterProfileComponent
+        var registry = EnsureRegistry(ev.Session.UserId);
+
+        foreach (var (slot, profile) in ev.Preferences.Characters)
         {
-            Data = newData,
-            EnabledJobs = [..newData.Profile.JobPreferences],
-            JobLoadouts = new(newData.Profile.Loadouts.Count),
-            OwnerNetId = session.UserId,
-            FavoriteJob = FallbackJob,
-            Slot = slot
-        };
-        foreach (var (key, loadout) in newData.Profile.Loadouts)
-            newComp.JobLoadouts.Add(key, loadout);
-        AddComp(newEnt,newComp);
-        var profileEnt = new Entity<CharacterProfileComponent>(newEnt, newComp);
-        playerPrefs.Comp.CharacterProfiles.Add(slot, profileEnt);
-        TransformSystem.SetParent(profileEnt, playerPrefs);
-        Dirty(profileEnt);
-        return profileEnt;
+            if (profile is not HumanoidCharacterProfile legacyProfile)
+            {
+                Log.Warning($"profile is of unsupported type:{profile.GetType()}");
+                continue;
+            }
+            var newProfile = CreateProfile();
+            ConvertLegacyProfile(newProfile, legacyProfile);
+            registry.SetProfile(slot, newProfile);
+            ClearDirty(newProfile);
+            RaiseNetworkEvent(new MsgLoadCharacterProfile(slot, newProfile.GetData(false)), ev.Session);
+        }
     }
+
 }

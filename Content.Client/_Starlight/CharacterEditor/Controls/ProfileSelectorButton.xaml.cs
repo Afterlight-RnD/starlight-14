@@ -67,7 +67,7 @@ public sealed partial class ProfileSelectorButton : ContainerButton, IUIEventSub
             return;
         }
         var favoriteJob = _protoManager.Index(_profile.Value.Comp.FavoriteJob);
-        CharacterName.Text = _profile.Value.Comp.Data.Profile.Name;
+        CharacterName.Text = _profile.Value.Comp.Data.LegacyProfile.Name;
         CharacterJob.Text = favoriteJob.LocalizedName;
         Visible = true;
     }
@@ -81,7 +81,7 @@ public sealed partial class ProfileSelectorButton : ContainerButton, IUIEventSub
             Visible = false;
             return;
         }
-        CharacterName.Text = profile.Value.Comp.Data.Profile.Name;
+        CharacterName.Text = profile.Value.Comp.Data.LegacyProfile.Name;
         CharacterJob.Text = jobProto?.Name;
         Visible = true;
     }

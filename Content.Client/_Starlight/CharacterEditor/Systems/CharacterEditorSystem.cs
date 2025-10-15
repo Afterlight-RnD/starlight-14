@@ -116,8 +116,8 @@ public sealed class CharacterEditorSystem : UISystem
         var liveProfile = LiveProfile;
         CopyComp(profile, liveProfile, profile.Comp);
 
-        _humanoidSystem.LoadProfile(liveProfile, profile.Comp.Data.Profile, liveProfile.Comp2);
-        _cybernetics.ApplyCyberneticVisuals((liveProfile, liveProfile.Comp2), profile.Comp.Data.Profile);
+        _humanoidSystem.LoadProfile(liveProfile, profile.Comp.Data.LegacyProfile, liveProfile.Comp2);
+        _cybernetics.ApplyCyberneticVisuals((liveProfile, liveProfile.Comp2), profile.Comp.Data.LegacyProfile);
         RaiseUIEvent(new LiveCharacterProfileUpdatedUIEvent(liveProfile));
     }
 
@@ -130,8 +130,8 @@ public sealed class CharacterEditorSystem : UISystem
 
         CopyComp(_liveProfile.Value.Owner, profileEnt, _liveProfile.Value.Comp1);
 
-        _humanoidSystem.LoadProfile(dollEnt, profileEnt.Comp.Data.Profile, dollEnt.Comp2);
-        _cybernetics.ApplyCyberneticVisuals((profileEnt, dollEnt.Comp2), profileEnt.Comp.Data.Profile);
+        _humanoidSystem.LoadProfile(dollEnt, profileEnt.Comp.Data.LegacyProfile, dollEnt.Comp2);
+        _cybernetics.ApplyCyberneticVisuals((profileEnt, dollEnt.Comp2), profileEnt.Comp.Data.LegacyProfile);
         _profileSystem.DirtyCharacter((profileEnt, profileEnt.Comp));
         return true;
     }

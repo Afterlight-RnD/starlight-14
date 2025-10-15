@@ -81,7 +81,7 @@ public sealed partial class CharacterPreviewWidget : UIWidget
 
     private void OnLiveProfileUpdated(LiveCharacterProfileUpdatedUIEvent ev)
     {
-        CharacterName.Text = ev.Profile.Comp1.Data.Profile.Name;
+        CharacterName.Text = ev.Profile.Comp1.Data.LegacyProfile.Name;
         CharacterSpritePreview.SetEntity(ev.Profile);
     }
 }

@@ -271,7 +271,6 @@ namespace Content.Server.Preferences.Managers
                 var prefsData = new PlayerPrefData();
                 var loadTask = LoadPrefs();
                 _cachedPlayerPrefs[session.UserId] = prefsData;
-                SLStartLoad(session);//Starlight-edit
                 await loadTask;
 
                 async Task LoadPrefs()
@@ -300,7 +299,7 @@ namespace Content.Server.Preferences.Managers
                 MaxCharacterSlots = MaxCharacterSlots
             };
             _netManager.ServerSendMessage(msg, session.Channel);
-            SLFinishLoad(session, prefsData.Prefs);//starlight-edit
+            SLFinishLoad(session, prefsData.Prefs!);//starlight-edit
         }
 
         public void OnClientDisconnected(ICommonSession session)
