@@ -1,7 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using Content.Client._Starlight.CharacterEditor.Controls;
 using Content.Client._Starlight.CharacterEditor.Systems;
 using Content.Client._Starlight.UI.Controls;
 using Content.Shared._Starlight.CharacterProfiles;
@@ -71,7 +70,13 @@ public sealed partial class CharacterPreviewWidget : UIWidget
     {
         SubscribeUIEvent<CharacterEditingHasChangesUIEvent>(OnCharacterDirtied);
         SubscribeUIEvent<CharacterEditingStartedUIEvent>(OnCharacterEditStart);
+        SubscribeUIEvent<CharacterEditingUpdatedPreviewUIEvent>(OnCharacterPreviewUpdated);
         SubscribeUIEvent<CharacterEditingFinishedUIEvent>(OnCharacterEditEnded);
+    }
+
+    private void OnCharacterPreviewUpdated(CharacterEditingUpdatedPreviewUIEvent ev)
+    {
+        CharacterSpritePreview.SetEntity(ev.PreviewEntity);
     }
 
     private void OnCharacterEditEnded(CharacterEditingFinishedUIEvent ev)
@@ -92,13 +97,13 @@ public sealed partial class CharacterPreviewWidget : UIWidget
     public void SetData( CharacterProfile? profile, Entity<SpriteComponent>? previewEnt)
     {
         CharacterSpritePreview.SetEntity(previewEnt);
-        if (profile != null)
+        if (profile == null)
         {
             CharacterName.Text = "N/A"; //TODO: localize
         }
         else
         {
-
+            CharacterName.Text = profile.GetData<CharacterIdentityData>().Name;
         }
     }
 }

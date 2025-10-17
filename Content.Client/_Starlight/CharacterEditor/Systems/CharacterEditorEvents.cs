@@ -8,6 +8,8 @@ namespace Content.Client._Starlight.CharacterEditor.Systems;
 
 public record struct CharacterEditingStartedUIEvent(CharacterProfile Profile, Entity<SpriteComponent> PreviewEntity);
 
+public record struct CharacterEditingUpdatedPreviewUIEvent(Entity<SpriteComponent> PreviewEntity);
+
 public record struct CharacterEditingHasChangesUIEvent(CharacterProfile Profile);
 
 public record struct CharacterEditingFinishedUIEvent(CharacterProfile Profile);

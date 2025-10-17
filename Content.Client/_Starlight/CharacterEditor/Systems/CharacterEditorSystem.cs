@@ -3,6 +3,7 @@
 
 using Content.Client._Starlight.CharacterEditor.Controls;
 using Content.Client._Starlight.CharacterProfiles.Systems;
+using Content.Client._Starlight.UI.Controls;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.GameObjects;
 using Robust.Client.UserInterface.Controls;
@@ -28,12 +29,12 @@ public sealed class CharacterEditorSystem : UISystem
         SubscribeUIEvent<ProfileSelectorButton, ControlExitedTreeUIEvent>(OnProfileButtonRemoved);
         SubscribeUIEvent<ProfileSelectorButton, ButtonPressedUIEvent>(OnProfileSelected);
 
-        SubscribeUIEvent<CharacterPreviewModeButton, ButtonPressedUIEvent>(OnPreviewModeButtonPressed);
+        SubscribeUIEvent<SLValueDropdown<CharacterPreviewMode>.Option, ButtonPressedUIEvent>(OnPreviewModeButtonPressed);
     }
 
-    private void OnPreviewModeButtonPressed(CharacterPreviewModeButton control, ButtonPressedUIEvent ev)
+    private void OnPreviewModeButtonPressed(SLValueDropdown<CharacterPreviewMode>.Option control, ButtonPressedUIEvent ev)
     {
-        ChangePreviewMode(control.PreviewMode);
+        ChangePreviewMode(control.Value);
     }
 
     private void OnProfileSelected(ProfileSelectorButton control, ButtonPressedUIEvent ev)
@@ -69,23 +70,22 @@ public sealed class CharacterEditorSystem : UISystem
             Log.Error($"Tried to start editing slot:{slot} but it doesn't have a profile!");
             return;
         }
-
+        ;
         if (_liveProfile != null)
         {
             if (_liveProfile.Slot == slot)
                 return;
-            RaiseUIEvent(new CharacterEditingFinishedUIEvent(_liveProfile));
+            if (!_liveProfile.HasDirtyData)
+            {
+                RaiseUIEvent(new CharacterEditingFinishedUIEvent(_liveProfile));
+                ClearPreviewEntity();
+            }
         }
-
-        if (_livePreview != null)
-        {
-            EntityManager.DeleteEntity(_livePreview);
-            _livePreview = null;
-        }
+        else ClearPreviewEntity();
         _liveProfile = new CharacterProfile(profile.GetData(false)) { Slot = slot };
-        _livePreview = EnsureLivePreview();
-        RaiseUIEvent(new CharacterEditingStartedUIEvent(_liveProfile, _livePreview.Value));
+        _livePreview = EnsureLivePreview(_previewmode);
         RefreshPreviewVisuals();
+        RaiseUIEvent(new CharacterEditingStartedUIEvent(_liveProfile, _livePreview.Value));
     }
 
     public void ApplyChanges()
@@ -112,28 +112,36 @@ public sealed class CharacterEditorSystem : UISystem
         if (_previewmode == newPreviewMode)
             return;
         _previewmode = newPreviewMode;
+        ClearPreviewEntity();
         RefreshPreviewVisuals();
     }
 
-    private Entity<SpriteComponent> EnsureLivePreview()
+    private Entity<SpriteComponent> EnsureLivePreview(CharacterPreviewMode previewMode = default)
     {
         if (_liveProfile == null)
             throw new InvalidOperationException("Cannot ensure preview without a live profile!");
         if (_livePreview != null)
             return _livePreview.Value;
-        var dollEnt = _characterProfileSystem.CreateProfileDoll(_liveProfile);
-        return (dollEnt, Comp<SpriteComponent>(dollEnt));
+        var dollEnt = _characterProfileSystem.CreateProfileDoll(_liveProfile, previewMode);
+        _livePreview = (dollEnt, Comp<SpriteComponent>(dollEnt));
+        RaiseUIEvent(new CharacterEditingUpdatedPreviewUIEvent(_livePreview.Value));
+        return _livePreview.Value;
     }
 
     public void RefreshPreviewVisuals()
     {
         if (_liveProfile == null)
+           ClearPreviewEntity();
+
+        _livePreview = EnsureLivePreview(_previewmode);
+    }
+
+    public void ClearPreviewEntity()
+    {
+        if (_livePreview != null)
         {
-            if (_livePreview != null)
-                EntityManager.DeleteEntity(_livePreview);
-            return;
+            EntityManager.DeleteEntity(_livePreview);
+            _livePreview = null;
         }
-        _livePreview = EnsureLivePreview();
-        _characterProfileSystem.ApplyToDoll(_livePreview.Value, _liveProfile, _previewmode);
     }
 }

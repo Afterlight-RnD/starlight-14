@@ -1,7 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using Content.Client._Starlight.CharacterEditor.Systems;
 using Content.Client._Starlight.UI;
 using Content.Client._Starlight.UI.Controls;
 using Content.Shared._Starlight.CharacterProfiles;
