@@ -25,15 +25,16 @@ public sealed partial class CharacterMenuWidget : UIWidget
 
     private void OnSaveChangesPressed(BaseButton.ButtonEventArgs obj)
     {
-        _editorSystem.SaveLiveCharacterChanges();
+        _editorSystem.ApplyChanges();
+        SaveChanges.Disabled = true;
     }
 
     protected override void EnteredTree()
     {
-        SubscribeUIEvent<LiveCharacterProfileDirtiedUIEvent>(OnCharacterDirtied);
+        SubscribeUIEvent<CharacterEditingHasChangesUIEvent>(OnCharacterDirtied);
     }
 
-    private void OnCharacterDirtied(LiveCharacterProfileDirtiedUIEvent ev)
+    private void OnCharacterDirtied(CharacterEditingHasChangesUIEvent ev)
     {
         SaveChanges.Disabled = false;
     }

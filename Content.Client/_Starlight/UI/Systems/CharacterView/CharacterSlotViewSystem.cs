@@ -8,16 +8,16 @@ using Robust.Client.UserInterface.UIEvents;
 
 namespace Content.Client._Starlight.UI.Systems.CharacterView;
 
-public sealed class CharacterSlotViewSystem : EntitySystem, IUIEventSubscriber
+public sealed class CharacterSlotViewSystem : UISystem
 {
     [Dependency] private readonly CharacterProfileSystem _characterProfileSystem = default!;
 
     [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
     public override void Initialize()
     {
-        _uiManager.SubscribeUIEvent<CharacterSlotView, CharacterSlotView.SlotChangedEvent>(this, OnSlotChanged);
-        _uiManager.SubscribeUIEvent<CharacterSlotView, ControlEnteredTreeUIEvent>(this, OnPreviewAdded);
-        _uiManager.SubscribeUIEvent<CharacterSlotView, ControlExitedTreeUIEvent>(this, OnPreviewRemoved);
+        SubscribeUIEvent<CharacterSlotView, CharacterSlotView.SlotChangedEvent>(OnSlotChanged);
+        SubscribeUIEvent<CharacterSlotView, ControlEnteredTreeUIEvent>(OnPreviewAdded);
+        SubscribeUIEvent<CharacterSlotView, ControlExitedTreeUIEvent>(OnPreviewRemoved);
     }
 
     private void OnPreviewRemoved(CharacterSlotView viewControl, ControlExitedTreeUIEvent ev)
@@ -38,18 +38,16 @@ public sealed class CharacterSlotViewSystem : EntitySystem, IUIEventSubscriber
 
     private void UpdateLinkedEntity(CharacterSlotView viewControl, int slot)
     {
-
-        if (_characterProfileSystem.TryGetCharacterInSlot(slot, out var profile, out var preview))
+        if (_characterProfileSystem.TryGetCharacterProfile(slot, out var profile))
         {
+            var preview = _characterProfileSystem.EnsurePreviewEntity(slot, profile);
             viewControl.LinkedProfile = profile;
             viewControl.SetEntity(preview);
-            viewControl.LinkedPreview = preview;
         }
         else
         {
             viewControl.LinkedProfile = null;
             viewControl.SetEntity(null);
-            viewControl.LinkedPreview = null;
         }
     }
 }

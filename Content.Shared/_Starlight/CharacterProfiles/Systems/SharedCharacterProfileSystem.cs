@@ -1,9 +1,12 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using System.Linq;
 using Content.Shared._Starlight.CharacterProfiles.Data;
+using Content.Shared.CCVar;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
+using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Reflection;
 
@@ -11,72 +14,139 @@ namespace Content.Shared._Starlight.CharacterProfiles.Systems;
 public abstract class SharedCharacterProfileSystem : EntitySystem
 {
     [Dependency] protected readonly IReflectionManager ReflectionManager = default!;
-    [Dependency] protected readonly IDynamicTypeFactory TypeFactory = default!;
+    [Dependency] protected readonly IConfigurationManager Cfg = default!;
 
-    protected List<Type> CharacterProfileDataTypes = new();
+    protected int MaxCharacters = -1;
+    protected readonly List<ICharacterDataSystem> CharacterDataSystems = new();
+    protected readonly List<ICharacterDataMigrationSystem> CharacterDataMigrations = new();
 
     public override void Initialize()
     {
-        InitializeCharacterDataTypes();
+        CacheReflectionData();
+        Cfg.OnValueChanged(CCVars.GameMaxCharacterSlots, MaxCharactersChanged);
     }
 
-    public void ApplyToEntity(EntityUid target, CharacterProfile profile, bool isDoll = false)
+    private void MaxCharactersChanged(int slots)
     {
-        foreach (var data in profile.IterateCharacterData())
-            RaiseLocalEvent(new ApplyCharacterProfileEvent(target, data, isDoll));
+        MaxCharacters = slots;
     }
 
-    private void InitializeCharacterDataTypes()
+    public bool ValidateProfile(CharacterProfile profile)
     {
-        CharacterProfileDataTypes.Clear();
-        var interfaceType = typeof(ICharacterData);
+        foreach (var dataSystem in CharacterDataSystems)
+            if (!dataSystem.ValidateProfile(profile))
+            {
+                profile.HasInvalidData = true;
+                return false;
+            }
+        return true;
+    }
+
+    public void FixProfile(CharacterProfile profile)
+    {
+        //No invalid data means nothing to fix!
+        if (!profile.HasInvalidData)
+            return;
+        foreach (var dataSystem in CharacterDataSystems)
+            dataSystem.FixProfile(profile);
+    }
+
+    public void ApplyToEntity(EntityUid target, CharacterProfile profile)
+    {
+        foreach (var dataSystem in CharacterDataSystems)
+            dataSystem.ApplyProfile(target, profile);
+    }
+
+    public void ApplyToDoll(EntityUid target, CharacterProfile profile, CharacterPreviewMode previewMode = default)
+    {
+        foreach (var dataSystem in CharacterDataSystems)
+            dataSystem.ApplyProfileToDoll(target, profile, previewMode);
+    }
+
+    private void CacheReflectionData()
+    {
+        CharacterDataSystems.Clear();
+        var dataSystemInterfaceType = typeof(ICharacterDataSystem);
+
+        //Get and cache all datasystems
         foreach (var type in ReflectionManager.FindAllTypes())
         {
-            if (!type.IsAssignableTo(interfaceType) || type.IsAbstract)
-                continue;
-            CharacterProfileDataTypes.Add(type);
+            if (type.IsAssignableTo(dataSystemInterfaceType) && !type.IsAbstract)
+            {
+                var dataSystem = (ICharacterDataSystem)EntityManager.EntitySysManager.GetEntitySystem(type);
+                CharacterDataSystems.Add(dataSystem);
+                if (type.IsAssignableTo(typeof(ICharacterDataMigrationSystem)))
+                    CharacterDataMigrations.Add((ICharacterDataMigrationSystem)dataSystem);
+            }
         }
+        //sort data systems so that methods get run according to characterData order
+        CharacterDataSystems.Sort((s1, s2) =>
+        {
+            if (s1.ApplyBeforeData != null && s1.ApplyBeforeData.Contains(s2.DataType))
+                return -1;
+            if (s1.ApplyAfterData != null && s1.ApplyAfterData.Contains(s2.DataType))
+                return 1;
+            return 0;
+        });
     }
 
     protected CharacterProfile CreateRandomProfile()
     {
         var profile = CreateProfile();
-        RandomizeProfile(profile);
+        RandomizeProfile(profile, false);
         return profile;
     }
 
-    public void RandomizeProfile(CharacterProfile profile)
+    public void RandomizeProfile(CharacterProfile profile, bool dirtyProfile = true)
     {
-        //TODO: randomization stuff
-        ConvertLegacyProfile(profile, HumanoidCharacterProfile.Random());
-        profile.MarkDirty();
-    }
-
-    protected CharacterProfile CreateProfile()
-    {
-        var characterData = new List<ICharacterData>();
-        foreach (var type in CharacterProfileDataTypes)
-            characterData.Add(TypeFactory.CreateInstance<ICharacterData>(type));
-        return new CharacterProfile(characterData);
+        foreach (var dataSystem in CharacterDataSystems)
+            dataSystem.RandomizeProfile(profile);
+        if (dirtyProfile)
+            profile.MarkDirty();
     }
 
     public void ConvertLegacyProfile(CharacterProfile profile, HumanoidCharacterProfile legacyProfile)
     {
-        profile.GetData<LegacyCharacterData>().LegacyProfile = legacyProfile;
-        var rolePrefs = profile.GetData<CharacterRolePreferences>();
-
+        profile.SetData(new LegacyCharacterData
+        {
+            LegacyProfile =  legacyProfile
+        });
+        var rolePrefs = profile.GetData<CharacterRoleData>();
         rolePrefs.EnabledAntags = new HashSet<ProtoId<AntagPrototype>>(legacyProfile.AntagPreferences);
-
         rolePrefs.EnabledJobs = new HashSet<ProtoId<JobPrototype>>(legacyProfile.JobPreferences);
         foreach (var (protoId, loadout) in legacyProfile.Loadouts)
-        {
             rolePrefs.JobLoadouts.Add(protoId, loadout);
-        }
+    }
 
+    /// <summary>
+    /// Create a profile from existing data
+    /// </summary>
+    /// <param name="existingData">pre-existing data</param>
+    /// <returns>new profile</returns>
+    protected CharacterProfile CreateProfile(List<ICharacterData> existingData)
+    {
+        return new CharacterProfile(existingData);
+    }
+
+    protected CharacterProfile CreateProfile()
+    {
+        var newProfile = new CharacterProfile();
+        foreach (var dataSystem in CharacterDataSystems)
+            dataSystem.SetProfileDefaults(newProfile);
+        foreach (var migrationSystem in CharacterDataMigrations)
+            migrationSystem.MigrateProfileData(newProfile);
+        return newProfile;
     }
 
     protected void ClearDirty(CharacterProfile profile)
     {
         profile.ClearDirty();
+    }
+
+    public EntityUid CreateProfileDoll(CharacterProfile profile, CharacterPreviewMode previewMode = default)
+    {
+        var doll = EntityManager.Spawn(profile.DollPrototype);
+        ApplyToDoll(doll, profile, previewMode);
+        return doll;
     }
 }

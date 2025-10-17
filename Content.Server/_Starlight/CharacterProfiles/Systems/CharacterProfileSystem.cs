@@ -7,6 +7,7 @@ using Content.Shared._Starlight.CharacterProfiles;
 using Content.Shared._Starlight.CharacterProfiles.Systems;
 using Content.Shared.Preferences;
 using Robust.Shared.Network;
+using Robust.Shared.Player;
 
 namespace Content.Server._Starlight.CharacterProfiles.Systems;
 
@@ -22,25 +23,35 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         SubscribeLocalEvent<PlayerPreferencesLoadedEvent>(OnPlayerPrefsLoaded);
         SubscribeNetworkEvent<MsgUpdateCharacterProfile>(HandleCharacterUpdate);
         SubscribeNetworkEvent<MsgDeleteCharacterProfile>(HandleDeleteCharacter);
-        SubscribeNetworkEvent<MsgCreateCharacterProfile>(HandleCreateCharacter);
-    }
-
-    private void HandleCreateCharacter(MsgCreateCharacterProfile msg, EntitySessionEventArgs args)
-    {
-        if (!TryGetCharacterRegistry(args.SenderSession.UserId, out var registry))
-            return;
-        CharacterProfile? newProfile;
-        if (!registry.TryGetCharacterProfile(msg.Slot, out newProfile))
-            newProfile = CreateRandomProfile();
-        RaiseNetworkEvent(new MsgLoadCharacterProfile(msg.Slot, newProfile.GetData(false)), args.SenderSession);
     }
 
     private void HandleDeleteCharacter(MsgDeleteCharacterProfile msg, EntitySessionEventArgs args)
     {
-        //TODO: Raise DB delete
-        if (!_characterProfiles.TryGetValue(args.SenderSession.UserId, out var registry))
+        //Don't raise on the client if we received a delete request to prevent recursive loops
+        DeleteCharacter(args.SenderSession, msg.Slot, false);
+    }
+
+    private void HandleCharacterUpdate(MsgUpdateCharacterProfile msg, EntitySessionEventArgs args)
+    {
+        if (!TryGetCharacterRegistry(args.SenderSession.UserId, out var registry))
             return;
-        registry.DeleteProfile(msg.Slot);
+        if (!registry.TryGetCharacterProfile(msg.Slot, out var existing))
+        {
+            existing = CreateProfile();
+        }
+        existing.SetData(msg.Data);
+        _preferencesManager.SLSaveCharacter(args.SenderSession, msg.Slot, existing);
+    }
+
+    public bool DeleteCharacter(ICommonSession userSession, int slot, bool raiseOnClient = true)
+    {
+        if (!_characterProfiles.TryGetValue(userSession.UserId, out var registry) || !registry.DeleteProfile(slot))
+            return false;
+        if (raiseOnClient)
+            RaiseNetworkEvent(new MsgDeleteCharacterProfile(slot), userSession);
+        //TODO: DB delete
+        _preferencesManager.SLDeleteCharacter(userSession, slot);
+        return true;
     }
 
     private bool TryGetCharacterRegistry(NetUserId userId, [NotNullWhen(true)] out CharacterProfileRegistry? registry)
@@ -59,13 +70,6 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         return false;
     }
 
-    private void HandleCharacterUpdate(MsgUpdateCharacterProfile msg, EntitySessionEventArgs args)
-    {
-        if (!TryGetCharacterRegistry(args.SenderSession.UserId, out var registry)
-            || !TryGetCharacterInRegistry(registry, msg.Slot, args.SenderSession.UserId, out var profile))
-            return;
-        profile.SetFromList(msg.Data);
-    }
 
     public bool TryGetCharacterProfile(NetUserId userId, int slot, [NotNullWhen(true)] out CharacterProfile? profile)
     {
@@ -96,9 +100,8 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
             }
             var newProfile = CreateProfile();
             ConvertLegacyProfile(newProfile, legacyProfile);
-            registry.SetProfile(slot, newProfile);
-            ClearDirty(newProfile);
-            RaiseNetworkEvent(new MsgLoadCharacterProfile(slot, newProfile.GetData(false)), ev.Session);
+            registry.AddProfile(slot, newProfile);
+            RaiseNetworkEvent(new MsgSyncCharacterProfile(slot, newProfile), ev.Session);
         }
     }
 

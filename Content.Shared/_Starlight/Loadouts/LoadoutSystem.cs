@@ -1,7 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
-
-using Content.Shared._Starlight.CharacterProfileSystem.Components;
+using Content.Shared._Starlight.CharacterProfiles.Data;
 using Content.Shared.Inventory;
 using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Roles;
@@ -13,7 +12,7 @@ namespace Content.Shared.Clothing;
 /// <summary>
 /// Assigns a loadout to an entity based on the RoleLoadout prototype
 /// </summary>
-public sealed partial class LoadoutSystem : EntitySystem
+public sealed partial class LoadoutSystem
 {
     [Dependency] private readonly InventorySystem _inventorySystem = default!;
 
@@ -63,15 +62,15 @@ public sealed partial class LoadoutSystem : EntitySystem
         return roleProto;
     }
 
-    public void ApplyJobClothes(EntityUid target, Entity<CharacterProfileComponent> profile,
+    public void ApplyJobClothes(EntityUid target, CharacterRoleData roleData,
         ProtoId<JobPrototype>? jobOverride = null)
     {
         if (!_inventorySystem.TryGetSlots(target, out var slots))
             return;
 
-        var jobProto = jobOverride ?? profile.Comp.FavoriteJob;
+        var jobProto = jobOverride ?? roleData.FavoriteJob;
         var job = _protoMan.Index(jobProto);
-        if (!profile.Comp.JobLoadouts.TryGetValue(jobProto, out var data))
+        if (!roleData.JobLoadouts.TryGetValue(jobProto, out var data))
         {
             data = CreateDefaultLoadout(jobProto);
         }

@@ -4,6 +4,7 @@
 using Content.Client._Starlight.CharacterEditor.Systems;
 using Content.Client._Starlight.UI;
 using Content.Client._Starlight.UI.Controls;
+using Content.Shared._Starlight.CharacterProfiles;
 
 namespace Content.Client._Starlight.CharacterEditor.Controls;
 

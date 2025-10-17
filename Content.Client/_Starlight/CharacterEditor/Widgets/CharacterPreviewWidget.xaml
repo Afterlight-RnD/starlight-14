@@ -1,7 +1,6 @@
 ﻿<widgets:CharacterPreviewWidget
     xmlns="https://spacestation14.io"
     xmlns:widgets="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets"
-    xmlns:controls="clr-namespace:Content.Client._Starlight.UI.Controls"
     Orientation="Vertical">
     <Label
         Name="CharacterName" Access="Protected"

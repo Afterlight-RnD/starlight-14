@@ -1,10 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using Content.Client._Starlight.CharacterProfiles;
-using Content.Shared._Starlight.CharacterProfileSystem.Components;
-using Content.Shared.Humanoid;
-using Robust.Client.GameObjects;
+using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.UIEvents;
 
@@ -14,9 +11,7 @@ public sealed class CharacterSlotView : SpriteView, IUIEventSubscriber
 {
     private int _slot = -1;
 
-    public Entity<CharacterProfileComponent>? LinkedProfile = null;
-
-    public Entity<SpriteComponent, HumanoidAppearanceComponent>? LinkedPreview = null;
+    public CharacterProfile? LinkedProfile = null;
 
     [ViewVariables]
     public int Slot

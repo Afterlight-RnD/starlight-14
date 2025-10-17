@@ -20,21 +20,55 @@ public sealed class CharacterProfileRegistry
         }
     }
 
+    public bool AddProfile(int slot, CharacterProfile profile)
+    {
+        profile.Slot = slot;
+        return AddProfile(profile);
+    }
+
+    public bool AddProfile(CharacterProfile profile)
+    {
+        return _profiles.TryAdd(profile.Slot, profile);
+    }
+
+    public bool SlotHasProfile(int slot)
+    {
+        return _profiles.ContainsKey(slot);
+    }
+
+    public int OccupiedSlots => _profiles.Count;
+
+    public int GetFirstFreeSlot(int maxCharacters)
+    {
+        for (var i = 0; i < maxCharacters; i++)
+            if (!_profiles.ContainsKey(i))
+                return i;
+        return -1;
+    }
+
     public bool TryGetCharacterProfile(int slot, [NotNullWhen(true)] out CharacterProfile? profile)
     {
         return _profiles.TryGetValue(slot, out profile);
     }
 
-    public void SetProfile(int characterProfile, CharacterProfile profile)
+    public void SetProfileData(int slot, params ICharacterData[] characterData)
     {
-        _profiles[characterProfile] = profile;
+        SetProfileData_Implementation(slot, characterData);
     }
 
-    public void MarkDirtyProfileData<T>(int slot) where T: ICharacterData, new()
+    public void SetProfileData(int slot, IEnumerable<ICharacterData> characterData)
     {
-        if (!TryGetCharacterProfile(slot, out var profile))
-            return;
-        profile.MarkDataDirty<T>();
+        SetProfileData_Implementation(slot, characterData);
+    }
+
+    private void SetProfileData_Implementation(int slot, IEnumerable<ICharacterData> characterData)
+    {
+        _profiles[slot].SetData(characterData);
+    }
+
+    private void SetProfileData<T>(int slot, IEnumerable<ICharacterData> characterData)
+    {
+        _profiles[slot].SetData(characterData);
     }
 
     public void MarkDirtyProfile(int slot)
