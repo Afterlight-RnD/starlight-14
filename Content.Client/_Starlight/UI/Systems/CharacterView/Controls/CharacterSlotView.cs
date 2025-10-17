@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using Content.Client._Starlight.CharacterProfiles;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.UIEvents;
@@ -25,5 +26,43 @@ public sealed class CharacterSlotView : SpriteView, IUIEventSubscriber
             UserInterfaceManager.RaiseUIEvent(this, new SlotChangedEvent());
         }
     }
+
+    protected override void EnteredTree()
+    {
+        UserInterfaceManager.SubscribeUIEvent<CharacterProfileCreatedUIEvent>(this,OnCharacterCreated);
+        UserInterfaceManager.SubscribeUIEvent<CharacterProfileUpdatedUIEvent>(this,OnCharacterUpdated);
+        UserInterfaceManager.SubscribeUIEvent<CharacterProfileDeletedUIEvent>(this,OnCharacterDeleted);
+    }
+
+    protected override void ExitedTree()
+    {
+        UserInterfaceManager.UnSubscribeAllUIEvents(this);
+    }
+
+    private void OnCharacterUpdated(CharacterProfileUpdatedUIEvent ev)
+    {
+        if (LinkedProfile?.Slot != _slot)
+            return;
+        LinkedProfile = ev.Profile;
+    }
+
+    private void OnCharacterDeleted(CharacterProfileDeletedUIEvent ev)
+    {
+        if (LinkedProfile?.Slot != _slot)
+            return;
+        LinkedProfile = null;
+        SetEntity(null);
+    }
+
+    private void OnCharacterCreated(CharacterProfileCreatedUIEvent ev)
+    {
+        if (LinkedProfile?.Slot != _slot)
+            return;
+        LinkedProfile = ev.Profile;
+        SetEntity(ev.PreviewEntity);
+    }
+
+
+
     public record struct SlotChangedEvent();
 }

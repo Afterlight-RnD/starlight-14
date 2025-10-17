@@ -34,19 +34,11 @@ public sealed partial class CharacterProfile
     public CharacterProfile(CharacterProfile other)
     {
         SetData(other.GetData(), false);
-
-        //TODO: Legacy migration
-        DollPrototype = IoCManager.Resolve<IPrototypeManager>()
-            .Index(GetData<LegacyCharacterData>().LegacyProfile.Species).DollPrototype;
     }
 
     public CharacterProfile(List<ICharacterData> dataList)
     {
         SetData(dataList, false);
-
-        //TODO: Legacy migration
-        DollPrototype = IoCManager.Resolve<IPrototypeManager>()
-            .Index(GetData<LegacyCharacterData>().LegacyProfile.Species).DollPrototype;
     }
 
     public Dictionary<Type, ICharacterData> GetTypedData(bool onlyDirty = true)

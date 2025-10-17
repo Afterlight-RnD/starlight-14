@@ -44,6 +44,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
             existingProfile.SetData(ev.Data);
             previewEnt = EnsurePreviewEntity(ev.Slot, existingProfile);
             ApplyToDoll(previewEnt, existingProfile);
+            _uiManager.RaiseUIEvent(new CharacterProfileUpdatedUIEvent(existingProfile));
             return;
         }
         if (ev.PartialData)
@@ -51,11 +52,11 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
             Log.Error($"Tried to create incomplete profile for slot:{ev.Slot}");
             return;
         }
-        //Slot is already checked so this will always succeed
-        var newProfile = CreateProfile(ev.Data);
+        var newProfile = LoadExistingProfile(ev.Data);
         _characterRegistry.AddProfile(ev.Slot,newProfile);
         previewEnt = EnsurePreviewEntity(ev.Slot, newProfile);
         ApplyToDoll(previewEnt, newProfile);
+        _uiManager.RaiseUIEvent(new CharacterProfileCreatedUIEvent(newProfile, previewEnt));
     }
 
     private void HandleCharacterDeleted(MsgDeleteCharacterProfile ev)
@@ -89,11 +90,12 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
 
     public bool DeleteCharacterInSlot(int slot, bool raiseOnServer = true)
     {
-        if (!_characterRegistry.DeleteProfile(slot))
+        if (!_characterRegistry.DeleteProfile(slot, out var oldProfile))
             return false;
         ClearPreviewEntity(slot);
         if (raiseOnServer)
             RaiseNetworkEvent(new MsgDeleteCharacterProfile(slot));
+        _uiManager.RaiseUIEvent(new CharacterProfileDeletedUIEvent(oldProfile));
         return true;
     }
 
@@ -118,6 +120,8 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
         ValidateProfile(profile);
         RaiseNetworkEvent(new MsgUpdateCharacterProfile(slot, profile));
         _characterRegistry.AddProfile(slot, profile);
+        var previewEnt = EnsurePreviewEntity(slot, profile);
+        _uiManager.RaiseUIEvent(new CharacterProfileCreatedUIEvent(profile, previewEnt));
         return true;
     }
 

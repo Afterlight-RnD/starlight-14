@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using Content.Client._Starlight.CharacterProfiles;
 using Content.Client._Starlight.CharacterProfiles.Systems;
 using Content.Client._Starlight.UI.Systems.CharacterView.Controls;
 using Robust.Client.UserInterface;
@@ -30,7 +31,6 @@ public sealed class CharacterSlotViewSystem : UISystem
     {
         UpdateLinkedEntity(viewControl, viewControl.Slot);
     }
-
     private void OnSlotChanged(CharacterSlotView viewControl, CharacterSlotView.SlotChangedEvent ev)
     {
         UpdateLinkedEntity(viewControl, viewControl.Slot);

@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using Content.Client._Starlight.CharacterEditor.Controls;
 using Content.Client._Starlight.CharacterProfiles.Systems;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.GameObjects;
@@ -22,6 +23,24 @@ public sealed class CharacterEditorSystem : UISystem
     public override void Initialize()
     {
         SubscribeUIEvent<CharacterEditingHasChangesUIEvent>(OnProfileDirtied);
+        SubscribeUIEvent<ProfileSelectorButton, ControlEnteredTreeUIEvent>(OnProfileButtonAdded);
+        SubscribeUIEvent<ProfileSelectorButton, ControlExitedTreeUIEvent>(OnProfileButtonRemoved);
+    }
+
+    private void OnProfileButtonRemoved(ProfileSelectorButton control, ControlExitedTreeUIEvent ev)
+    {
+        control.SetFromProfile(null);
+        control.SetPreviewSprite(null);
+    }
+
+    private void OnProfileButtonAdded(ProfileSelectorButton control, ControlEnteredTreeUIEvent ev)
+    {
+        _characterProfileSystem.TryGetCharacterProfile(control.Slot, out var profile);
+        Entity<SpriteComponent>? previewEnt = null;
+        if (profile != null)
+            previewEnt = _characterProfileSystem.EnsurePreviewEntity(control.Slot, profile);
+        control.SetFromProfile(profile);
+        control.SetPreviewSprite(previewEnt);
     }
 
     private void OnProfileDirtied(CharacterEditingHasChangesUIEvent ev)

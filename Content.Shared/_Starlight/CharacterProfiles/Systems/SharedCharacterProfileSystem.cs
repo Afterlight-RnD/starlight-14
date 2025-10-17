@@ -20,6 +20,7 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
     protected int MaxCharacters = -1;
     protected readonly List<ICharacterDataSystem> CharacterDataSystems = new();
     protected readonly List<ICharacterDataMigrationSystem> CharacterDataMigrations = new();
+    protected ICharacterDollProvider DollProvider = default!;//No provider or multiple providers will cause a fatal error
 
     public override void Initialize()
     {
@@ -69,6 +70,7 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
         CharacterDataSystems.Clear();
         var dataSystemInterfaceType = typeof(ICharacterDataSystem);
 
+        var foundDollProvider = false;
         //Get and cache all datasystems
         foreach (var type in ReflectionManager.FindAllTypes())
         {
@@ -78,6 +80,13 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
                 CharacterDataSystems.Add(dataSystem);
                 if (type.IsAssignableTo(typeof(ICharacterDataMigrationSystem)))
                     CharacterDataMigrations.Add((ICharacterDataMigrationSystem)dataSystem);
+                if (type.IsAssignableTo(typeof(ICharacterDollProvider)))
+                {
+                    if (foundDollProvider)
+                        Log.Fatal($"Multiple CharacterDollProviders found, only one is supported! {DollProvider.GetType()}, {type}");
+                    DollProvider = (ICharacterDollProvider)dataSystem;
+                    foundDollProvider = true;
+                }
             }
         }
         //sort data systems so that methods get run according to characterData order
@@ -102,21 +111,9 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
     {
         foreach (var dataSystem in CharacterDataSystems)
             dataSystem.RandomizeProfile(profile);
+        profile.DollPrototype = DollProvider.GetDollProto(profile);
         if (dirtyProfile)
             profile.MarkDirty();
-    }
-
-    public void ConvertLegacyProfile(CharacterProfile profile, HumanoidCharacterProfile legacyProfile)
-    {
-        profile.SetData(new LegacyCharacterData
-        {
-            LegacyProfile =  legacyProfile
-        });
-        var rolePrefs = profile.GetData<CharacterRoleData>();
-        rolePrefs.EnabledAntags = new HashSet<ProtoId<AntagPrototype>>(legacyProfile.AntagPreferences);
-        rolePrefs.EnabledJobs = new HashSet<ProtoId<JobPrototype>>(legacyProfile.JobPreferences);
-        foreach (var (protoId, loadout) in legacyProfile.Loadouts)
-            rolePrefs.JobLoadouts.Add(protoId, loadout);
     }
 
     /// <summary>
@@ -124,11 +121,21 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
     /// </summary>
     /// <param name="existingData">pre-existing data</param>
     /// <returns>new profile</returns>
-    protected CharacterProfile CreateProfile(List<ICharacterData> existingData)
+    protected CharacterProfile LoadExistingProfile(List<ICharacterData> existingData)
     {
-        return  new CharacterProfile(existingData);
+        var newProfile = new CharacterProfile(existingData);
+        //Migrate existing data
+        foreach (var migrationSystem in CharacterDataMigrations)
+            migrationSystem.MigrateProfileData(newProfile);
+
+        newProfile.DollPrototype = DollProvider.GetDollProto(newProfile);
+        return newProfile;
     }
 
+    /// <summary>
+    /// Create a new default profile
+    /// </summary>
+    /// <returns></returns>
     protected CharacterProfile CreateProfile()
     {
         var newProfile = new CharacterProfile();
@@ -137,9 +144,7 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
         foreach (var migrationSystem in CharacterDataMigrations)
             migrationSystem.MigrateProfileData(newProfile);
 
-        //TODO: Legacy migration
-        newProfile.DollPrototype = PrototypeManager
-            .Index(newProfile.GetData<LegacyCharacterData>().LegacyProfile.Species).DollPrototype;
+        newProfile.DollPrototype = DollProvider.GetDollProto(newProfile);
         return newProfile;
     }
 

@@ -78,4 +78,9 @@ public sealed class CharacterProfileRegistry
     {
         return _profiles.Remove(slot);
     }
+
+    public bool DeleteProfile(int slot,  [NotNullWhen(true)] out CharacterProfile? profile)
+    {
+        return _profiles.Remove(slot, out profile);
+    }
 }

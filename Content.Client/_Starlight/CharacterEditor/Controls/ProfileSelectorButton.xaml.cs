@@ -28,7 +28,25 @@ public sealed partial class ProfileSelectorButton : ContainerButton, IUIEventSub
 
     protected override void EnteredTree()
     {
+        UserInterfaceManager.SubscribeUIEvent<CharacterProfileCreatedUIEvent>(this,OnProfileCreated);
         UserInterfaceManager.SubscribeUIEvent<CharacterProfileUpdatedUIEvent>(this,OnProfileUpdated);
+        UserInterfaceManager.SubscribeUIEvent<CharacterProfileDeletedUIEvent>(this,OnProfileDeleted);
+    }
+
+    private void OnProfileDeleted(CharacterProfileDeletedUIEvent ev)
+    {
+        if (ev.Profile.Slot != Slot)
+            return;
+        SetFromProfile(null);
+        CharacterView.SetEntity(null);
+    }
+
+    private void OnProfileCreated(CharacterProfileCreatedUIEvent ev)
+    {
+        if (ev.Profile.Slot != Slot)
+            return;
+        SetFromProfile(ev.Profile);
+        CharacterView.SetEntity(ev.PreviewEntity);
     }
 
     private void OnProfileUpdated(CharacterProfileUpdatedUIEvent ev)
@@ -46,6 +64,7 @@ public sealed partial class ProfileSelectorButton : ContainerButton, IUIEventSub
     public ProfileSelectorButton()
     {
         RobustXamlLoader.Load(this);
+        IoCManager.InjectDependencies(this);
         AddStyleClass(StyleClassButton);
         SetupButtonOutlines();
         EnabledCheck.OnToggled += OnActivateToggled;
@@ -62,6 +81,11 @@ public sealed partial class ProfileSelectorButton : ContainerButton, IUIEventSub
     {
         DeleteButtonOutline.Visible = visible;
         DeleteButton.Disabled = !visible;
+    }
+
+    public void SetPreviewSprite(Entity<SpriteComponent>? previewEntity)
+    {
+        CharacterView.SetEntity(previewEntity);
     }
 
     public void SetFromProfile(CharacterProfile? profile)

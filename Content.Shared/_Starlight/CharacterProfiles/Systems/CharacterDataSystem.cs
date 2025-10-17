@@ -12,6 +12,11 @@ public interface ICharacterDataMigrationSystem
     public void MigrateProfileData(CharacterProfile profile);
 }
 
+public interface ICharacterDollProvider
+{
+    public EntProtoId GetDollProto(CharacterProfile profile);
+}
+
 public interface ICharacterDataMigration<in TOld, TNew>: ICharacterDataMigrationSystem
     where TOld: struct, ICharacterData
     where TNew: struct, ICharacterData

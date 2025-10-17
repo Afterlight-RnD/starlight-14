@@ -4,10 +4,12 @@
 using System.Diagnostics.CodeAnalysis;
 using Content.Server.Preferences.Managers;
 using Content.Shared._Starlight.CharacterProfiles;
+using Content.Shared._Starlight.CharacterProfiles.Data;
 using Content.Shared._Starlight.CharacterProfiles.Systems;
 using Content.Shared.Preferences;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server._Starlight.CharacterProfiles.Systems;
 
@@ -86,11 +88,18 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         return newRegistry;
     }
 
+    public CharacterProfile LoadProfile(ICommonSession userSession, int slot, List<ICharacterData> characterData)
+    {
+        var registry = EnsureRegistry(userSession.UserId);
+        var newProfile = LoadExistingProfile(characterData);
+        registry.AddProfile(slot, newProfile);
+        RaiseNetworkEvent(new MsgSyncCharacterProfile(slot, newProfile), userSession);
+        return newProfile;
+    }
+
 
     private void OnPlayerPrefsLoaded(PlayerPreferencesLoadedEvent ev)
     {
-        var registry = EnsureRegistry(ev.Session.UserId);
-
         foreach (var (slot, profile) in ev.Preferences.Characters)
         {
             if (profile is not HumanoidCharacterProfile legacyProfile)
@@ -98,10 +107,12 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
                 Log.Warning($"profile is of unsupported type:{profile.GetType()}");
                 continue;
             }
-            var newProfile = CreateProfile();
-            ConvertLegacyProfile(newProfile, legacyProfile);
-            registry.AddProfile(slot, newProfile);
-            RaiseNetworkEvent(new MsgSyncCharacterProfile(slot, newProfile), ev.Session);
+            //TODO: Legacy conversion
+            LoadProfile(ev.Session, slot,
+            [
+                new CharacterRoleData(), new CharacterSpeciesData(),
+                new LegacyCharacterData { LegacyProfile = legacyProfile }
+            ]);
         }
     }
 
