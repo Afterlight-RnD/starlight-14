@@ -6,7 +6,6 @@ using Content.Shared._Starlight.Medical.Cybernetics.Systems;
 using Content.Shared.Clothing;
 using Content.Shared.Humanoid;
 using Content.Shared.Preferences;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Starlight.CharacterProfiles.Data;
@@ -17,7 +16,7 @@ public partial struct LegacyCharacterData() : ICharacterData
     [DataField] public HumanoidCharacterProfile LegacyProfile = HumanoidCharacterProfile.DefaultWithSpecies();
 }
 
-public sealed class LegacyCharacterDataSystem : CharacterDataSystem<LegacyCharacterData>, ICharacterDollProvider
+public sealed class LegacyCharacterDataSystem : CharacterDataSystem<LegacyCharacterData>
 {
     [Dependency] private readonly SharedHumanoidAppearanceSystem _appearanceSystem = default!;
     [Dependency] private readonly LoadoutSystem _loadoutSystem = default!;
@@ -28,10 +27,8 @@ public sealed class LegacyCharacterDataSystem : CharacterDataSystem<LegacyCharac
         _cyberneticsSystem.ApplyCyberneticVisuals((target, Comp<HumanoidAppearanceComponent>(target)), data.LegacyProfile);
     }
 
-    protected override void Randomize(ref LegacyCharacterData data)
+    protected override void Randomize(CharacterProfile profile, ref LegacyCharacterData data)
     {
         data.LegacyProfile = HumanoidCharacterProfile.Random();
     }
-
-    public EntProtoId GetDollProto(CharacterProfile profile) => PrototypeManager.Index(profile.GetData<LegacyCharacterData>().LegacyProfile.Species).DollPrototype;
 }

@@ -5,6 +5,7 @@ using Content.Client._Starlight.CharacterEditor.Controls;
 using Content.Client._Starlight.CharacterProfiles.Systems;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.GameObjects;
+using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.UIEvents;
 
 namespace Content.Client._Starlight.CharacterEditor.Systems;
@@ -25,6 +26,19 @@ public sealed class CharacterEditorSystem : UISystem
         SubscribeUIEvent<CharacterEditingHasChangesUIEvent>(OnProfileDirtied);
         SubscribeUIEvent<ProfileSelectorButton, ControlEnteredTreeUIEvent>(OnProfileButtonAdded);
         SubscribeUIEvent<ProfileSelectorButton, ControlExitedTreeUIEvent>(OnProfileButtonRemoved);
+        SubscribeUIEvent<ProfileSelectorButton, ButtonPressedUIEvent>(OnProfileSelected);
+
+        SubscribeUIEvent<CharacterPreviewModeButton, ButtonPressedUIEvent>(OnPreviewModeButtonPressed);
+    }
+
+    private void OnPreviewModeButtonPressed(CharacterPreviewModeButton control, ButtonPressedUIEvent ev)
+    {
+        ChangePreviewMode(control.PreviewMode);
+    }
+
+    private void OnProfileSelected(ProfileSelectorButton control, ButtonPressedUIEvent ev)
+    {
+        StartEditingSlot(control.Slot);
     }
 
     private void OnProfileButtonRemoved(ProfileSelectorButton control, ControlExitedTreeUIEvent ev)
@@ -50,16 +64,27 @@ public sealed class CharacterEditorSystem : UISystem
 
     public void StartEditingSlot(int slot)
     {
-        if (_liveProfile == null || !_characterProfileSystem.TryGetCharacterProfile(slot, out var profile))
+        if (!_characterProfileSystem.TryGetCharacterProfile(slot, out var profile))
         {
             Log.Error($"Tried to start editing slot:{slot} but it doesn't have a profile!");
             return;
         }
-        if (_liveProfile.Slot == slot)
-            return;
+
+        if (_liveProfile != null)
+        {
+            if (_liveProfile.Slot == slot)
+                return;
+            RaiseUIEvent(new CharacterEditingFinishedUIEvent(_liveProfile));
+        }
+
         if (_livePreview != null)
+        {
             EntityManager.DeleteEntity(_livePreview);
+            _livePreview = null;
+        }
         _liveProfile = new CharacterProfile(profile.GetData(false)) { Slot = slot };
+        _livePreview = EnsureLivePreview();
+        RaiseUIEvent(new CharacterEditingStartedUIEvent(_liveProfile, _livePreview.Value));
         RefreshPreviewVisuals();
     }
 
@@ -79,12 +104,15 @@ public sealed class CharacterEditorSystem : UISystem
         }
         profile.SetData(_liveProfile.GetData());
         _characterProfileSystem.ApplyProfileChanges(_liveProfile.Slot);
+        RaiseUIEvent(new CharacterEditingAppliedUIEvent(_liveProfile));
     }
 
     public void ChangePreviewMode(CharacterPreviewMode newPreviewMode)
     {
         if (_previewmode == newPreviewMode)
             return;
+        _previewmode = newPreviewMode;
+        RefreshPreviewVisuals();
     }
 
     private Entity<SpriteComponent> EnsureLivePreview()

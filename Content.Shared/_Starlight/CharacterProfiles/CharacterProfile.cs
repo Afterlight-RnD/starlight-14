@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using System.Linq;
-using Content.Shared._Starlight.CharacterProfiles.Data;
 using Content.Shared._Starlight.CharacterProfiles.Systems;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Starlight.CharacterProfiles;
@@ -16,9 +14,6 @@ public sealed partial class CharacterProfile
 
     //TODO: probably should have some custom serialization stuff so that types aren't serialized into yaml?
     [DataField] private Dictionary<Type, ICharacterData> _data = new();
-
-    [Access(typeof(SharedCharacterProfileSystem))]
-    [DataField] public EntProtoId DollPrototype { get; set; }
 
     [Access(typeof(SharedCharacterProfileSystem))]
 

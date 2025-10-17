@@ -4,8 +4,6 @@
 using System.Linq;
 using Content.Shared._Starlight.CharacterProfiles.Data;
 using Content.Shared.CCVar;
-using Content.Shared.Preferences;
-using Content.Shared.Roles;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Reflection;
@@ -20,7 +18,7 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
     protected int MaxCharacters = -1;
     protected readonly List<ICharacterDataSystem> CharacterDataSystems = new();
     protected readonly List<ICharacterDataMigrationSystem> CharacterDataMigrations = new();
-    protected ICharacterDollProvider DollProvider = default!;//No provider or multiple providers will cause a fatal error
+    protected readonly List<ICharacterDataSystem> InitSystems = new();
 
     public override void Initialize()
     {
@@ -70,7 +68,6 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
         CharacterDataSystems.Clear();
         var dataSystemInterfaceType = typeof(ICharacterDataSystem);
 
-        var foundDollProvider = false;
         //Get and cache all datasystems
         foreach (var type in ReflectionManager.FindAllTypes())
         {
@@ -78,15 +75,10 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
             {
                 var dataSystem = (ICharacterDataSystem)EntityManager.EntitySysManager.GetEntitySystem(type);
                 CharacterDataSystems.Add(dataSystem);
+                if (dataSystem.HasInit)
+                    InitSystems.Add(dataSystem);
                 if (type.IsAssignableTo(typeof(ICharacterDataMigrationSystem)))
                     CharacterDataMigrations.Add((ICharacterDataMigrationSystem)dataSystem);
-                if (type.IsAssignableTo(typeof(ICharacterDollProvider)))
-                {
-                    if (foundDollProvider)
-                        Log.Fatal($"Multiple CharacterDollProviders found, only one is supported! {DollProvider.GetType()}, {type}");
-                    DollProvider = (ICharacterDollProvider)dataSystem;
-                    foundDollProvider = true;
-                }
             }
         }
         //sort data systems so that methods get run according to characterData order
@@ -111,7 +103,6 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
     {
         foreach (var dataSystem in CharacterDataSystems)
             dataSystem.RandomizeProfile(profile);
-        profile.DollPrototype = DollProvider.GetDollProto(profile);
         if (dirtyProfile)
             profile.MarkDirty();
     }
@@ -127,8 +118,8 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
         //Migrate existing data
         foreach (var migrationSystem in CharacterDataMigrations)
             migrationSystem.MigrateProfileData(newProfile);
-
-        newProfile.DollPrototype = DollProvider.GetDollProto(newProfile);
+        foreach (var dataSystem in InitSystems)
+            dataSystem.InitProfile(newProfile);
         return newProfile;
     }
 
@@ -143,8 +134,8 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
             dataSystem.SetProfileDefaults(newProfile);
         foreach (var migrationSystem in CharacterDataMigrations)
             migrationSystem.MigrateProfileData(newProfile);
-
-        newProfile.DollPrototype = DollProvider.GetDollProto(newProfile);
+        foreach (var dataSystem in InitSystems)
+            dataSystem.InitProfile(newProfile);
         return newProfile;
     }
 
@@ -155,7 +146,7 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
 
     public EntityUid CreateProfileDoll(CharacterProfile profile, CharacterPreviewMode previewMode = default)
     {
-        var doll = EntityManager.Spawn(profile.DollPrototype);
+        var doll = EntityManager.Spawn(profile.GetData<CharacterSpeciesData>().DollPrototype);
         ApplyToDoll(doll, profile, previewMode);
         return doll;
     }

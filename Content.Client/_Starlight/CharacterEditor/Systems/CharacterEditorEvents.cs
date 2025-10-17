@@ -12,4 +12,6 @@ public record struct CharacterEditingHasChangesUIEvent(CharacterProfile Profile)
 
 public record struct CharacterEditingFinishedUIEvent(CharacterProfile Profile);
 
+public record struct CharacterEditingAppliedUIEvent(CharacterProfile Profile);
+
 public record struct CharacterProfileToggleActiveUIEvent(int Slot, bool Active);

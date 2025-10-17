@@ -24,11 +24,12 @@ public partial struct CharacterRoleData() : ICharacterData
 }
 
 
-public sealed class CharacterRoleDataSystem : CharacterDataSystem<CharacterRoleData>,
+public sealed partial class CharacterRoleDataSystem : CharacterDataSystem<CharacterRoleData>,
     ICharacterDataMigration<LegacyCharacterData, CharacterRoleData>
 {
     [Dependency] private readonly LoadoutSystem _loadoutSystem = default!;
 
+    public override Type[]? ApplyAfterData => [typeof(LegacyCharacterData)];
 
     protected override void ApplyToDoll(EntityUid target, CharacterRoleData data, CharacterPreviewMode previewMode)
     {

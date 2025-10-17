@@ -110,8 +110,9 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
             //TODO: Legacy conversion
             LoadProfile(ev.Session, slot,
             [
-                new CharacterRoleData(), new CharacterSpeciesData(),
-                new LegacyCharacterData { LegacyProfile = legacyProfile }
+                new LegacyCharacterData { LegacyProfile = legacyProfile},
+                new CharacterIdentityData(),
+                new CharacterRoleData(), new CharacterSpeciesData()
             ]);
         }
     }

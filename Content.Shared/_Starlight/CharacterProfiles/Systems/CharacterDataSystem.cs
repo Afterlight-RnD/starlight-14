@@ -5,16 +5,9 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Shared._Starlight.CharacterProfiles.Systems;
-
-
 public interface ICharacterDataMigrationSystem
 {
     public void MigrateProfileData(CharacterProfile profile);
-}
-
-public interface ICharacterDollProvider
-{
-    public EntProtoId GetDollProto(CharacterProfile profile);
 }
 
 public interface ICharacterDataMigration<in TOld, TNew>: ICharacterDataMigrationSystem
@@ -42,6 +35,8 @@ public interface ICharacterDataSystem
     /// </summary>
     public virtual Type[]? ApplyAfterData => null;
 
+    public virtual bool HasInit => false;
+
     public abstract Type DataType { get; }
 
     public void SetProfileDefaults(CharacterProfile profile);
@@ -55,6 +50,8 @@ public interface ICharacterDataSystem
     public bool ValidateProfile(CharacterProfile profile);
 
     public void FixProfile(CharacterProfile profile);
+
+    public void InitProfile(CharacterProfile profile);
 }
 
 public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataSystem where TData: struct, ICharacterData
@@ -72,6 +69,11 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
     /// </summary>
     public virtual Type[]? ApplyAfterData => null;
 
+    /// <summary>
+    /// Should we run init on this data
+    /// </summary>
+    public virtual bool HasInit => false;
+
 
     Type ICharacterDataSystem.DataType => typeof(TData);
 
@@ -82,23 +84,32 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
         Apply(target, data);
     }
 
-    protected virtual void Randomize(ref TData data){}
+    protected virtual void Randomize(CharacterProfile profile, ref TData data){}
 
-    protected virtual bool Validate(TData data) => true;
+    protected virtual bool Validate(CharacterProfile profile, TData data) => true;
 
     /// <summary>
     /// Fixes any malformed/malicious data in the profile
     /// </summary>
+    /// <param name="profile">owning profile</param>
     /// <param name="data">data to change</param>
     /// <returns>True if changes were made</returns>
-    protected virtual bool FixData(ref TData data) => false;
+    protected virtual bool FixData(CharacterProfile profile, ref TData data) => false;
 
     /// <summary>
     /// Applies default values to a profile
     /// </summary>
+    /// <param name="profile">owning profile</param>
     /// <param name="data">data to change</param>
-    /// <returns>True if changes were made</returns>
-    protected virtual void SetDefaults(ref TData data) {}
+
+    protected virtual void SetDefaults(CharacterProfile profile, ref TData data) {}
+
+    /// <summary>
+    /// Runs after profile construction to initialize dependent data
+    /// </summary>
+    /// <param name="profile">owning profile</param>
+    /// <param name="data">data to change</param>
+    protected virtual void InitData(CharacterProfile profile, ref TData data){}
 
     void ICharacterDataSystem.ApplyProfile(EntityUid target, CharacterProfile profile)
     {
@@ -112,29 +123,34 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
 
     void ICharacterDataSystem.RandomizeProfile(CharacterProfile profile)
     {
-        //var data = new TData(); //this explodes sandboxing
         var data = _typeFactory.CreateInstance<TData>();
         profile.SetData(data);
     }
 
     bool ICharacterDataSystem.ValidateProfile(CharacterProfile profile)
     {
-        return Validate(profile.GetData<TData>());
+        return Validate(profile, profile.GetData<TData>());
     }
 
     void ICharacterDataSystem.FixProfile(CharacterProfile profile)
     {
         var data = profile.GetData<TData>();
-        if (!FixData(ref data))
+        if (!FixData(profile, ref data))
             return;
+        profile.SetData(data);
+    }
+
+    public void InitProfile(CharacterProfile profile)
+    {
+        var data = profile.GetData<TData>();
+        InitData(profile, ref data);
         profile.SetData(data);
     }
 
     void ICharacterDataSystem.SetProfileDefaults(CharacterProfile profile)
     {
-        //var data = new TData(); //this explodes sandboxing
         var data = _typeFactory.CreateInstance<TData>();
-        SetDefaults(ref data);
+        SetDefaults(profile, ref data);
 
         profile.SetData(data, false);
     }

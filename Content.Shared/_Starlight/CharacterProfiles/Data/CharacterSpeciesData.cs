@@ -14,21 +14,38 @@ namespace Content.Shared._Starlight.CharacterProfiles.Data;
 public partial struct CharacterSpeciesData(): ICharacterData
 {
     [DataField] public ProtoId<SpeciesPrototype> BaseSpecies = new();
+    [DataField] public EntProtoId DollPrototype = new();
 }
 
-public sealed class CharacterSpeciesDataSystem : CharacterDataSystem<CharacterSpeciesData>
+public sealed class CharacterSpeciesDataSystem : CharacterDataSystem<CharacterSpeciesData>,
+    ICharacterDataMigration<LegacyCharacterData, CharacterSpeciesData>
 {
+    public override Type[]? ApplyAfterData => [typeof(LegacyCharacterData)];
+
+    public override bool HasInit => true;
+
+    protected override void InitData(CharacterProfile profile,  ref CharacterSpeciesData data)
+    {
+        data.DollPrototype = PrototypeManager.Index(data.BaseSpecies).DollPrototype;
+    }
+
     protected override void Apply(EntityUid target, CharacterSpeciesData data)
     {
         //nothing for now
     }
 
-    protected override void Randomize(ref CharacterSpeciesData data)
+    protected override void Randomize(CharacterProfile profile, ref CharacterSpeciesData data)
     {
         data.BaseSpecies = Random.Pick(PrototypeManager
             .EnumeratePrototypes<SpeciesPrototype>()
             .Where(x => x.RoundStart)
             .ToArray()
         ).ID;
+        data.DollPrototype = PrototypeManager.Index(data.BaseSpecies).DollPrototype;
+    }
+
+    public void MigrateData(LegacyCharacterData oldData, ref CharacterSpeciesData newData)
+    {
+        newData.BaseSpecies = oldData.LegacyProfile.Species;
     }
 }
