@@ -15,6 +15,7 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
 {
     [Dependency] protected readonly IReflectionManager ReflectionManager = default!;
     [Dependency] protected readonly IConfigurationManager Cfg = default!;
+    [Dependency] protected readonly IPrototypeManager PrototypeManager = default!;
 
     protected int MaxCharacters = -1;
     protected readonly List<ICharacterDataSystem> CharacterDataSystems = new();
@@ -125,7 +126,7 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
     /// <returns>new profile</returns>
     protected CharacterProfile CreateProfile(List<ICharacterData> existingData)
     {
-        return new CharacterProfile(existingData);
+        return  new CharacterProfile(existingData);
     }
 
     protected CharacterProfile CreateProfile()
@@ -135,6 +136,10 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
             dataSystem.SetProfileDefaults(newProfile);
         foreach (var migrationSystem in CharacterDataMigrations)
             migrationSystem.MigrateProfileData(newProfile);
+
+        //TODO: Legacy migration
+        newProfile.DollPrototype = PrototypeManager
+            .Index(newProfile.GetData<LegacyCharacterData>().LegacyProfile.Species).DollPrototype;
         return newProfile;
     }
 

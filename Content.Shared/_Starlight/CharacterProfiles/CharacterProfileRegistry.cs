@@ -50,23 +50,12 @@ public sealed class CharacterProfileRegistry
     {
         return _profiles.TryGetValue(slot, out profile);
     }
-
-    public void SetProfileData(int slot, params ICharacterData[] characterData)
-    {
-        SetProfileData_Implementation(slot, characterData);
-    }
-
-    public void SetProfileData(int slot, IEnumerable<ICharacterData> characterData)
-    {
-        SetProfileData_Implementation(slot, characterData);
-    }
-
-    private void SetProfileData_Implementation(int slot, IEnumerable<ICharacterData> characterData)
+    public void SetProfileData(int slot, List<ICharacterData> characterData)
     {
         _profiles[slot].SetData(characterData);
     }
 
-    private void SetProfileData<T>(int slot, IEnumerable<ICharacterData> characterData)
+    private void SetProfileData<T>(int slot, List<ICharacterData> characterData)
     {
         _profiles[slot].SetData(characterData);
     }

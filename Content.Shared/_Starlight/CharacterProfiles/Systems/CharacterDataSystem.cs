@@ -21,6 +21,7 @@ public interface ICharacterDataMigration<in TOld, TNew>: ICharacterDataMigration
         var oldData = profile.GetData<TOld>();
         var newData = profile.GetData<TNew>();
         MigrateData(oldData, ref newData);
+        profile.SetData(newData, false);
     }
     public void MigrateData(TOld oldData, ref TNew newData);
 }
@@ -55,6 +56,7 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
 {
     [Dependency] protected IPrototypeManager PrototypeManager = default!;
     [Dependency] protected IRobustRandom Random = default!;
+    [Dependency] private IDynamicTypeFactory _typeFactory = default!;
 
     /// <summary>
     /// Apply before other CharacterData
@@ -105,7 +107,8 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
 
     void ICharacterDataSystem.RandomizeProfile(CharacterProfile profile)
     {
-        var data = new TData();
+        //var data = new TData(); //this explodes sandboxing
+        var data = _typeFactory.CreateInstance<TData>();
         profile.SetData(data);
     }
 
@@ -124,7 +127,8 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
 
     void ICharacterDataSystem.SetProfileDefaults(CharacterProfile profile)
     {
-        var data = new TData();
+        //var data = new TData(); //this explodes sandboxing
+        var data = _typeFactory.CreateInstance<TData>();
         SetDefaults(ref data);
 
         profile.SetData(data, false);

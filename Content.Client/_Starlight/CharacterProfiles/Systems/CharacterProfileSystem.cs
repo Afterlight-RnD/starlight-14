@@ -117,7 +117,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
         profile = CreateRandomProfile();
         ValidateProfile(profile);
         RaiseNetworkEvent(new MsgUpdateCharacterProfile(slot, profile));
-        _characterRegistry.SetProfileData(slot);
+        _characterRegistry.AddProfile(slot, profile);
         return true;
     }
 

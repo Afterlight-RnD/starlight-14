@@ -9,3 +9,12 @@ public enum CharacterPreviewMode
     Loadout,
     Nude
 }
+
+public static class CharacterPreviewModeHelpers
+{
+    private const string PreviewModeLocPrefix = "character-editor-preview-mode-";
+    public static string GetLocalizedPreviewMode(CharacterPreviewMode mode)
+    {
+        return Loc.GetString($"{PreviewModeLocPrefix}{mode.ToString().ToLower()}");
+    }
+}

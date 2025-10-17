@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using System.Linq;
+using Content.Shared._Starlight.CharacterProfiles.Data;
 using Content.Shared._Starlight.CharacterProfiles.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
@@ -16,7 +17,8 @@ public sealed partial class CharacterProfile
     //TODO: probably should have some custom serialization stuff so that types aren't serialized into yaml?
     [DataField] private Dictionary<Type, ICharacterData> _data = new();
 
-    [DataField] public EntProtoId DollPrototype { get; private set; }
+    [Access(typeof(SharedCharacterProfileSystem))]
+    [DataField] public EntProtoId DollPrototype { get; set; }
 
     [Access(typeof(SharedCharacterProfileSystem))]
 
@@ -29,9 +31,22 @@ public sealed partial class CharacterProfile
     private bool _fullDirty = false;
     private HashSet<Type> _dirtyData = new();
 
+    public CharacterProfile(CharacterProfile other)
+    {
+        SetData(other.GetData(), false);
+
+        //TODO: Legacy migration
+        DollPrototype = IoCManager.Resolve<IPrototypeManager>()
+            .Index(GetData<LegacyCharacterData>().LegacyProfile.Species).DollPrototype;
+    }
+
     public CharacterProfile(List<ICharacterData> dataList)
     {
         SetData(dataList, false);
+
+        //TODO: Legacy migration
+        DollPrototype = IoCManager.Resolve<IPrototypeManager>()
+            .Index(GetData<LegacyCharacterData>().LegacyProfile.Species).DollPrototype;
     }
 
     public Dictionary<Type, ICharacterData> GetTypedData(bool onlyDirty = true)
@@ -97,17 +112,7 @@ public sealed partial class CharacterProfile
         _fullDirty = false;
     }
 
-    public void SetData(IEnumerable<ICharacterData> newData, bool shouldDirty = true)
-    {
-        SetData_Internal(newData, shouldDirty);
-    }
-
-    public void SetData(bool shouldDirty = true, params ICharacterData[] newData)
-    {
-        SetData_Internal(newData, shouldDirty);
-    }
-
-    private void SetData_Internal(IEnumerable<ICharacterData> newData, bool shouldDirty = true)
+    public void SetData(List<ICharacterData> newData, bool shouldDirty = true)
     {
         if (shouldDirty)
         {
