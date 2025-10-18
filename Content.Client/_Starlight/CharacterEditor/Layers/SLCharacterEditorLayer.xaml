@@ -54,7 +54,7 @@
                         <widgets1:CharacterPreviewWidget
                             Name="CharacterPreview" Access="Public"
                             VerticalExpand="True" HorizontalExpand="True"
-                            HorizontalAlignment="Center" VerticalAlignment="Top" />
+                            HorizontalAlignment="Stretch" VerticalAlignment="Top" />
                         <controls:HLine
                             HorizontalExpand="True" HorizontalAlignment="Stretch"
                             Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />

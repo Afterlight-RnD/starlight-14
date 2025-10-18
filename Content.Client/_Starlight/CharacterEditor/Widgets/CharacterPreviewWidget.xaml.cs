@@ -70,11 +70,11 @@ public sealed partial class CharacterPreviewWidget : UIWidget
     {
         SubscribeUIEvent<CharacterEditingHasChangesUIEvent>(OnCharacterDirtied);
         SubscribeUIEvent<CharacterEditingStartedUIEvent>(OnCharacterEditStart);
-        SubscribeUIEvent<CharacterEditingUpdatedPreviewUIEvent>(OnCharacterPreviewUpdated);
+        SubscribeUIEvent<CharacterEditingUpdatedPreviewEntityUIEvent>(OnCharacterPreviewUpdated);
         SubscribeUIEvent<CharacterEditingFinishedUIEvent>(OnCharacterEditEnded);
     }
 
-    private void OnCharacterPreviewUpdated(CharacterEditingUpdatedPreviewUIEvent ev)
+    private void OnCharacterPreviewUpdated(CharacterEditingUpdatedPreviewEntityUIEvent ev)
     {
         CharacterSpritePreview.SetEntity(ev.PreviewEntity);
     }

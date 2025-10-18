@@ -1,32 +1,52 @@
 ﻿<widgets:CharacterPreviewWidget
     xmlns="https://spacestation14.io"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:widgets="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets"
-    Orientation="Vertical">
-    <Label
-        Name="CharacterName" Access="Protected"
-        Text="Urist McPlaceholder"
-        VerticalExpand="True" HorizontalExpand="True"
-        HorizontalAlignment="Center" VerticalAlignment="Top" />
-    <SpriteView
-        Name="CharacterSpritePreview" Access="Protected"
-        VerticalExpand="True" HorizontalExpand="True"
-        HorizontalAlignment="Center" VerticalAlignment="Center"
-        Scale="8 8" Margin="4" SizeFlagsStretchRatio="1" SetSize="256 384"
-        />
-        <BoxContainer Orientation="Horizontal" HorizontalExpand="True"
-                      VerticalAlignment="Bottom" HorizontalAlignment="Center"
-                      Margin="0 5">
-            <TextureButton
-                Name="ViewLeft" Access="Protected"
-                TexturePath="filled_left_arrow.svg.192dpi"
-                ModulateSelfOverride="#DEDEDE"
-                Scale="0.5 0.5"/>
-            <widgets:CharacterPreviewModeValueDropdown Margin = "5 0">
-            </widgets:CharacterPreviewModeValueDropdown>
-            <TextureButton
-                Name="ViewRight" Access="Protected"
-                TexturePath="filled_right_arrow.svg.192dpi"
-                ModulateSelfOverride="#DEDEDE"
-                Scale="0.5 0.5"/>
+    Orientation="Vertical"
+    HorizontalExpand="True"
+    HorizontalAlignment="Stretch">
+    <Control
+        HorizontalExpand="True" VerticalExpand="True"
+        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <BoxContainer
+            VerticalExpand="True" HorizontalExpand="True"
+            HorizontalAlignment="Stretch" VerticalAlignment="Top"
+            Orientation="Vertical">
+            <Label
+                Name="CharacterName" Access="Protected"
+                Text="Urist McPlaceholder"
+                HorizontalAlignment="Center" VerticalAlignment="Top" />
+            <SpriteView
+                Name="CharacterSpritePreview" Access="Protected"
+                VerticalExpand="True" HorizontalExpand="True"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                Scale="8 8" Margin="4" SizeFlagsStretchRatio="1" SetSize="256 384"/>
+            <BoxContainer Orientation="Horizontal" HorizontalExpand="True"
+                          VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                          Margin="0 5">
+                <TextureButton
+                    Name="ViewLeft" Access="Protected"
+                    TexturePath="filled_left_arrow.svg.192dpi"
+                    ModulateSelfOverride="#DEDEDE"
+                    Scale="0.5 0.5"/>
+                <widgets:CharacterPreviewModeValueDropdown Margin = "5 0">
+                </widgets:CharacterPreviewModeValueDropdown>
+                <TextureButton
+                    Name="ViewRight" Access="Protected"
+                    TexturePath="filled_right_arrow.svg.192dpi"
+                    ModulateSelfOverride="#DEDEDE"
+                    Scale="0.5 0.5"/>
+            </BoxContainer>
         </BoxContainer>
+        <BoxContainer
+            HorizontalExpand="True" VerticalExpand="False"
+            HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <Control HorizontalExpand="True" HorizontalAlignment="Stretch"/>
+            <Button
+                HorizontalAlignment="Right"
+                Margin="5 2 5 2"
+                Text="Randomize"
+                Name="RandomizeCharacter" Access="Protected"/>
+        </BoxContainer>
+    </Control>
 </widgets:CharacterPreviewWidget>

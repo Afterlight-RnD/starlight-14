@@ -56,11 +56,21 @@ public sealed class CharacterEditorSystem : UISystem
             previewEnt = _characterProfileSystem.EnsurePreviewEntity(control.Slot, profile);
         control.SetFromProfile(profile);
         control.SetPreviewSprite(previewEnt);
+        if (_liveProfile == null && profile != null)
+            StartEditingSlot(control.Slot);
     }
 
     private void OnProfileDirtied(CharacterEditingHasChangesUIEvent ev)
     {
         RefreshPreviewVisuals();
+    }
+    public void ShutdownEditor()
+    {
+        ClearPreviewEntity();
+        if (_liveProfile == null)
+            return;
+        RaiseUIEvent(new CharacterEditingFinishedUIEvent(_liveProfile));
+        _liveProfile = null;
     }
 
     public void StartEditingSlot(int slot)
@@ -70,7 +80,6 @@ public sealed class CharacterEditorSystem : UISystem
             Log.Error($"Tried to start editing slot:{slot} but it doesn't have a profile!");
             return;
         }
-        ;
         if (_liveProfile != null)
         {
             if (_liveProfile.Slot == slot)
@@ -107,6 +116,22 @@ public sealed class CharacterEditorSystem : UISystem
         RaiseUIEvent(new CharacterEditingAppliedUIEvent(_liveProfile));
     }
 
+
+    public void DiscardChanges()
+    {
+        if (_liveProfile == null)
+            return;
+        if (!_characterProfileSystem.TryGetCharacterProfile(_liveProfile.Slot, out var profile))
+        {
+            _liveProfile = null;
+            return;
+        }
+        _liveProfile.SetData(profile.GetData());
+        ClearPreviewEntity();
+        RefreshPreviewVisuals();
+        RaiseUIEvent(new CharacterEditingUpdateUIEvent(_liveProfile));
+    }
+
     public void ChangePreviewMode(CharacterPreviewMode newPreviewMode)
     {
         if (_previewmode == newPreviewMode)
@@ -124,7 +149,7 @@ public sealed class CharacterEditorSystem : UISystem
             return _livePreview.Value;
         var dollEnt = _characterProfileSystem.CreateProfileDoll(_liveProfile, previewMode);
         _livePreview = (dollEnt, Comp<SpriteComponent>(dollEnt));
-        RaiseUIEvent(new CharacterEditingUpdatedPreviewUIEvent(_livePreview.Value));
+        RaiseUIEvent(new CharacterEditingUpdatedPreviewEntityUIEvent(_livePreview.Value));
         return _livePreview.Value;
     }
 

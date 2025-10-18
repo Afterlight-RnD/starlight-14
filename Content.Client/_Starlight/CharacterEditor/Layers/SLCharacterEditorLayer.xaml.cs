@@ -16,7 +16,6 @@ namespace Content.Client._Starlight.CharacterEditor.Layers;
 public sealed partial class SLCharacterEditorLayer : UIScreenLayer
 {
     [Dependency] private readonly IDynamicTypeFactory _typeFactory = default!;
-
     private Dictionary<Type, EditorModeWidget> _editorWidgetLookup = new();
     private EditorModeButton? _activeEditorModeButton = null;
 

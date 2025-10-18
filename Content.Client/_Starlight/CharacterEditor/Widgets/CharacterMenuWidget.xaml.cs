@@ -21,6 +21,13 @@ public sealed partial class CharacterMenuWidget : UIWidget
         CreateCharacter.OnPressed += OnCreateCharacterPressed;
         SelectCharacter.ToggleMode = true;
         SaveChanges.OnPressed += OnSaveChangesPressed;
+        DiscardChanges.OnPressed += OnDiscardPressed;
+    }
+
+    private void OnDiscardPressed(BaseButton.ButtonEventArgs obj)
+    {
+        _editorSystem.DiscardChanges();
+        SaveChanges.Disabled = true;
     }
 
     private void OnSaveChangesPressed(BaseButton.ButtonEventArgs obj)

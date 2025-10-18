@@ -38,6 +38,14 @@ public sealed class CharacterProfileRegistry
 
     public int OccupiedSlots => _profiles.Count;
 
+    public CharacterProfile? GetFirstProfileOrNull(int maxCharacters)
+    {
+        for (var i = 0; i < maxCharacters; i++)
+            if (!_profiles.TryGetValue(i, out var foundProfile))
+                return foundProfile;
+        return null;
+    }
+
     public int GetFirstFreeSlot(int maxCharacters)
     {
         for (var i = 0; i < maxCharacters; i++)
@@ -82,5 +90,13 @@ public sealed class CharacterProfileRegistry
     public bool DeleteProfile(int slot,  [NotNullWhen(true)] out CharacterProfile? profile)
     {
         return _profiles.Remove(slot, out profile);
+    }
+
+    public int GetFirstProfileSlot(int maxCharacters)
+    {
+        for (var i = 0; i < maxCharacters; i++)
+            if (_profiles.ContainsKey(i))
+                return i;
+        return -1;
     }
 }

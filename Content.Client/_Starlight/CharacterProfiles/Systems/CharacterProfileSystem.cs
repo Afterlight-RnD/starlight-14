@@ -151,4 +151,14 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
         EntityManager.DeleteEntity(ent);
         return true;
     }
+
+    public CharacterProfile? GetFirstProfileOrNull()
+    {
+        return _characterRegistry.GetFirstProfileOrNull(MaxCharacters);
+    }
+
+    public int GetFirstProfileSlot()
+    {
+        return _characterRegistry.GetFirstProfileSlot(MaxCharacters);
+    }
 }
