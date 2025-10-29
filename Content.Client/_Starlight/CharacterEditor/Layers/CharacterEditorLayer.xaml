@@ -1,4 +1,4 @@
-﻿<layers:SLCharacterEditorLayer
+﻿<layers:CharacterEditorLayer
     xmlns="https://spacestation14.io"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:style="clr-namespace:Content.Client.Stylesheets"
@@ -8,7 +8,8 @@
     xmlns:widgets1="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets"
     xmlns:slcontrols="clr-namespace:Content.Client._Starlight.UI.Controls"
     xmlns:widgets3="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
-    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client">
+    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+    xmlns:controls1="clr-namespace:Content.Client._Starlight.CharacterEditor.Controls">
     <PanelContainer Name="BackgroundPanel" Access="Protected"
                     Margin="10" HorizontalExpand="True" VerticalExpand="True"
                     StyleClasses="AngleRect" ModulateSelfOverride="#1f1f23">
@@ -60,10 +61,9 @@
                             Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
                         <ScrollContainer HScrollEnabled="False"
                                          VerticalExpand="True" HorizontalExpand="True">
-                            <BoxContainer
-                                Name="EditingPanel" Access="Protected"
-                                HorizontalExpand="True" VerticalExpand="False"
-                                HorizontalAlignment="Stretch" />
+                            <controls1:CharacterEditorPanelStub
+                                Name="MainPanel" Access="Protected"
+                                EditorLayout="Main"/>
                         </ScrollContainer>
                     </BoxContainer>
                     <BoxContainer Orientation="Horizontal"
@@ -75,10 +75,8 @@
                                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ScrollContainer HScrollEnabled="False"
                                              VerticalExpand="True" HorizontalExpand="True">
-                                <BoxContainer
-                                            Name="DetailsPanel" Access="Protected"
-                                            HorizontalExpand="True" VerticalExpand="true"
-                                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                <controls1:CharacterEditorPanelStub
+                                            Name="SidePanel" Access="Protected" EditorLayout="Side"/>
                             </ScrollContainer>
 
                             <BoxContainer Orientation="Vertical"
@@ -109,4 +107,4 @@
             </BoxContainer>
         </BoxContainer>
     </PanelContainer>
-</layers:SLCharacterEditorLayer>
+</layers:CharacterEditorLayer>

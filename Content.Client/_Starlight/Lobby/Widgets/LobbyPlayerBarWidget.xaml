@@ -8,6 +8,6 @@
     <GridContainer Name="PlayerButtonGrid" Access="Protected">
         <slcontrols:UILayerButton
             Text="{Loc 'lobby-character-preview-panel-character-setup-button'}"
-            LayerType="{x:Type layers:SLCharacterEditorLayer}"/>
+            LayerType="{x:Type layers:CharacterEditorLayer}"/>
     </GridContainer>
 </widgets:LobbyPlayerBarWidget>

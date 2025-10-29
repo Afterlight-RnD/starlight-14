@@ -6,8 +6,10 @@ using Content.Client._Starlight.CharacterProfiles.Systems;
 using Content.Client._Starlight.UI.Controls;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.GameObjects;
+using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.UIEvents;
+using Robust.Shared.Reflection;
 
 namespace Content.Client._Starlight.CharacterEditor.Systems;
 
@@ -28,7 +30,6 @@ public sealed class CharacterEditorSystem : UISystem
         SubscribeUIEvent<ProfileSelectorButton, ControlEnteredTreeUIEvent>(OnProfileButtonAdded);
         SubscribeUIEvent<ProfileSelectorButton, ControlExitedTreeUIEvent>(OnProfileButtonRemoved);
         SubscribeUIEvent<ProfileSelectorButton, ButtonPressedUIEvent>(OnProfileSelected);
-
         SubscribeUIEvent<SLValueDropdown<CharacterPreviewMode>.Option, ButtonPressedUIEvent>(OnPreviewModeButtonPressed);
     }
 
