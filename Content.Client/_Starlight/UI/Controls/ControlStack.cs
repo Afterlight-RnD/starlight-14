@@ -1,19 +1,16 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
-
-using System.Diagnostics.CodeAnalysis;
 using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.UI.Controls;
 
 [Virtual]
-public class ControlStack<TKey> : Control where TKey: struct, Enum
+public class ControlStack : Control
 {
-    public bool StackedControlsStartVisible { get; init; } = true;
+    public bool OnlyTopVisible { get; set; } = true;
 
-    protected readonly Dictionary<TKey, StackEntry> StackedControls = new();
-
-    protected ControlStack()
+    public Control? TopControl { get; private set; } = null;
+    public ControlStack()
     {
         HorizontalExpand = true;
         VerticalExpand = true;
@@ -21,83 +18,54 @@ public class ControlStack<TKey> : Control where TKey: struct, Enum
         VerticalAlignment = VAlignment.Stretch;
     }
 
-    public virtual void SetVisibilityInStack(TKey key, bool newVisible)
+    public void PushVisibleControl<TControl>(TControl control) where TControl: Control, new()
     {
-        if (StackedControls.TryGetValue(key, out var value))
-            value.Visible = newVisible;
+        if (TopControl == control)
+            return;
+        var oldTop = TopControl;
+        if (!Children.Contains(control))
+        {
+            AddChild(control);
+            control.SetPositionFirst();
+        }
+        control.Visible = true;
+        if (OnlyTopVisible && oldTop != null)
+            oldTop.Visible = false;
     }
 
-    public bool SetPositionInStack(TKey key, int newPos)
+    public void PopVisibleControl()
     {
-        if (!StackedControls.TryGetValue(key, out var entry)) return true;
-        if (newPos >= ChildCount || newPos < 0)
-            return false;
-        entry.SetPositionInParent(newPos);
-        return true;
+        if (TopControl == null)
+            return;
+        var nextTop = TopControl.GetPositionInParent()-1;
+        if (nextTop < 0)
+        {
+            TopControl = null;
+            return;
+        }
+        if (OnlyTopVisible)
+            TopControl.Visible = false;
+        TopControl = GetChild(nextTop);
+        TopControl.Visible = true;
     }
 
     protected override void ChildAdded(Control newChild)
     {
-        if (newChild is not StackEntry entry)
-            throw new InvalidOperationException($"ControlStack:{GetType()} only support children of type:{typeof(StackEntry)}");
-        if (!StackedControls.TryAdd(entry.Key, entry))
-            throw new InvalidOperationException($"ControlStack:{GetType()} already has control registered for key:{entry.Key}");
-        if (!StackedControlsStartVisible)
-            entry.Visible = false;
+        if (newChild.Visible)
+        {
+            if (OnlyTopVisible && TopControl != null)
+                TopControl.Visible = false;
+            TopControl = newChild;
+        }
         base.ChildAdded(newChild);
     }
 
     protected override void ChildRemoved(Control child)
     {
-        if (child is not StackEntry entry)
-        {
-            base.ChildRemoved(child);
-            return;
-        }
-        StackedControls.Remove(entry.Key);
         base.ChildRemoved(child);
-    }
-
-    public T GetStackedControl<T>(TKey key) where T:Control, new()
-    {
-        if (StackedControls[key] is T control)
-            return control;
-        throw new KeyNotFoundException($"Could not find ControlEntry of type:{typeof(T)} for key:{key} StackedControl:{this}");
-    }
-
-    public bool TryGetStackedControl<T>(TKey key, [NotNullWhen(true)] out T? foundControl) where T : Control, new()
-    {
-        foundControl = null;
-        return StackedControls.TryGetValue(key, out var stackEntry) && stackEntry.TryGetGetWrappedType(out foundControl);
-    }
-
-    public sealed class StackEntry : Control
-    {
-        public TKey Key { get; init; } = new();
-        public StackEntry()
-        {
-            HorizontalExpand = true;
-            VerticalExpand = true;
-            HorizontalAlignment = HAlignment.Stretch;
-            VerticalAlignment = VAlignment.Stretch;
-        }
-
-        public T GetWrappedType<T>() where T : Control
-        {
-            var child = Children.GetEnumerator().Current;
-            return (T)child;
-        }
-
-        public bool TryGetGetWrappedType<T>([NotNullWhen(true)] out T? foundControl) where T : Control, new()
-        {
-            foundControl = null;
-            if (ChildCount == 0)
-                return false;
-            var child = Children.GetEnumerator().Current;
-            if (child is not T entry)
-                return false;
-            foundControl = entry;
-            return true;
-        }
+        if (!child.Visible) // if child is not visible then it can't be the top control
+            return;
+        if (child == TopControl)
+            PopVisibleControl();
     }
 }

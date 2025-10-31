@@ -1,6 +1,0 @@
-﻿<lobby:SLLobbyScreen
-    xmlns="https://spacestation14.io"
-    xmlns:lobby="clr-namespace:Content.Client._Starlight.Lobby">
-    <TextureRect Access="Public" VerticalExpand="True" HorizontalExpand="True" Name="Background"
-                 Stretch="KeepAspectCovered" />
-</lobby:SLLobbyScreen>

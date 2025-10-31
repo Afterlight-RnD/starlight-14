@@ -68,10 +68,10 @@ public sealed partial class CharacterPreviewWidget : UIWidget
 
     protected override void EnteredTree()
     {
-        SubscribeUIEvent<CharacterEditingHasChangesUIEvent>(OnCharacterDirtied);
-        SubscribeUIEvent<CharacterEditingStartedUIEvent>(OnCharacterEditStart);
-        SubscribeUIEvent<CharacterEditingUpdatedPreviewEntityUIEvent>(OnCharacterPreviewUpdated);
-        SubscribeUIEvent<CharacterEditingFinishedUIEvent>(OnCharacterEditEnded);
+        // SubscribeUIEvent<CharacterEditingHasChangesUIEvent>(OnCharacterDirtied);
+        // SubscribeUIEvent<CharacterEditingStartedUIEvent>(OnCharacterEditStart);
+        // SubscribeUIEvent<CharacterEditingUpdatedPreviewEntityUIEvent>(OnCharacterPreviewUpdated);
+        // SubscribeUIEvent<CharacterEditingFinishedUIEvent>(OnCharacterEditEnded);
     }
 
     private void OnCharacterPreviewUpdated(CharacterEditingUpdatedPreviewEntityUIEvent ev)

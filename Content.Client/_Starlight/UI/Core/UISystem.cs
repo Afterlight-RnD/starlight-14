@@ -9,9 +9,19 @@ public abstract class UISystem : EntitySystem
 
     private HashSet<UIEventHandle> _uiEventHandles = new();
 
-    public void SubscribeUIEvent<T>(WriteableUIEvent<T> uiEvent) where T : struct
+    public void RaiseUIEvent<T>(T args) where T : struct
     {
-        _uiEventHandles.Add(UIEvents.Subscribe(uiEvent));
+       UIEvents.RaiseEvent(args);
+    }
+
+    public void RaiseUIWritableEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseEvent(ref args);
+    }
+
+    public void SubscribeWritableUIEvent<T>(WriteableUIEvent<T> uiEvent) where T : struct
+    {
+        _uiEventHandles.Add(UIEvents.SubscribeWritable(uiEvent));
     }
 
     public void SubscribeUIEvent<T>(UIEvent<T> uiEvent) where T : struct

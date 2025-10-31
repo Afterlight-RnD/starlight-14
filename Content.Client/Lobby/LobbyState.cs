@@ -48,8 +48,6 @@ namespace Content.Client.Lobby
             Lobby = (LobbyGui) _userInterfaceManager.ActiveScreen;
             //TODO: Jezi testing code
             Lobby.Visible = false;
-            Lobby.EnableLayer<SLLobbyScreenTest>();
-            Lobby.EnableLayer<SLLobbyLayer>();
 
             var chatController = _userInterfaceManager.GetUIController<ChatUIController>();
             _gameTicker = _entityManager.System<ClientGameTicker>();

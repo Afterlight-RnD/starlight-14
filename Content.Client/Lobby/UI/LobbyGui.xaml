@@ -9,12 +9,13 @@
     xmlns:lobbyUi="clr-namespace:Content.Client.Lobby.UI"
     xmlns:info="clr-namespace:Content.Client.Info"
     xmlns:nulllink="clr-namespace:Content.Client._NullLink"
-    xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets">
+    xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
+    xmlns:lobby="clr-namespace:Content.Client._Starlight.Lobby">
     <!-- Background -->
     <TextureRect Access="Public" VerticalExpand="True" HorizontalExpand="True" Name="Background"
-                 Stretch="KeepAspectCovered" />
+                 Stretch="KeepAspectCovered" Visible="False"/> <!-- starlight Hide !-->
     <BoxContainer Name="MainContainer" VerticalExpand="True" HorizontalExpand="True" Orientation="Horizontal"
-                  Margin="10 10 10 10" SeparationOverride="2">
+                  Margin="10 10 10 10" SeparationOverride="2" Visible="False">  <!-- starlight Hide !-->
         <SplitContainer State="Auto" ResizeMode="NotResizable" HorizontalExpand="True">
             <!-- LHS Controls -->
             <BoxContainer Name="LeftSide" Orientation="Vertical" SeparationOverride="4" HorizontalExpand="True">
@@ -54,13 +55,13 @@
                     </BoxContainer>
                     <!-- Vertical Padding-->
                     <Control VerticalExpand="True" />
-            
+
                     <!-- Left Bot Panel -->
                   <!-- NullLink start -->
                   <BoxContainer Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                    
+
                     <nulllink:Hub />
-                    
+
                     <BoxContainer Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                         <info:DevInfoBanner Name="DevInfoBanner" VerticalExpand="false" Margin="3 3 3 3" />
                         <PanelContainer StyleClasses="AngleRect">
@@ -127,7 +128,7 @@
             </PanelContainer>
         </SplitContainer>
         <PanelContainer Name="ExpandPanel"
-                        StyleClasses="AngleRect" 
+                        StyleClasses="AngleRect"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Top"
                         Margin="0 2 2 0"
@@ -140,4 +141,5 @@
                         Scale="0.5 0.5"/>
         </PanelContainer>
     </BoxContainer>
+    <lobby:SLDummyLobbyControl/>
 </lobbyUi:LobbyGui>

@@ -12,7 +12,7 @@ public delegate void UIEvent<TEvent>(ref readonly TEvent args) where TEvent: str
 public sealed partial class UIEventBus
 {
     [Pure]
-    public UIEventHandle Subscribe<T>(WriteableUIEvent<T> handler) where T: struct
+    public UIEventHandle SubscribeWritable<T>(WriteableUIEvent<T> handler) where T: struct
     {
         var subs = EnsureSubscription<T>();
         return subs.RegisterHandler(GetNextHandle(typeof(T)),handler);
@@ -49,7 +49,7 @@ public sealed partial class UIEventBus
     }
 }
 
-public struct UIEventHandle : IDisposable, IEquatable<UIEventHandle>
+public struct UIEventHandle : IEquatable<UIEventHandle>
 {
     public bool IsValid => Generation != 0 || EventType == null;
 
@@ -80,12 +80,6 @@ public struct UIEventHandle : IDisposable, IEquatable<UIEventHandle>
     public void Invalidate()
     {
         Generation = 0;
-    }
-
-
-    public void Dispose()
-    {
-        Unsubscribe();
     }
 
     public bool Equals(UIEventHandle other) => Owner.Equals(other.Owner) && Id == other.Id && Generation == other.Generation;

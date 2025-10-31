@@ -18,9 +18,9 @@ public static class UIEvents
          _container.Value ?? (_container.Value = IoCManager.Resolve<UIEventBus>());
 
     [Pure]
-    public static UIEventHandle Subscribe<T>(WriteableUIEvent<T> handler) where T: struct
+    public static UIEventHandle SubscribeWriteable<T>(WriteableUIEvent<T> handler) where T: struct
     {
-        return LocalEventBus.Subscribe(handler);
+        return LocalEventBus.SubscribeWritable(handler);
     }
 
     [Pure]
@@ -34,7 +34,7 @@ public static class UIEvents
         LocalEventBus.RaiseEvent(args);
     }
 
-    public static void RaiseEvent<T>(ref T args) where T : struct
+    public static void RaiseWriteableEvent<T>(ref T args) where T : struct
     {
         LocalEventBus.RaiseEvent(args);
     }
