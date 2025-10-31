@@ -29,6 +29,7 @@ using Content.Shared.Players.PlayTimeTracking;
 using Content.Shared.Players.RateLimiting;
 using Content.Shared.Starlight;
 using Content.Client._NullLink;
+using Content.Client._Starlight.UI.Core;
 
 namespace Content.Client.IoC
 {
@@ -73,6 +74,10 @@ namespace Content.Client.IoC
             collection.Register<INullLinkPlayerRolesManager, NullLinkPlayerRolesManager>();  
             collection.Register<ISharedNullLinkPlayerRolesReqManager, PlayerRolesReqManager>();
             // NullLink end
+
+            //starlight start
+            collection.Register<UIEventBus>();
+            //starlight end
         }
     }
 }
