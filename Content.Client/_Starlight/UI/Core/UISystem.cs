@@ -7,29 +7,28 @@ public abstract class UISystem : EntitySystem
 {
     [Dependency] protected readonly UIEventBus UIEvents = default!;
 
-    private Dictionary<Type,UIEventHandle> _uiEventHandles = new();
+    private HashSet<UIEventHandle> _uiEventHandles = new();
 
     public void SubscribeUIEvent<T>(WriteableUIEvent<T> uiEvent) where T : struct
     {
-        _uiEventHandles.Add(typeof(T),UIEvents.Subscribe(uiEvent));
+        _uiEventHandles.Add(UIEvents.Subscribe(uiEvent));
     }
 
     public void SubscribeUIEvent<T>(UIEvent<T> uiEvent) where T : struct
     {
-        _uiEventHandles.Add(typeof(T),UIEvents.Subscribe(uiEvent));
+        _uiEventHandles.Add(UIEvents.Subscribe(uiEvent));
     }
 
-    public void UnsubscribeUIEvent<T>() where T : struct
+    public void UnSubscribeUIEvents()
     {
-        if (!_uiEventHandles.Remove(typeof(T), out var handle))
-            return;
-        UIEvents.Unsubscribe<T>(ref handle);
+        foreach (var handle in _uiEventHandles)
+            handle.Unsubscribe();
+        _uiEventHandles.Clear();
     }
 
     public override void Shutdown()
     {
-        foreach (var (handleType, handle) in _uiEventHandles)
-            UIEvents.Unsubscribe(handleType, handle);
+        UnSubscribeUIEvents();
         base.Shutdown();
     }
 }

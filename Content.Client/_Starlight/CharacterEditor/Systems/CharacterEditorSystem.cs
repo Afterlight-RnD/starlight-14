@@ -30,10 +30,10 @@ public sealed class CharacterEditorSystem : UISystem
         SubscribeUIEvent<ProfileSelectorButton, ControlEnteredTreeUIEvent>(OnProfileButtonAdded);
         SubscribeUIEvent<ProfileSelectorButton, ControlExitedTreeUIEvent>(OnProfileButtonRemoved);
         SubscribeUIEvent<ProfileSelectorButton, ButtonPressedUIEvent>(OnProfileSelected);
-        SubscribeUIEvent<SLValueDropdown<CharacterPreviewMode>.Option, ButtonPressedUIEvent>(OnPreviewModeButtonPressed);
+        SubscribeUIEvent<ValueDropdown<CharacterPreviewMode>.Option, ButtonPressedUIEvent>(OnPreviewModeButtonPressed);
     }
 
-    private void OnPreviewModeButtonPressed(SLValueDropdown<CharacterPreviewMode>.Option control, ButtonPressedUIEvent ev)
+    private void OnPreviewModeButtonPressed(ValueDropdown<CharacterPreviewMode>.Option control, ButtonPressedUIEvent ev)
     {
         ChangePreviewMode(control.Value);
     }

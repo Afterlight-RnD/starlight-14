@@ -11,12 +11,12 @@ public interface IDropdownControlOption
 
 
 [Virtual]
-public class SLDropdown: ContainerButton
+public class Dropdown: ContainerButton
 {
     private SLDropdownPopout? _dropdown = null;
     public Vector2 DropdownOffset { get; set; } = new(0, 5);
 
-    public SLDropdown()
+    public Dropdown()
     {
         OnPressed += HandlePressed;
     }

@@ -8,12 +8,13 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
 using Robust.Shared.Reflection;
+using Serilog;
 using SLLobbyLayer = Content.Client._Starlight.Lobby.Layers.SLLobbyLayer;
 
 namespace Content.Client._Starlight.CharacterEditor.Layers;
 
 [GenerateTypedNameReferences]
-public sealed partial class CharacterEditorLayer : UIScreenLayer
+public sealed partial class CharacterEditorLayer : Control
 {
     [Dependency] private readonly IDynamicTypeFactory _typeFactory = default!;
     [Dependency] private readonly IReflectionManager _reflectionManager = default!;
@@ -26,7 +27,6 @@ public sealed partial class CharacterEditorLayer : UIScreenLayer
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
         CreateEditorModes();
-        SetAnchorPreset(BackgroundPanel, LayoutPreset.Wide, true);
         CharacterSelectorButtons.SelectCharacter.OnToggled += OnSelectCharacterPressed;
     }
 
@@ -37,7 +37,6 @@ public sealed partial class CharacterEditorLayer : UIScreenLayer
 
     protected override void EnteredTree()
     {
-        SubscribeUIEvent<ProfileSelectorButton, ButtonPressedUIEvent>(OnCharacterSelected);
         InjectEditorModeControls();
     }
 
@@ -51,26 +50,6 @@ public sealed partial class CharacterEditorLayer : UIScreenLayer
     {
         TogglePopoutPanel(false);
         CharacterSelectorButtons.SelectCharacter.Pressed = false;
-    }
-
-    protected override void AddedToScreen()
-    {
-        if (ParentScreen == null || !ParentScreen.TryGetLayer<SLLobbyLayer>(out var lobbyLayer, true))
-        {
-            Log.Error($"Character Editor could not find LobbyLayer to hide!");
-            return;
-        }
-        lobbyLayer.Visible = false;
-    }
-
-    protected override void RemovedFromScreen()
-    {
-        if (ParentScreen == null || !ParentScreen.TryGetLayer<SLLobbyLayer>(out var lobbyLayer, true))
-        {
-            Log.Error($"Character Editor could not find LobbyLayer to hide!");
-            return;
-        }
-        lobbyLayer.Visible = true;
     }
 
     public void TogglePopoutPanel(bool visible)

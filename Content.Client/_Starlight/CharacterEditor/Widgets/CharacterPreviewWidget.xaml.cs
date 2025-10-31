@@ -109,9 +109,8 @@ public sealed partial class CharacterPreviewWidget : UIWidget
 }
 
 public sealed class CharacterPreviewModeValueDropdown()
-    : SLValueDropdown<CharacterPreviewMode>(CharacterPreviewMode.Loadout)
+    : EnumDropdown<CharacterPreviewMode>(CharacterPreviewMode.Loadout)
 {
     public override string LocPrefix => "character-editor-preview-mode";
     public override string GetLocStringForValue(CharacterPreviewMode value) => value.ToString().ToLower();
-    public override IEnumerable<CharacterPreviewMode> IterateValues() => Enum.GetValues<CharacterPreviewMode>();
 };

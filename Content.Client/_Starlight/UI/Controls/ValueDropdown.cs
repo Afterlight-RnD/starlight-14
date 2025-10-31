@@ -5,8 +5,7 @@ using Label = Robust.Client.UserInterface.Controls.Label;
 
 namespace Content.Client._Starlight.UI.Controls;
 
-
-public abstract class SLValueDropdown<T> : SLDropdown where T: notnull
+public abstract class ValueDropdown<T> : Dropdown where T: notnull
 {
     private T _selectedValue;
 
@@ -28,7 +27,7 @@ public abstract class SLValueDropdown<T> : SLDropdown where T: notnull
 
     protected Label Label;
 
-    public SLValueDropdown(T initialValue)
+    public ValueDropdown(T initialValue)
     {
         Label = new Label();
         AddChild(Label);

@@ -7,7 +7,7 @@ using Robust.Client.UserInterface;
 namespace Content.Client._Starlight.UI.Controls;
 
 [Virtual]
-public class ControlStack<TKey> : Control where TKey: Enum, new()
+public class ControlStack<TKey> : Control where TKey: struct, Enum
 {
     public bool StackedControlsStartVisible { get; init; } = true;
 

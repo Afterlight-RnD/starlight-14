@@ -7,7 +7,7 @@ using Robust.Client.UserInterface;
 namespace Content.Client._Starlight.UI.Controls;
 
 [Virtual]
-public class SingletonControlStack<TKey> : ControlStack<TKey> where TKey: Enum, new()
+public class SingletonControlStack<TKey> : ControlStack<TKey> where TKey: struct, Enum
 {
     public TKey StartingKey { get; init; } = new();
 
