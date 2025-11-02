@@ -54,14 +54,22 @@ public abstract class UISystem<TControl> : UISystem where TControl: Control, new
         SubscribeUIEvent<DeregisterControlUIEvent>(OnControlDeregistered);
     }
 
+    [MustCallBase(true)]
+    protected virtual void ControlRegistered(TControl control) {}
+
+    [MustCallBase(true)]
+    protected virtual void ControlDeregistered(TControl control) {}
+
     private void OnControlDeregistered(ref readonly DeregisterControlUIEvent args)
     {
+        ControlDeregistered(args.Instance);
         _registeredInstances.Remove(args.Instance);
     }
 
     private void OnControlRegistered(ref readonly RegisterControlUIEvent args)
     {
         _registeredInstances.Add(args.NewInstance);
+        ControlRegistered(args.NewInstance);
     }
 
     public IEnumerable<TControl> IterateInstances()

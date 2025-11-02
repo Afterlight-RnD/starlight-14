@@ -6,6 +6,7 @@
     xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
     xmlns:slwidgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
     xmlns:layer="clr-namespace:Content.Client._Starlight.Lobby.Layers"
+    xmlns:controls1="clr-namespace:Content.Client._Starlight.Lobby.Controls"
     HorizontalExpand="True" VerticalExpand="True"
     HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <BoxContainer Name="MainContainer" VerticalExpand="True" HorizontalExpand="True" Orientation="Horizontal"
@@ -75,7 +76,7 @@
                     <!-- Gold line -->
                     <controls:HLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" Access="Public" />
                     <controls:HSpacer Spacing="10" />
-                    <widgets:ChatBox Name="Chat" Access="Public" VerticalExpand="True" Margin="3 3 3 3" MinHeight="50" />
+                    <controls1:LobbyChatBox Name="Chat" Access="Public" VerticalExpand="True" Margin="3 3 3 3" MinHeight="50" />
                 </BoxContainer>
                 <TextureButton Name="CollapseButton"
                                TexturePath="filled_right_arrow.svg.192dpi"

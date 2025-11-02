@@ -14,19 +14,7 @@ public abstract class SLWidget : UIWidget
     protected SLWidget()
     {
         IoCManager.InjectDependencies(this);
-        UIEvents.Subscribe<SystemsLoadedUIEvent>(HandleSystemDeps);
     }
-
-    private void HandleSystemDeps(ref readonly SystemsLoadedUIEvent args)
-    {
-        InjectSystems(args.SystemDependencies);
-    }
-
-    [MustCallBase(true)]
-    protected virtual void InjectSystems(IDependencyCollection dependencyCollection)
-    {
-    }
-
     public void SubscribeWriteableUIEvent<T>(WriteableUIEvent<T> handler) where T: struct
     {
         _uiEventHandles.Add(UIEvents.SubscribeWriteable(handler));

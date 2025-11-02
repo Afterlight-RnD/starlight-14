@@ -48,7 +48,6 @@ public abstract class CharacterEditorMode : ICharacterEditorMode
     protected CharacterEditorMode()
     {
         editorPanels = new Control?[Enum.GetValues<CharacterEditorPanelLayout>().Length];
-        editorPanels.Initialize();
     }
 
     void ICharacterEditorMode.Initialize()

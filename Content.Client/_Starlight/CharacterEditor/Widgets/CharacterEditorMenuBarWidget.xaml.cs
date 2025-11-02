@@ -1,7 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2025 Afterlight RnD
 // SPDX-License-Identifier: ASL-1.1
 
-using Content.Client._Starlight.CharacterEditor.Layers;
 using Content.Client._Starlight.CharacterEditor.Systems;
 using Content.Client._Starlight.UI.Controls;
 using Content.Client.Lobby.UI;

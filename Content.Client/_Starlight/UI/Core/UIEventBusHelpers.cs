@@ -13,10 +13,7 @@ namespace Content.Client._Starlight.UI.Core;
 /// </summary>
 public static class UIEvents
 {
-    private static readonly ThreadLocal<UIEventBus> _container = new();
-
-    private static UIEventBus LocalEventBus =>
-         _container.Value ?? (_container.Value = IoCManager.Resolve<UIEventBus>());
+    private static UIEventBus LocalEventBus => IoCManager.Resolve<UIEventBus>();
 
     [Pure]
     public static UIEventHandle SubscribeWriteable<T>(WriteableUIEvent<T> handler) where T: struct
