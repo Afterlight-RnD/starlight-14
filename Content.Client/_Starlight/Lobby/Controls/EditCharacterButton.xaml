@@ -1,0 +1,5 @@
+﻿<controls:EditCharacterButton
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Controls"
+    Text="{Loc 'lobby-character-preview-panel-character-setup-button'}">
+</controls:EditCharacterButton >

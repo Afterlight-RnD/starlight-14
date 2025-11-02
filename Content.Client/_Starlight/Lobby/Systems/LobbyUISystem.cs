@@ -15,11 +15,21 @@ public sealed class LobbySystem : UISystem
     [Dependency] private readonly ClientGameTicker _gameTicker = default!;
     [Dependency] private readonly ContentAudioSystem _audioSystem = default!;
 
+    private bool _gameStarted = false;
+    private bool _gamePaused = false;
+    private TimeSpan _startTime;
+
     /// <inheritdoc/>
     public override void Initialize()
     {
         _gameTicker.LobbyStatusUpdated += OnLobbyStatusUpdated;
         _audioSystem.LobbySoundtrackChanged += OnLobbySoundtrackChanged;
+        _gameTicker.InfoBlobUpdated += OnInfoBlobUpdated;
+    }
+
+    private void OnInfoBlobUpdated()
+    {
+        RaiseUIEvent(new LobbyInfoUpdatedUIEvent(_gameTicker.ServerInfoBlob));
     }
 
     private void OnLobbySoundtrackChanged(LobbySoundtrackChangedEvent args)
@@ -38,6 +48,10 @@ public sealed class LobbySystem : UISystem
         Texture? lobbyBackground = null;
         if (_gameTicker.LobbyBackground != null)
             lobbyBackground = _resourceCache.GetResource<TextureResource>(_gameTicker.LobbyBackground);
-        RaiseUIEvent(new LobbyUpdatedUIEvent(_gameTicker.StartTime, _gameTicker.RoundStartTimeSpan, _gameTicker.IsGameStarted, _gameTicker.Paused, lobbyBackground, _gameTicker.AreWeReady));
+
+        RaiseUIEvent(new LobbyBackgroundChangedUIEvent(lobbyBackground));
+        RaiseUIEvent(new RoundStateChangedUIEvent());
+
+        // RaiseUIEvent(new LobbyUpdatedUIEvent(_gameTicker.StartTime, _gameTicker.RoundStartTimeSpan, _gameTicker.IsGameStarted, _gameTicker.Paused, lobbyBackground, _gameTicker.AreWeReady));
     }
 }

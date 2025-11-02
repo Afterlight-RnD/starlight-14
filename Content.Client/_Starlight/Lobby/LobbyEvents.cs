@@ -5,17 +5,15 @@ using Robust.Client.Audio;
 using Robust.Client.Graphics;
 
 namespace Content.Client._Starlight.Lobby;
+public record struct LobbyInfoUpdatedUIEvent(string? NewInfo);
 
+public record struct RoundStateChangedUIEvent(bool Started, bool Paused);
 
+public record struct LobbyBackgroundChangedUIEvent(Texture? BackgroundTexture);
 
-//UI Events
-public record struct LobbyUpdatedUIEvent(
-    TimeSpan StartTime,
-    TimeSpan RoundStartTimeSpan,
-    bool IsGameStarted,
-    bool Paused,
-    Texture? BackgroundTexture,
-    bool PlayerReadied);
+public record struct PlayerReadyStatusChangedUIEvent(bool NewReady);
+
+public record struct RoundStartTimeChangedUIEvent(TimeSpan StartTime);
 
 public record struct LobbyMusicUpdatedUIEvent(AudioStream? Song)
 {

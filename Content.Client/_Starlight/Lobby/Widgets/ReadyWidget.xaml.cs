@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: ASL-1.0
 // Modified from a file licensed under MIT (Space Wizards Federation)
 
+using Content.Client._Starlight.UI;
 using Content.Client._Starlight.UI.Controls;
 using Content.Client.Lobby;
 using Content.Client.Lobby.UI;
@@ -35,10 +36,17 @@ public sealed partial class ReadyWidget : SLWidget
 
     protected override void EnteredTree()
     {
-        SubscribeUIEvent<LobbyUpdatedUIEvent>(OnLobbyUpdated);
+        SubscribeUIEvent<RoundStateChangedUIEvent>(OnRoundStateChanged);
     }
 
-    private void OnLobbyUpdated(ref readonly LobbyUpdatedUIEvent args)
+    private void OnRoundStateChanged(ref readonly RoundStateChangedUIEvent args)
+    {
+        _gameStarted = args.Started;
+        OnLobbyUpdated();
+    }
+
+
+    private void OnLobbyUpdated()
     {
         if (_gameStarted)
         {

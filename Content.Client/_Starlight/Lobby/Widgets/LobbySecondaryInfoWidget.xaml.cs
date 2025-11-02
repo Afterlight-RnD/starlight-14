@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2025 Afterlight RnD
 // SPDX-License-Identifier: ASL-1.0
 
+using Content.Client._Starlight.UI;
 using Content.Client._Starlight.UI.Controls;
 using Content.Client.Message;
 using Content.Shared.CCVar;

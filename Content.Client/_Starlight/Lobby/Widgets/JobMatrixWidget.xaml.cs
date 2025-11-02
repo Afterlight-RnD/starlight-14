@@ -3,6 +3,7 @@
 
 using System.Linq;
 using System.Numerics;
+using Content.Client._Starlight.UI;
 using Content.Client._Starlight.UI.Controls;
 using Content.Client.Lobby;
 using Content.Client.Lobby.UI;

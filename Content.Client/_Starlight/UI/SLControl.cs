@@ -2,19 +2,15 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Client._Starlight.UI.Core;
-using Robust.Client.UserInterface.Controls;
+using Robust.Client.UserInterface;
 
-namespace Content.Client._Starlight.UI.Controls;
+namespace Content.Client._Starlight.UI;
 
-public abstract class SLWidget : UIWidget
+[Virtual]
+public  class SLControl : Control
 {
-    [Dependency] protected readonly IEntityManager EntityManager = default!;
+    #region UIEvents
     private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
-
-    protected SLWidget()
-    {
-        IoCManager.InjectDependencies(this);
-    }
     public void SubscribeWriteableUIEvent<T>(WriteableUIEvent<T> handler) where T: struct
     {
         _uiEventHandles.Add(UIEvents.SubscribeWriteable(handler));
@@ -57,23 +53,5 @@ public abstract class SLWidget : UIWidget
     {
         UnsubscribeAllUIEvents();
     }
-}
-
-
-public abstract class SLWidget<TSelf,TSystem> : SLWidget
-    where TSystem: UISystem<TSelf>
-    where TSelf:SLWidget<TSelf,TSystem>, new()
-{
-    [MustCallBase(true)]
-    protected override void EnteredTree()
-    {
-        RaiseUIEvent(new UISystem<TSelf>.RegisterControlUIEvent((TSelf)this));
-    }
-
-    [MustCallBase(true)]
-    protected override void ExitedTree()
-    {
-        RaiseUIEvent(new UISystem<TSelf>.DeregisterControlUIEvent((TSelf)this));
-        base.ExitedTree();
-    }
+    #endregion
 }

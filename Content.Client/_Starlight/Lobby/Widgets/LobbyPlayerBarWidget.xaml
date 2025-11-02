@@ -2,12 +2,9 @@
     xmlns="https://spacestation14.io"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:widgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
-    xmlns:slcontrols="clr-namespace:Content.Client._Starlight.Lobby.Controls"
-    xmlns:layers="clr-namespace:Content.Client._Starlight.CharacterEditor.Layers"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Controls"
     Orientation="Vertical">
     <GridContainer Name="PlayerButtonGrid" Access="Protected">
-        <!-- <slcontrols:UILayerButton -->
-        <!--     Text="{Loc 'lobby-character-preview-panel-character-setup-button'}" -->
-        <!--     LayerType="{x:Type layers:CharacterEditorLayer}"/> -->
+        <controls:EditCharacterButton/>
     </GridContainer>
 </widgets:LobbyPlayerBarWidget>

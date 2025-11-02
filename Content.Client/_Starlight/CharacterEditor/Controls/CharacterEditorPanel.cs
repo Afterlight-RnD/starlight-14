@@ -7,7 +7,7 @@ namespace Content.Client._Starlight.CharacterEditor.Controls;
 
 public sealed class CharacterEditorPanelStub : Control
 {
-    public CharacterEditorPanelLayout EditorLayout { get; private set; } = default;
+    public CharacterEditorPanelLayout EditorLayout { get; set; } = default;
 
     public CharacterEditorPanelStub()
     {

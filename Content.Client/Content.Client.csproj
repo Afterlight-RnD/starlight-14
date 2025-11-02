@@ -27,7 +27,6 @@
     <Folder Include="_Starlight\Achievement\" />
     <Folder Include="_Starlight\Actions\" />
     <Folder Include="_Starlight\Audio\" />
-    <Folder Include="_Starlight\CharacterEditor\Layers\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Xaml" />
