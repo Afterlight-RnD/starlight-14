@@ -61,7 +61,7 @@ public abstract class ValueDropdown<T> : Dropdown where T: notnull
                     popout.Close();
                     return;
                 }
-                UserInterfaceManager.RaiseUIEvent(this, new ValueChanged(SelectedValue, selector.Value));
+                //UserInterfaceManager.RaiseUIEvent(this, new ValueChanged(SelectedValue, selector.Value));
                 SelectedValue = selector.Value;
                 popout.Close();
             };

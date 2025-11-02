@@ -25,11 +25,6 @@ public sealed partial class CharacterSlotSelectorWidget : UIWidget
         RobustXamlLoader.Load(this);
         Orientation = LayoutOrientation.Vertical;
         _cfg.OnValueChanged(CCVars.GameMaxCharacterSlots, OnValueChanged, true);
-        _buttonGroup.OnUnPressed += button =>
-        {
-            if (button is ProfileSelectorButton selector)
-                selector.ToggleDeleteButton(true);
-        };
     }
 
     private void OnValueChanged(int newMaxCharacters)

@@ -8,6 +8,8 @@ namespace Content.Client._Starlight.UI.Controls;
 
 public abstract class SLWidget : UIWidget, IUIEventDispatcher, IUIEventSubscriber
 {
+    [Dependency] protected readonly IEntityManager EntityManager = default!;
+
     protected HashSet<UIEventHandle> UIEventHandles { get; } = new();
 
     public void SubscribeWriteableUIEvent<T>(WriteableUIEvent<T> handler) where T: struct

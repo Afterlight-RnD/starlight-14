@@ -3,6 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Content.Client._Starlight.Medical.Cybernetics.Systems;
+using Content.Client._Starlight.UI.Core;
 using Content.Client.Humanoid;
 using Content.Client.Lobby;
 using Content.Shared._Starlight.CharacterProfiles;
@@ -10,7 +11,6 @@ using Content.Shared._Starlight.CharacterProfiles.Systems;
 using Content.Shared.Clothing;
 using Robust.Client.GameObjects;
 using Robust.Client.UserInterface;
-using Robust.Client.UserInterface.UIEvents;
 using Robust.Shared.Prototypes;
 
 namespace Content.Client._Starlight.CharacterProfiles.Systems;
@@ -44,7 +44,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
             existingProfile.SetData(ev.Data);
             previewEnt = EnsurePreviewEntity(ev.Slot, existingProfile);
             ApplyToDoll(previewEnt, existingProfile);
-            _uiManager.RaiseUIEvent(new CharacterProfileUpdatedUIEvent(existingProfile));
+            //_uiManager.RaiseUIEvent(new CharacterProfileUpdatedUIEvent(existingProfile));
             return;
         }
         if (ev.PartialData)
@@ -56,7 +56,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
         _characterRegistry.AddProfile(ev.Slot,newProfile);
         previewEnt = EnsurePreviewEntity(ev.Slot, newProfile);
         ApplyToDoll(previewEnt, newProfile);
-        _uiManager.RaiseUIEvent(new CharacterProfileCreatedUIEvent(newProfile, previewEnt));
+        //_uiManager.RaiseUIEvent(new CharacterProfileCreatedUIEvent(newProfile, previewEnt));
     }
 
     private void HandleCharacterDeleted(MsgDeleteCharacterProfile ev)
@@ -95,7 +95,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
         ClearPreviewEntity(slot);
         if (raiseOnServer)
             RaiseNetworkEvent(new MsgDeleteCharacterProfile(slot));
-        _uiManager.RaiseUIEvent(new CharacterProfileDeletedUIEvent(oldProfile));
+        //_uiManager.RaiseUIEvent(new CharacterProfileDeletedUIEvent(oldProfile));
         return true;
     }
 
@@ -121,7 +121,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEv
         RaiseNetworkEvent(new MsgUpdateCharacterProfile(slot, profile));
         _characterRegistry.AddProfile(slot, profile);
         var previewEnt = EnsurePreviewEntity(slot, profile);
-        _uiManager.RaiseUIEvent(new CharacterProfileCreatedUIEvent(profile, previewEnt));
+        //_uiManager.RaiseUIEvent(new CharacterProfileCreatedUIEvent(profile, previewEnt));
         return true;
     }
 

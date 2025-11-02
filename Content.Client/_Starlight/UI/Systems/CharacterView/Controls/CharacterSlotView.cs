@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Client._Starlight.CharacterProfiles;
+using Content.Client._Starlight.UI.Core;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.UserInterface.Controls;
-using Robust.Client.UserInterface.UIEvents;
 
 namespace Content.Client._Starlight.UI.Systems.CharacterView.Controls;
 
@@ -23,20 +23,15 @@ public sealed class CharacterSlotView : SpriteView, IUIEventSubscriber
             if (_slot == value)
                 return;
             _slot = value;
-            UserInterfaceManager.RaiseUIEvent(this, new SlotChangedEvent());
         }
     }
 
     protected override void EnteredTree()
     {
-        UserInterfaceManager.SubscribeUIEvent<CharacterProfileCreatedUIEvent>(this,OnCharacterCreated);
-        UserInterfaceManager.SubscribeUIEvent<CharacterProfileUpdatedUIEvent>(this,OnCharacterUpdated);
-        UserInterfaceManager.SubscribeUIEvent<CharacterProfileDeletedUIEvent>(this,OnCharacterDeleted);
     }
 
     protected override void ExitedTree()
     {
-        UserInterfaceManager.UnSubscribeAllUIEvents(this);
     }
 
     private void OnCharacterUpdated(CharacterProfileUpdatedUIEvent ev)

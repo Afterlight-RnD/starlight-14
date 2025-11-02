@@ -3,6 +3,7 @@
 
 using System.Linq;
 using System.Numerics;
+using Content.Client._Starlight.UI.Controls;
 using Content.Client.Lobby;
 using Content.Client.Lobby.UI;
 using Content.Client.Lobby.UI.ProfileEditorControls;
@@ -20,13 +21,16 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._Starlight.Lobby.Widgets;
 
 [GenerateTypedNameReferences]
-public sealed partial class JobMatrixWidget : UIWidget
+public sealed partial class JobMatrixWidget : SLWidget
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IClientPreferencesManager _preferences = default!;
     [Dependency] private readonly JobRequirementsManager _requirements = default!;
     [Dependency] private readonly ISharedPlayerManager _playerManager = default!;
-    private readonly SpriteSystem _spriteSystem = default!;
+    private readonly SpriteSystem? _spriteSystem;
+
+    //TODO: Workaround for UiScreenLifecycle bs
+    private SpriteSystem SpriteSystem => _spriteSystem ?? EntityManager.System<SpriteSystem>();
 
     /// <summary>
     /// Action invoked when the player's job priorities have been updated.
@@ -36,8 +40,6 @@ public sealed partial class JobMatrixWidget : UIWidget
     public JobMatrixWidget()
     {
         RobustXamlLoader.Load(this);
-
-        _spriteSystem = EntityManager.System<SpriteSystem>();
 
         // If job or department prototypes get reloaded, we need to respond to that.
         _prototypeManager.PrototypesReloaded += OnPrototypesReloaded;
@@ -50,25 +52,6 @@ public sealed partial class JobMatrixWidget : UIWidget
         // in another high priority job.
         GetTargetControl(JobPriority.High).SetFallbackTarget(GetTargetControl(JobPriority.Medium));
     }
-
-    protected override void AddedToScreen()
-    {
-        if (_preferences.Preferences != null)
-        {
-            PreferencesDataLoaded();
-        }
-        Refresh();
-    }
-
-
-    protected override void RemovedFromScreen()
-    {
-        _prototypeManager.PrototypesReloaded -= OnPrototypesReloaded;
-        _preferences.OnServerDataLoaded -= PreferencesDataLoaded;
-        Loaded.Visible = false;
-        Unloaded.Visible = true;
-    }
-
     private void PreferencesDataLoaded()
     {
         Loaded.Visible = true;
@@ -121,7 +104,7 @@ public sealed partial class JobMatrixWidget : UIWidget
                 icon.Modulate = Color.Salmon;
 
             var jobIcon = _prototypeManager.Index(job.Icon);
-            icon.Texture = _spriteSystem.Frame0(jobIcon.Icon);
+            icon.Texture = SpriteSystem.Frame0(jobIcon.Icon);
 
             foreach (var targetControl in Enum.GetValues<JobPriority>().Select(GetTargetControl))
             {
