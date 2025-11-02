@@ -2,32 +2,34 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using System.Diagnostics.CodeAnalysis;
-using JetBrains.Annotations;
+using Robust.Client.UserInterface;
 using Robust.Shared.Collections;
 
 namespace Content.Client._Starlight.UI.Core;
 
-public sealed partial class UIEventBus
+public sealed partial class UIEventBus: IPostInjectInit
 {
     [Dependency] private readonly IDynamicTypeFactory _typeFactory = default!;
+    [Dependency] private readonly IEntitySystemManager _systemManager = default!;
+    [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
 
     private readonly Dictionary<Type, Subscriptions> _subscriptions = new();
 
-    private bool TryGetSubscription<T>([NotNullWhen(true)] out Subscriptions<T>? subscriptions) where T : struct
+    private bool TryGetSubscription<TEvent>([NotNullWhen(true)] out Subscriptions<TEvent>? subscriptions) where TEvent : struct
     {
         subscriptions = null;
-        if (!_subscriptions.TryGetValue(typeof(T), out var rawSubscriptions))
+        if (!_subscriptions.TryGetValue(typeof(TEvent), out var rawSubscriptions))
             return false;
-        subscriptions = rawSubscriptions.GetTyped<T>();
+        subscriptions = rawSubscriptions.GetTyped<TEvent>();
         return true;
     }
 
-    private Subscriptions<T> EnsureSubscription<T>() where T : struct
+    private Subscriptions<TEvent> EnsureSubscription<TEvent>() where TEvent : struct
     {
-        if (TryGetSubscription(out Subscriptions<T>? subs))
+        if (TryGetSubscription(out Subscriptions<TEvent>? subs))
             return subs;
-        subs = _typeFactory.CreateInstance<Subscriptions<T>>(true, false);
-        _subscriptions.Add(typeof(T), subs);
+        subs = _typeFactory.CreateInstance<Subscriptions<TEvent>>(true, false);
+        _subscriptions.Add(typeof(TEvent), subs);
         return subs;
     }
 
@@ -36,39 +38,42 @@ public sealed partial class UIEventBus
 
     private void FreeHandle(ref UIEventHandle handle)
     {
-        _freeHandles.Enqueue(new UIEventHandle(handle.Id, handle.Generation + 1, this, handle.EventType));
+        _freeHandles.Enqueue(new UIEventHandle(handle.Id, handle.Generation + 1, this, handle.EventType,
+            handle.ControlType));
         handle.Unsubscribe();
     }
 
-    private UIEventHandle GetNextHandle(Type handleType)
+    private UIEventHandle GetNextHandle(Type handleType, Type? controlType)
     {
         if (_freeHandles.TryDequeue(out var handle))
-            return handle;
-        handle = new UIEventHandle(_nextHandle, 1, this, handleType);
+            return new UIEventHandle(handle.Id, handle.Generation, this, handleType, controlType);
+
+        handle = new UIEventHandle(_nextHandle, 1, this, handleType, controlType);
         _nextHandle++;
         return handle;
     }
 
-    public abstract class Subscriptions
+    private abstract class Subscriptions
     {
         public Subscriptions<TEvent> GetTyped<TEvent>() where TEvent : struct => (Subscriptions<TEvent>)this;
 
         public abstract void Unsubscribe(ref UIEventHandle handle);
     };
 
-    public sealed class Subscriptions<TEvent> : Subscriptions where TEvent : struct
+    private sealed class Subscriptions<TEvent> : Subscriptions where TEvent : struct
     {
         private ValueList<(WriteableUIEvent<TEvent> handler, UIEventHandle handle)> Handlers = new();
         private ValueList<(UIEvent<TEvent>handler, UIEventHandle handle)> ReadonlyHandlers = new();
         private Dictionary<UIEventHandle, (bool readOnly, int idx)> _handleLookup = new();
 
-        public void Raise(TEvent args)
+
+        public void Raise(in TEvent args)
         {
             foreach (var (handler,_) in ReadonlyHandlers)
-                handler.Invoke(ref args);
+                handler.Invoke(in args);
         }
 
-        public void RaiseRef(ref TEvent args)
+        public void RaiseWritable(ref TEvent args)
         {
             foreach (var (handler,_) in Handlers)
                 handler.Invoke(ref args);
@@ -109,5 +114,10 @@ public sealed partial class UIEventBus
                 _handleLookup[oldHandler.handle] = (false, handlerData.idx);
             }
         }
+    }
+
+    public void PostInject()
+    {
+        _uiManager.OnScreenChanged += OnUIScreenChanged;
     }
 }

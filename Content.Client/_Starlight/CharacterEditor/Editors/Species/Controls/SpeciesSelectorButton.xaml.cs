@@ -12,7 +12,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._Starlight.CharacterEditor.Editors.Species.Controls;
 
 [GenerateTypedNameReferences]
-public sealed partial class SpeciesSelectorButton : ContainerButton, IUIEventSubscriber
+public sealed partial class SpeciesSelectorButton : ContainerButton
 {
     public ProtoId<SpeciesPrototype> Species { get; set; }
     public SpeciesSelectorButton()

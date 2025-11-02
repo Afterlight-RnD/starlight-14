@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Client._Starlight.CharacterProfiles;
-using Content.Client._Starlight.UI.Core;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.UI.Systems.CharacterView.Controls;
 
-public sealed class CharacterSlotView : SpriteView, IUIEventSubscriber
+public sealed class CharacterSlotView : SpriteView
 {
     private int _slot = -1;
 

@@ -14,7 +14,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._Starlight.CharacterEditor.Editors.Species.Controls;
 
 [GenerateTypedNameReferences]
-public sealed partial class SpeciesGroupList : BoxContainer, IUIEventSubscriber
+public sealed partial class SpeciesGroupList : BoxContainer
 {
     public string? GroupName { get => SpeciesGroupLabel.Text; set => SpeciesGroupLabel.Text = value; }
     public int Columns { get => SpeciesGrid.Columns; set => SpeciesGrid.Columns = value; }

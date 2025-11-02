@@ -6,20 +6,35 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.UI.Controls;
 
-public abstract class SLWidget : UIWidget, IUIEventDispatcher, IUIEventSubscriber
+public abstract class SLWidget : UIWidget
 {
     [Dependency] protected readonly IEntityManager EntityManager = default!;
+    private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
 
-    protected HashSet<UIEventHandle> UIEventHandles { get; } = new();
+    protected SLWidget()
+    {
+        IoCManager.InjectDependencies(this);
+        UIEvents.Subscribe<SystemsLoadedUIEvent>(HandleSystemDeps);
+    }
+
+    private void HandleSystemDeps(ref readonly SystemsLoadedUIEvent args)
+    {
+        InjectSystems(args.SystemDependencies);
+    }
+
+    [MustCallBase(true)]
+    protected virtual void InjectSystems(IDependencyCollection dependencyCollection)
+    {
+    }
 
     public void SubscribeWriteableUIEvent<T>(WriteableUIEvent<T> handler) where T: struct
     {
-        UIEventHandles.Add(UIEvents.SubscribeWriteable(handler));
+        _uiEventHandles.Add(UIEvents.SubscribeWriteable(handler));
     }
 
     public void SubscribeUIEvent<T>(UIEvent<T> handler) where T: struct
     {
-        UIEventHandles.Add(UIEvents.Subscribe(handler));
+        _uiEventHandles.Add(UIEvents.Subscribe(handler));
     }
 
     public void RaiseUIEvent<T>(T args) where T : struct
@@ -35,23 +50,42 @@ public abstract class SLWidget : UIWidget, IUIEventDispatcher, IUIEventSubscribe
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
-        if (!handle.IsValid || UIEventHandles.Remove(handle))
+        if (!handle.IsValid || _uiEventHandles.Remove(handle))
             return;
         handle.Unsubscribe();
     }
 
     public void UnsubscribeAllUIEvents()
     {
-        foreach (var handle in UIEventHandles)
+        foreach (var handle in _uiEventHandles)
         {
             handle.Unsubscribe();
         }
-        UIEventHandles.Clear();
+        _uiEventHandles.Clear();
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
         UnsubscribeAllUIEvents();
+    }
+}
+
+
+public abstract class SLWidget<TSelf,TSystem> : SLWidget
+    where TSystem: UISystem<TSelf>
+    where TSelf:SLWidget<TSelf,TSystem>, new()
+{
+    [MustCallBase(true)]
+    protected override void EnteredTree()
+    {
+        RaiseUIEvent(new UISystem<TSelf>.RegisterControlUIEvent((TSelf)this));
+    }
+
+    [MustCallBase(true)]
+    protected override void ExitedTree()
+    {
+        RaiseUIEvent(new UISystem<TSelf>.DeregisterControlUIEvent((TSelf)this));
+        base.ExitedTree();
     }
 }

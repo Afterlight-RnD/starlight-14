@@ -12,7 +12,7 @@ using Robust.Shared.Configuration;
 namespace Content.Client._Starlight.Lobby.Layers;
 
 [GenerateTypedNameReferences]
-public sealed partial class StarlightLobbyLayer : Control, IUIEventSubscriber, IUIEventDispatcher
+public sealed partial class StarlightLobbyLayer : Control
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
@@ -26,12 +26,6 @@ public sealed partial class StarlightLobbyLayer : Control, IUIEventSubscriber, I
         CollapseButton.OnPressed += CollapseSideBar;
         ExpandButton.OnPressed += ExpandSideBar;
     }
-
-    protected override void VisibilityChanged(bool newVisible)
-    {
-        UIEvents.RaiseEvent(new ControlVisibilityChangedUIEvent<StarlightLobbyLayer>(this, newVisible));
-    }
-
     private void ExpandSideBar(BaseButton.ButtonEventArgs obj)
     {
         if (SidePanel.Visible)

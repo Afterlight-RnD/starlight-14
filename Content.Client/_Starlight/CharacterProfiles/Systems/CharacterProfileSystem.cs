@@ -15,7 +15,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client._Starlight.CharacterProfiles.Systems;
 
-public sealed class CharacterProfileSystem : SharedCharacterProfileSystem, IUIEventSubscriber
+public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
 {
     [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
     [Dependency] private readonly IClientPreferencesManager _preferences = default!;

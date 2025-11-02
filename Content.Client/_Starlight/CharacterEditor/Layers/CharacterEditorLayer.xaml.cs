@@ -17,7 +17,7 @@ public sealed partial class CharacterEditorLayer : Control
     [Dependency] private readonly IReflectionManager _reflectionManager = default!;
 
     private List<CharacterEditorMode> _editorModes = new();
-    public CharacterEditorMode? CurrentEditorMode { get; private set; } = null;
+    public CharacterEditorMode? CurrentEditorMode { get; set; } = null;
 
     public CharacterEditorLayer()
     {

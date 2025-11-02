@@ -1,6 +1,8 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using Robust.Client.UserInterface;
+
 namespace Content.Client._Starlight.UI.Core;
 
 public abstract class UISystem : EntitySystem
@@ -16,7 +18,7 @@ public abstract class UISystem : EntitySystem
 
     public void RaiseUIWritableEvent<T>(ref T args) where T : struct
     {
-        UIEvents.RaiseEvent(ref args);
+        UIEvents.RaiseWritableEvent(ref args);
     }
 
     public void SubscribeWritableUIEvent<T>(WriteableUIEvent<T> uiEvent) where T : struct
@@ -41,4 +43,33 @@ public abstract class UISystem : EntitySystem
         UnSubscribeUIEvents();
         base.Shutdown();
     }
+}
+public abstract class UISystem<TControl> : UISystem where TControl: Control, new()
+{
+    private HashSet<TControl> _registeredInstances = new();
+
+    public override void Initialize()
+    {
+        SubscribeUIEvent<RegisterControlUIEvent>(OnControlRegistered);
+        SubscribeUIEvent<DeregisterControlUIEvent>(OnControlDeregistered);
+    }
+
+    private void OnControlDeregistered(ref readonly DeregisterControlUIEvent args)
+    {
+        _registeredInstances.Remove(args.Instance);
+    }
+
+    private void OnControlRegistered(ref readonly RegisterControlUIEvent args)
+    {
+        _registeredInstances.Add(args.NewInstance);
+    }
+
+    public IEnumerable<TControl> IterateInstances()
+    {
+        foreach (var instance in _registeredInstances)
+            yield return instance;
+    }
+
+    public record struct RegisterControlUIEvent(TControl NewInstance);
+    public record struct DeregisterControlUIEvent(TControl Instance);
 }
