@@ -1,9 +1,9 @@
-﻿<widgets:RoundTimerWidget
+﻿<controls:RoundTimerControl
     xmlns="https://spacestation14.io"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:maths="clr-namespace:Robust.Shared.Maths;assembly=Robust.Shared.Maths"
 
-    xmlns:widgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets">
+    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Controls">
     <BoxContainer Orientation="Vertical">
         <Label Name="StartTime"
                Access="Protected"
@@ -14,4 +14,4 @@
                Margin="3 3 3 3" HorizontalAlignment="Center" Visible="True"/>
         <!--> <RichTextLabel Name="PlaytimeComment" Visible="False" Access="Public" HorizontalAlignment="Center" /> <!-->
     </BoxContainer>
-</widgets:RoundTimerWidget>
+</controls:RoundTimerControl>

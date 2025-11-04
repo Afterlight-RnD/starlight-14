@@ -31,12 +31,14 @@ public sealed partial class SLDummyLobbyControl : Control
 
     private void HandleExitCharacterEditor(ref readonly ExitCharacterEditorUIEvent args)
     {
+        CharacterEditor.Visible = false;
         Lobby.Visible = true;
     }
 
     private void HandleEnterCharacterEditor(ref readonly EnterCharacterEditorUIEvent args)
     {
         Lobby.Visible = false;
+        CharacterEditor.Visible = true;
     }
 
     protected override void ExitedTree()

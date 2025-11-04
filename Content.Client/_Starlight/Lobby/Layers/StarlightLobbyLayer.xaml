@@ -3,7 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
     xmlns:style="clr-namespace:Content.Client.Stylesheets"
-    xmlns:widgets="clr-namespace:Content.Client.UserInterface.Systems.Chat.Widgets"
     xmlns:slwidgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
     xmlns:layer="clr-namespace:Content.Client._Starlight.Lobby.Layers"
     xmlns:controls1="clr-namespace:Content.Client._Starlight.Lobby.Controls"
@@ -24,7 +23,7 @@
                                 <slwidgets:LobbyServerNameWidget />
                                 <controls:HLine Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
                                 <slwidgets:LobbyLinkBannerWidget ButtonColumns="6" />
-                                <slwidgets:ReadyWidget />
+                                <controls1:ReadyButton />
                                 <!-- <RichTextLabel Name="PlaytimeComment" Visible="False" Access="Public" -->
                                 <!--                HorizontalAlignment="Center" /> Seriously? -->
                             </BoxContainer>

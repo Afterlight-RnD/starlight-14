@@ -2,9 +2,9 @@
     xmlns="https://spacestation14.io"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:widgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
-    xmlns:controls="clr-namespace:Content.Client._Starlight.Lobby.Controls"
     Orientation="Vertical">
     <GridContainer Name="PlayerButtonGrid" Access="Protected">
-        <controls:EditCharacterButton/>
+        <Button Name="EditCharacter" Access="Protected"
+                Text="{Loc 'lobby-character-preview-panel-character-setup-button'}"/>
     </GridContainer>
 </widgets:LobbyPlayerBarWidget>
