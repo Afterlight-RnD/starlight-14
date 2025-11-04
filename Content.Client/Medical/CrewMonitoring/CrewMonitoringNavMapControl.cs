@@ -2,6 +2,8 @@ using Content.Client.Pinpointer.UI;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Timing;
+using Robust.Shared.Map; // Starlight
+using Robust.Shared.Localization; // Starlight
 
 namespace Content.Client.Medical.CrewMonitoring;
 
@@ -9,6 +11,7 @@ public sealed partial class CrewMonitoringNavMapControl : NavMapControl
 {
     public NetEntity? Focus;
     public Dictionary<NetEntity, string> LocalizedNames = new();
+    public event Action<EntityCoordinates>? MapClicked; // Starlight
 
     private Label _trackedEntityLabel;
     private PanelContainer _trackedEntityPanel;
@@ -42,6 +45,7 @@ public sealed partial class CrewMonitoringNavMapControl : NavMapControl
 
         _trackedEntityPanel.AddChild(_trackedEntityLabel);
         this.AddChild(_trackedEntityPanel);
+        MapClickedAction += coords => MapClicked?.Invoke(coords); // Starlight
     }
 
     protected override void FrameUpdate(FrameEventArgs args)
@@ -62,9 +66,11 @@ public sealed partial class CrewMonitoringNavMapControl : NavMapControl
                 continue;
 
             if (!LocalizedNames.TryGetValue(netEntity, out var name))
-                name = "Unknown";
+                name = Loc.GetString("navmap-unknown-target"); // Starlight-end
 
-            var message = name + "\nLocation: [x = " + MathF.Round(blip.Coordinates.X) + ", y = " + MathF.Round(blip.Coordinates.Y) + "]";
+            var message = name + "\n" + Loc.GetString("navmap-location",
+                ("x", MathF.Round(blip.Coordinates.X)),
+                ("y", MathF.Round(blip.Coordinates.Y)));
 
             _trackedEntityLabel.Text = message;
             _trackedEntityPanel.Visible = true;
