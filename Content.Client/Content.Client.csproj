@@ -29,6 +29,7 @@
     <Folder Include="_Starlight\Actions\" />
     <Folder Include="_Starlight\Audio\" />
     <Folder Include="_Starlight\Crayon\" />
+    <Folder Include="_Starlight\UI\Systems\CharacterView\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Xaml" />

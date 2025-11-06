@@ -6,24 +6,25 @@ using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.UI.Core;
 
-public delegate void WriteableUIEvent<TEvent>(ref TEvent args) where TEvent: struct;
-
 public delegate void UIEvent<TEvent>(ref readonly TEvent args) where TEvent: struct;
-
-public delegate void WriteableUIEvent<in TControl, TEvent>(TControl control, ref TEvent args)
-    where TControl : Control, new()
-    where TEvent: struct;
 
 public delegate void UIEvent<in TControl,TEvent>(TControl control, ref readonly TEvent args)
     where TControl : Control, new()
     where TEvent: struct;
+
+public delegate void UIRequest<TEvent>(ref TEvent args) where TEvent: struct;
+
+public delegate void UIRequest<in TControl, TEvent>(TControl control, ref TEvent args)
+    where TControl : Control, new()
+    where TEvent: struct;
+
 
 public sealed partial class UIEventBus
 {
     //== Global UI Events ==
 
     [Pure]
-    public UIEventHandle SubscribeWritable<TEvent>(WriteableUIEvent<TEvent> handler) where TEvent: struct
+    public UIEventHandle SubscribeRequest<TEvent>(UIRequest<TEvent> handler) where TEvent: struct
     {
         var subs = EnsureSubscription<TEvent>();
         return subs.RegisterHandler(GetNextHandle(typeof(TEvent), null),handler);
@@ -42,17 +43,17 @@ public sealed partial class UIEventBus
         foundSubs.Raise(args);
     }
 
-    public void RaiseWritableEvent<TEvent>(ref TEvent args) where TEvent : struct
+    public void RaiseRequest<TEvent>(ref TEvent args) where TEvent : struct
     {
         if (!TryGetSubscription<TEvent>(out var foundSubs))
             return;
-        foundSubs.RaiseWritable(ref args);
+        foundSubs.RaiseRequest(ref args);
     }
 
     //==Control UiEvents==
 
     [Pure]
-    public UIEventHandle SubscribeWritable<TControl,TEvent>(WriteableUIEvent<TControl,TEvent> handler)
+    public UIEventHandle SubscribeRequest<TControl,TEvent>(UIRequest<TControl,TEvent> handler)
         where TControl: Control, new()
         where TEvent: struct
     {
@@ -77,7 +78,7 @@ public sealed partial class UIEventBus
         foundSubs.Raise(control, in args);
     }
 
-    public void RaiseWritableControlEvent<TEvent>(Control control, ref TEvent args)
+    public void RaiseControlRequest<TEvent>(Control control, ref TEvent args)
         where TEvent : struct
     {
         if (!TryGetControlSubscription<TEvent>(control.GetType(),out var foundSubs))
@@ -93,12 +94,12 @@ public sealed partial class UIEventBus
             RaiseControlEventRecursive(childControl,in args);
     }
 
-    public void RaiseWritableControlEventRecursive<TEvent>(Control control, ref TEvent args)
+    public void RaiseControlRequestRecursive<TEvent>(Control control, ref TEvent args)
         where TEvent : struct
     {
-        RaiseWritableControlEvent(control,ref args);
+        RaiseControlRequest(control,ref args);
         foreach (var childControl in control.Children)
-            RaiseWritableControlEventRecursive(childControl,ref args);
+            RaiseControlRequestRecursive(childControl,ref args);
     }
 
     //==Event Helpers for screens ==
@@ -112,18 +113,18 @@ public sealed partial class UIEventBus
     public void RaiseScreenWritableEvent<TEvent>(UIScreen screen, ref TEvent args)
         where TEvent : struct
     {
-        RaiseWritableControlEventRecursive(screen,ref args);
+        RaiseControlRequestRecursive(screen,ref args);
     }
 
     //==Common==
 
-    public void Unsubscribe(ref UIEventHandle handle)
+    public void Unsubscribe(in UIEventHandle handle)
     {
         //EventType is never null if handle is valid
-        if (!handle.IsValid || _subscriptions.TryGetValue(handle.EventType, out var subs))
+        if (!handle.IsValid || !_subscriptions.TryGetValue(handle.EventType, out var subs))
             return;
-        subs?.Unsubscribe(ref handle);
-        FreeHandle(ref handle);
+        subs.Unsubscribe(in handle);
+        FreeHandle(in handle);
     }
 }
 

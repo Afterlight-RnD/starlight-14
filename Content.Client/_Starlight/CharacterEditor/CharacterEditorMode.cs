@@ -1,31 +1,18 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using System.Diagnostics.CodeAnalysis;
 using Content.Client._Starlight.CharacterEditor.Controls;
+using Content.Client._Starlight.UI.Core;
 using Robust.Client.Graphics;
-using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.CharacterEditor;
-
-public interface ICharacterEditorMode
+public abstract class CharacterEditorMode
 {
-    public void AddPanelsToUI(params CharacterEditorPanelStub[] parentControls);
-
-    public void Initialize();
-
-    public void RemovePanelsFromUI();
-
-    public void Activate();
-
-    public void Deactivate();
-}
-
-
-public abstract class CharacterEditorMode : ICharacterEditorMode
-{
+    [Dependency] private readonly UIEventBus _uiEvents = default!;
     [Dependency] private readonly IDynamicTypeFactory _typeFactory = default!;
-    private Control?[] editorPanels;
-    public bool IsActive { get; private set; } = false;
+    [Dependency] private readonly ILogManager _logMan = default!;
+    protected ISawmill Log = default!;
 
     /// <summary>
     /// Which modes should be put before this one in the character editor
@@ -42,103 +29,98 @@ public abstract class CharacterEditorMode : ICharacterEditorMode
 
     public virtual string? ModeSubText => null;
 
-    public abstract void SetupPanels();
+    public bool IsActive { get; private set; } = false;
 
+    private CharacterEditor _characterEditor = default!;
+    private CharacterEditorModeButton? _modeButton = null;
 
-    protected CharacterEditorMode()
+    private CharacterEditorPanel?[] Panels = new CharacterEditorPanel?[Enum.GetValues<CharacterEditorPanelLayout>().Length];
+    protected abstract void RegisterPanels();
+
+    protected TPanel RegisterPanel<TPanel>() where TPanel : CharacterEditorPanel, new()
     {
-        editorPanels = new Control?[Enum.GetValues<CharacterEditorPanelLayout>().Length];
-    }
-
-    void ICharacterEditorMode.Initialize()
-    {
-        SetupPanels();
-    }
-
-    public Control? GetPanel(CharacterEditorPanelLayout layout)
-    {
-        return editorPanels[(int)layout];
-    }
-
-    public T? GetPanel<T>(CharacterEditorPanelLayout layout) where T: Control
-    {
-        var control = editorPanels[(int)layout];
-        if (control is T retVal)
-            return retVal;
-        return null;
-    }
-
-    public IEnumerable<Control> IteratePanels()
-    {
-        foreach (var panel in editorPanels)
+        var newPanel = _typeFactory.CreateInstance<TPanel>();
+        newPanel.Visible = false;
+        if (TryGetPanel(newPanel.Layout, out var existing))
         {
-            if (panel == null)
-                continue;
-            yield return panel;
+            Log.Info($"Panel:{existing} already exists in layout position:{newPanel.Layout}! Overriding!");
+            existing.Orphan();
+        }
+        Panels[(int)newPanel.Layout] = newPanel;
+
+        switch (newPanel.Layout)
+        {
+            case CharacterEditorPanelLayout.Main:
+                _characterEditor.MainPanel.AddChild(newPanel);
+                break;
+            case CharacterEditorPanelLayout.Side:
+                _characterEditor.SidePanel.AddChild(newPanel);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        return newPanel;
+    }
+
+
+    private void ChangePanelsVisibility(bool newVisibility)
+    {
+        foreach (var panel in Panels)
+        {
+            if (panel != null)
+                panel.Visible = newVisibility;
         }
     }
 
-    /// <summary>
-    /// Injects editor panel controls into specified parents.
-    /// </summary>
-    /// <param name="parentControls"></param>
-    /// <exception cref="Exception"></exception>
-    void ICharacterEditorMode.AddPanelsToUI(params CharacterEditorPanelStub[] parentControls)
+    public IEnumerable<CharacterEditorPanel> IteratePanels()
     {
-        if (parentControls.Length != editorPanels.Length)
-            throw new Exception($"EditorPanel to ParentControl Mismatch! PanelCount:{editorPanels.Length} Parents:{parentControls.Length}");
-
-        foreach (var control in parentControls)
+        foreach (var panel in Panels)
         {
-            var panel = GetPanel(control.EditorLayout);
-            if (panel == null)
-                continue;
-            if (panel.Parent != null)
-                throw new Exception(
-                    $"Panel of type:{panel.GetType()} in editorMode:{GetType()} is already already injected!");
-            control.AddChild(panel);
+            if (panel != null)
+                yield return panel;
         }
-
     }
 
-    void ICharacterEditorMode.RemovePanelsFromUI()
+    public bool TryGetPanel(CharacterEditorPanelLayout layout, [NotNullWhen(true)] out CharacterEditorPanel? panel)
     {
-        foreach (var panel in editorPanels)
-            panel?.Orphan();
+        panel = Panels[(int)layout];
+        return panel != null;
+    }
+    public void Initialize(CharacterEditor characterEditor)
+    {
+        _characterEditor = characterEditor;
+        Log = _logMan.GetSawmill(GetType().ToString());
+        RegisterPanels();
     }
 
-    void ICharacterEditorMode.Activate()
+    public void Activate()
     {
         if (IsActive)
             return;
-        foreach (var panel in editorPanels)
-        {
-            if (panel != null)
-                panel.Visible = true;
-        }
+        ChangePanelsVisibility(true);
         IsActive = true;
+        if (_modeButton != null)
+            _modeButton.Pressed = true;
+        _characterEditor.CurrentEditorMode?.Deactivate();
+        _characterEditor.CurrentEditorMode = this;
+        _uiEvents.RaiseEvent(new CharacterEditorModeEnteredUIEvent(this));
     }
 
-    void ICharacterEditorMode.Deactivate()
+    public void Deactivate()
     {
         if (!IsActive)
             return;
-        foreach (var panel in editorPanels)
-        {
-            if (panel != null)
-                panel.Visible = false;
-        }
+        ChangePanelsVisibility(false);
         IsActive = false;
+        _uiEvents.RaiseEvent(new CharacterEditorModeExitedUIEvent(this));
+        _characterEditor.CurrentEditorMode = null;
     }
 
-    protected void RegisterPanel<T>(CharacterEditorPanelLayout panelLayout) where T : Control, new()
+    public void LinkButton(CharacterEditorModeButton button)
     {
-        var panel = _typeFactory.CreateInstance<T>();
-        var panelIdx = (int)panelLayout;
-        if (editorPanels[panelIdx] != null)
-            throw new InvalidOperationException(
-                $"Could not set Panel of type{typeof(T)} location:{panelLayout} is already occupied!");
-        editorPanels[panelIdx] = panel;
+        if (_modeButton != null)
+            throw new InvalidOperationException($"EditorButton already linked to {this}!");
+        _modeButton = button;
     }
 }
 

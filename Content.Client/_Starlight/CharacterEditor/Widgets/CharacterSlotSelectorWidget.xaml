@@ -3,6 +3,6 @@
     xmlns:widgets="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets"
     Orientation="Vertical" HorizontalAlignment="Stretch">
     <ScrollContainer VerticalExpand="True">
-        <BoxContainer Name="ListEntries" Access="Protected" Orientation="Vertical"/>
+        <BoxContainer Name="SelectorButtons" Access="Protected" Orientation="Vertical"/>
     </ScrollContainer>
 </widgets:CharacterSlotSelectorWidget>

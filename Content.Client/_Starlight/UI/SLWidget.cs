@@ -9,15 +9,23 @@ namespace Content.Client._Starlight.UI;
 public abstract class SLWidget : UIWidget
 {
     [Dependency] protected readonly IEntityManager EntityManager = default!;
-    private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
 
     protected SLWidget()
     {
         IoCManager.InjectDependencies(this);
     }
-    public void SubscribeWriteableUIEvent<T>(WriteableUIEvent<T> handler) where T: struct
+
+    [MustCallBase]
+    protected override void ExitedTree()
     {
-        _uiEventHandles.Add(UIEvents.SubscribeWriteable(handler));
+        UnsubscribeAllUIEvents();
+    }
+
+    #region UIEvents
+    private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
+    public void SubscribeUIRequest<T>(UIRequest<T> handler) where T: struct
+    {
+        _uiEventHandles.Add(UIEvents.SubscribeRequest(handler));
     }
 
     public void SubscribeUIEvent<T>(UIEvent<T> handler) where T: struct
@@ -30,9 +38,9 @@ public abstract class SLWidget : UIWidget
         UIEvents.RaiseEvent(args);
     }
 
-    public void RaiseUIEvent<T>(ref T args) where T : struct
+    public void RaiseRequest<T>(ref T args) where T : struct
     {
-        UIEvents.RaiseWriteableEvent(ref args);
+        UIEvents.RaiseRequest(ref args);
     }
 
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
@@ -51,10 +59,5 @@ public abstract class SLWidget : UIWidget
         }
         _uiEventHandles.Clear();
     }
-
-    [MustCallBase]
-    protected override void ExitedTree()
-    {
-        UnsubscribeAllUIEvents();
-    }
+    #endregion
 }

@@ -1,25 +1,27 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using Robust.Client.UserInterface;
-
+using Content.Client._Starlight.UI;
 namespace Content.Client._Starlight.CharacterEditor.Controls;
 
-public sealed class CharacterEditorPanelStub : Control
+public abstract class CharacterEditorPanel : SLBox
 {
-    public CharacterEditorPanelLayout EditorLayout { get; set; } = default;
+    public CharacterEditorPanelLayout Layout => CharacterEditorPanelLayout.Main;
 
-    public CharacterEditorPanelStub()
+    public bool IsSide => Layout == CharacterEditorPanelLayout.Side;
+
+    public bool IsMain => Layout == CharacterEditorPanelLayout.Main;
+    protected CharacterEditorPanel()
     {
         HorizontalExpand = true;
         VerticalExpand = true;
         HorizontalAlignment = HAlignment.Stretch;
         VerticalAlignment = VAlignment.Stretch;
     }
-}
+};
 
 public enum CharacterEditorPanelLayout
 {
     Main,
-    Side,
+    Side
 }

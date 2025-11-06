@@ -35,7 +35,7 @@
                     <PanelContainer.PanelOverride>
                         <gfx:StyleBoxTexture />
                     </PanelContainer.PanelOverride>
-                    <Button Name="EnabledCheck" Access="Protected"
+                    <Button Name="EnabledCheck" Access="Public"
                             ToggleMode="True" HorizontalAlignment="Stretch"
                             Text="{Loc 'character-setup-gui-character-picker-button-enabled-button'}"/>
                 </PanelContainer>
@@ -44,7 +44,7 @@
                     <PanelContainer.PanelOverride>
                         <gfx:StyleBoxTexture/>
                     </PanelContainer.PanelOverride>
-                    <controls1:ConfirmButton Name="DeleteButton" HorizontalAlignment="Stretch"
+                    <controls1:ConfirmButton Name="DeleteButton" HorizontalAlignment="Stretch" Access="Protected"
                                              Text="{Loc 'character-setup-gui-character-picker-button-delete-button'}"/>
                 </PanelContainer>
             </BoxContainer> <!-- End button container -->

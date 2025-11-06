@@ -19,24 +19,10 @@ public sealed partial class EditorModeList : SLWidget
         RobustXamlLoader.Load(this);
         _modeSelectorGroup = new(false);
     }
-
-    private void HandleDeselect(BaseButton obj)
-    {
-        var editorMode = ((EditorModeButton)obj).EditorMode;
-        RaiseUIEvent(new CharacterEditorModeExitedUIEvent(editorMode));
-    }
-
-    private void HandleModeSelection(BaseButton.ButtonEventArgs obj)
-    {
-        var editorMode = ((EditorModeButton)obj.Button).EditorMode;
-        RaiseUIEvent(new CharacterEditorModeEnteredUIEvent(editorMode));
-    }
-
     public void AddEditorMode(CharacterEditorMode mode)
     {
-        var newButton = new EditorModeButton{EditorMode = mode,Group = _modeSelectorGroup};
-        newButton.OnPressed += HandleModeSelection;
+        var newButton = new CharacterEditorModeButton{EditorMode = mode,Group = _modeSelectorGroup};
         if (_modeSelectorGroup.Buttons.Count != 1) return; //don't continue if we aren't the first mode/button added
-        RaiseUIEvent(new CharacterEditorModeEnteredUIEvent(newButton.EditorMode));
+        newButton.Pressed = true;
     }
 }

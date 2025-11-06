@@ -1,7 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using Content.Client._Starlight.CharacterEditor.Controls;
 using Content.Client._Starlight.CharacterEditor.Editors.BodyType;
 using Content.Client._Starlight.CharacterEditor.Editors.Species;
 
@@ -11,9 +10,9 @@ public sealed class SpeciesEditorMode : CharacterEditorMode
 {
     public override string ModeName => "Species";
 
-    public override void SetupPanels()
+    protected override void RegisterPanels()
     {
-        RegisterPanel<SpeciesSelectorPanel>(CharacterEditorPanelLayout.Side);
-        RegisterPanel<BodyTypePanel>(CharacterEditorPanelLayout.Main);
+        RegisterPanel<SpeciesSelectorPanel>();
+        RegisterPanel<BodyTypePanel>();
     }
 }

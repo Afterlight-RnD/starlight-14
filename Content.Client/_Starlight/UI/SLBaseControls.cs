@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using System.Numerics;
+using Content.Client._Starlight.UI.Core;
 using Content.Client.UserInterface.Controls;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
@@ -89,9 +90,110 @@ public class SLScroll : ScrollContainer
 public class SLPanel : PanelContainer
 {
 }
+
 [Virtual]
 public class SLButton : Button
 {
+    [MustCallBase]
+    protected override void ExitedTree()
+    {
+        UnsubscribeAllUIEvents();
+    }
+
+    #region UIEvents
+
+    private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
+
+    public void SubscribeUIRequest<T>(UIRequest<T> handler) where T : struct
+    {
+        _uiEventHandles.Add(UIEvents.SubscribeRequest(handler));
+    }
+
+    public void SubscribeUIEvent<T>(UIEvent<T> handler) where T : struct
+    {
+        _uiEventHandles.Add(UIEvents.Subscribe(handler));
+    }
+
+    public void RaiseUIEvent<T>(T args) where T : struct
+    {
+        UIEvents.RaiseEvent(args);
+    }
+
+    public void RaiseRequest<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseRequest(ref args);
+    }
+
+    public void UnsubscribeUIEvent(ref UIEventHandle handle)
+    {
+        //EventType is never null if handle is valid
+        if (!handle.IsValid || _uiEventHandles.Remove(handle))
+            return;
+        handle.Unsubscribe();
+    }
+
+    public void UnsubscribeAllUIEvents()
+    {
+        foreach (var handle in _uiEventHandles)
+        {
+            handle.Unsubscribe();
+        }
+
+        _uiEventHandles.Clear();
+    }
+
+    #endregion
+}
+
+[Virtual]
+public class SLContainerButton : ContainerButton
+{
+    [MustCallBase]
+    protected override void ExitedTree()
+    {
+        UnsubscribeAllUIEvents();
+    }
+
+    #region UIEvents
+    private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
+    public void SubscribeUIRequest<T>(UIRequest<T> handler) where T: struct
+    {
+        _uiEventHandles.Add(UIEvents.SubscribeRequest(handler));
+    }
+
+    public void SubscribeUIEvent<T>(UIEvent<T> handler) where T: struct
+    {
+        _uiEventHandles.Add(UIEvents.Subscribe(handler));
+    }
+
+    public void RaiseUIEvent<T>(T args) where T : struct
+    {
+        UIEvents.RaiseEvent(args);
+    }
+
+    public void RaiseRequest<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseRequest(ref args);
+    }
+
+    public void UnsubscribeUIEvent(ref UIEventHandle handle)
+    {
+        //EventType is never null if handle is valid
+        if (!handle.IsValid || _uiEventHandles.Remove(handle))
+            return;
+        handle.Unsubscribe();
+    }
+
+    public void UnsubscribeAllUIEvents()
+    {
+        foreach (var handle in _uiEventHandles)
+        {
+            handle.Unsubscribe();
+        }
+        _uiEventHandles.Clear();
+    }
+    #endregion
+
 }
 
 [Virtual]
@@ -115,6 +217,52 @@ public class SLButtonWithShader : Button
         renderHandle.DrawingHandleScreen.UseShader(ShaderInstance);
         base.Draw(renderHandle);
     }
+
+    [MustCallBase]
+    protected override void ExitedTree()
+    {
+        UnsubscribeAllUIEvents();
+    }
+
+    #region UIEvents
+    private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
+    public void SubscribeUIRequest<T>(UIRequest<T> handler) where T: struct
+    {
+        _uiEventHandles.Add(UIEvents.SubscribeRequest(handler));
+    }
+
+    public void SubscribeUIEvent<T>(UIEvent<T> handler) where T: struct
+    {
+        _uiEventHandles.Add(UIEvents.Subscribe(handler));
+    }
+
+    public void RaiseUIEvent<T>(T args) where T : struct
+    {
+        UIEvents.RaiseEvent(args);
+    }
+
+    public void RaiseRequest<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseRequest(ref args);
+    }
+
+    public void UnsubscribeUIEvent(ref UIEventHandle handle)
+    {
+        //EventType is never null if handle is valid
+        if (!handle.IsValid || _uiEventHandles.Remove(handle))
+            return;
+        handle.Unsubscribe();
+    }
+
+    public void UnsubscribeAllUIEvents()
+    {
+        foreach (var handle in _uiEventHandles)
+        {
+            handle.Unsubscribe();
+        }
+        _uiEventHandles.Clear();
+    }
+    #endregion
 }
 
 [Virtual]

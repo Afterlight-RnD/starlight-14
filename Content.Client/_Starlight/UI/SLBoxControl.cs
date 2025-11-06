@@ -14,11 +14,17 @@ public class SLBox : BoxContainer
     }
     public SLBox(LayoutOrientation orientation) => Orientation = orientation;
 
+    [MustCallBase]
+    protected override void ExitedTree()
+    {
+        UnsubscribeAllUIEvents();
+    }
+
     #region UIEvents
     private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
-    public void SubscribeWriteableUIEvent<T>(WriteableUIEvent<T> handler) where T: struct
+    public void SubscribeUIRequest<T>(UIRequest<T> handler) where T: struct
     {
-        _uiEventHandles.Add(UIEvents.SubscribeWriteable(handler));
+        _uiEventHandles.Add(UIEvents.SubscribeRequest(handler));
     }
 
     public void SubscribeUIEvent<T>(UIEvent<T> handler) where T: struct
@@ -31,9 +37,9 @@ public class SLBox : BoxContainer
         UIEvents.RaiseEvent(args);
     }
 
-    public void RaiseUIEvent<T>(ref T args) where T : struct
+    public void RaiseRequest<T>(ref T args) where T : struct
     {
-        UIEvents.RaiseWriteableEvent(ref args);
+        UIEvents.RaiseRequest(ref args);
     }
 
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
@@ -51,12 +57,6 @@ public class SLBox : BoxContainer
             handle.Unsubscribe();
         }
         _uiEventHandles.Clear();
-    }
-
-    [MustCallBase]
-    protected override void ExitedTree()
-    {
-        UnsubscribeAllUIEvents();
     }
     #endregion
 }

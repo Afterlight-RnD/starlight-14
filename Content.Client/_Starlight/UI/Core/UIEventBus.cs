@@ -36,7 +36,7 @@ public sealed partial class UIEventBus: IPostInjectInit
     private int _nextHandle = 0;
     private readonly Queue<UIEventHandle> _freeHandles = new();
 
-    private void FreeHandle(ref UIEventHandle handle)
+    private void FreeHandle(in UIEventHandle handle)
     {
         _freeHandles.Enqueue(new UIEventHandle(handle.Id, handle.Generation + 1, this, handle.EventType,
             handle.ControlType));
@@ -57,12 +57,12 @@ public sealed partial class UIEventBus: IPostInjectInit
     {
         public Subscriptions<TEvent> GetTyped<TEvent>() where TEvent : struct => (Subscriptions<TEvent>)this;
 
-        public abstract void Unsubscribe(ref UIEventHandle handle);
+        public abstract void Unsubscribe(in UIEventHandle handle);
     };
 
     private sealed class Subscriptions<TEvent> : Subscriptions where TEvent : struct
     {
-        private ValueList<(WriteableUIEvent<TEvent> handler, UIEventHandle handle)> Handlers = new();
+        private ValueList<(UIRequest<TEvent> handler, UIEventHandle handle)> Handlers = new();
         private ValueList<(UIEvent<TEvent>handler, UIEventHandle handle)> ReadonlyHandlers = new();
         private Dictionary<UIEventHandle, (bool readOnly, int idx)> _handleLookup = new();
 
@@ -73,13 +73,13 @@ public sealed partial class UIEventBus: IPostInjectInit
                 handler.Invoke(in args);
         }
 
-        public void RaiseWritable(ref TEvent args)
+        public void RaiseRequest(ref TEvent args)
         {
             foreach (var (handler,_) in Handlers)
                 handler.Invoke(ref args);
         }
 
-        public UIEventHandle RegisterHandler(UIEventHandle handle, WriteableUIEvent<TEvent> del)
+        public UIEventHandle RegisterHandler(UIEventHandle handle, UIRequest<TEvent> del)
         {
             _handleLookup.Add(handle, (false, Handlers.Count));
             Handlers.Add((del, handle));
@@ -94,7 +94,7 @@ public sealed partial class UIEventBus: IPostInjectInit
             return handle;
         }
 
-        public override void Unsubscribe(ref UIEventHandle handle)
+        public override void Unsubscribe(in UIEventHandle handle)
         {
             if (!handle.IsValid || !_handleLookup.Remove(handle, out var handlerData)) return;
             if (handlerData.readOnly)

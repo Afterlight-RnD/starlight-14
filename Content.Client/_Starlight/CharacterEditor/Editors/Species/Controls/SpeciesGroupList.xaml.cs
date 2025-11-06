@@ -32,11 +32,11 @@ public sealed partial class SpeciesGroupList : BoxContainer
     {
     }
 
-    private void OnEditingStarted(CharacterEditingStartedUIEvent ev)
-    {
-        var speciesData = ev.Profile.GetData<CharacterSpeciesData>();
-        SelectSpeciesButton(speciesData.BaseSpecies);
-    }
+    // private void OnEditingStarted(CharacterEditingStartedUIEvent ev)
+    // {
+    //     var speciesData = ev.Profile.GetData<CharacterSpeciesData>();
+    //     SelectSpeciesButton(speciesData.BaseSpecies);
+    // }
 
     public void SelectSpeciesButton(ProtoId<SpeciesPrototype> species)
     {

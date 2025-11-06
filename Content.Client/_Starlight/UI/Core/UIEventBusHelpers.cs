@@ -16,9 +16,9 @@ public static class UIEvents
     private static UIEventBus LocalEventBus => IoCManager.Resolve<UIEventBus>();
 
     [Pure]
-    public static UIEventHandle SubscribeWriteable<T>(WriteableUIEvent<T> handler) where T: struct
+    public static UIEventHandle SubscribeRequest<T>(UIRequest<T> handler) where T: struct
     {
-        return LocalEventBus.SubscribeWritable(handler);
+        return LocalEventBus.SubscribeRequest(handler);
     }
 
     [Pure]
@@ -32,9 +32,9 @@ public static class UIEvents
         LocalEventBus.RaiseEvent(in args);
     }
 
-    public static void RaiseWriteableEvent<T>(ref T args) where T : struct
+    public static void RaiseRequest<T>(ref T args) where T : struct
     {
-        LocalEventBus.RaiseWritableEvent(ref args);
+        LocalEventBus.RaiseRequest(ref args);
     }
 
     public static void Unsubscribe(ref UIEventHandle handle)
@@ -45,11 +45,11 @@ public static class UIEvents
     // == Control Events ==
 
     [Pure]
-    public static UIEventHandle SubscribeWritable<TControl,TEvent>(WriteableUIEvent<TControl,TEvent> handler)
+    public static UIEventHandle SubscribeRequest<TControl,TEvent>(UIRequest<TControl,TEvent> handler)
         where TControl: Control, new()
         where TEvent: struct
     {
-        return  LocalEventBus.SubscribeWritable(handler);
+        return  LocalEventBus.SubscribeRequest(handler);
     }
 
     [Pure]
@@ -66,10 +66,10 @@ public static class UIEvents
         LocalEventBus.RaiseControlEvent(control, in args);
     }
 
-    public static void RaiseWritableControlEvent<TEvent>(Control control, ref TEvent args)
+    public static void RaiseControlRequest<TEvent>(Control control, ref TEvent args)
         where TEvent : struct
     {
-        LocalEventBus.RaiseWritableControlEvent(control, ref args);
+        LocalEventBus.RaiseControlRequest(control, ref args);
     }
 
     public static void RaiseControlEventRecursive<TEvent>(Control control, in TEvent args)
@@ -78,10 +78,10 @@ public static class UIEvents
         LocalEventBus.RaiseControlEventRecursive(control, in args);
     }
 
-    public static void RaiseWritableControlEventRecursive<TEvent>(Control control, ref TEvent args)
+    public static void RaiseControlRequestRecursive<TEvent>(Control control, ref TEvent args)
         where TEvent : struct
     {
-        LocalEventBus.RaiseWritableControlEventRecursive(control, ref args);
+        LocalEventBus.RaiseControlRequestRecursive(control, ref args);
     }
 
 }

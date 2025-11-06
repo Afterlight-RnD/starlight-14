@@ -1,6 +1,8 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using Robust.Client.UserInterface;
+
 namespace Content.Client._Starlight.UI.Core;
 
 public abstract class UISystem : EntitySystem
@@ -9,24 +11,38 @@ public abstract class UISystem : EntitySystem
 
     private HashSet<UIEventHandle> _uiEventHandles = new();
 
-    public void RaiseUIEvent<T>(T args) where T : struct
+    public void RaiseUIEvent<TEvent>(TEvent args) where TEvent : struct
     {
        UIEvents.RaiseEvent(args);
     }
 
-    public void RaiseUIWritableEvent<T>(ref T args) where T : struct
+    public void RaiseUIRequest<TEvent>(ref TEvent args) where TEvent : struct
     {
-        UIEvents.RaiseWritableEvent(ref args);
+        UIEvents.RaiseRequest(ref args);
     }
 
-    public void SubscribeWritableUIEvent<T>(WriteableUIEvent<T> uiEvent) where T : struct
-    {
-        _uiEventHandles.Add(UIEvents.SubscribeWritable(uiEvent));
-    }
-
-    public void SubscribeUIEvent<T>(UIEvent<T> uiEvent) where T : struct
+    public void SubscribeUIEvent<TEvent>(UIEvent<TEvent> uiEvent) where TEvent : struct
     {
         _uiEventHandles.Add(UIEvents.Subscribe(uiEvent));
+    }
+
+    public void SubscribeUIEvent<TControl,TEvent>(UIEvent<TControl,TEvent> uiEvent)
+        where TControl: Control, new()
+        where TEvent : struct
+    {
+        _uiEventHandles.Add(UIEvents.Subscribe(uiEvent));
+    }
+
+    public void SubscribeUIRequest<TEvent>(UIRequest<TEvent> uiRequest) where TEvent : struct
+    {
+        _uiEventHandles.Add(UIEvents.SubscribeRequest(uiRequest));
+    }
+
+    public void SubscribeUIRequest<TControl,TEvent>(UIRequest<TControl,TEvent> uiRequest)
+        where TControl: Control, new()
+        where TEvent : struct
+    {
+        _uiEventHandles.Add(UIEvents.SubscribeRequest(uiRequest));
     }
 
     public void UnSubscribeUIEvents()

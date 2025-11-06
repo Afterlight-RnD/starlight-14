@@ -56,11 +56,11 @@ public sealed partial class UIEventBus
         where TControl: Control, new()
         where TEvent : struct
     {
-        private ValueList<(WriteableUIEvent<TControl,TEvent> handler, UIEventHandle handle)> Handlers = new();
+        private ValueList<(UIRequest<TControl,TEvent> handler, UIEventHandle handle)> Handlers = new();
         private ValueList<(UIEvent<TControl,TEvent>handler, UIEventHandle handle)> ReadonlyHandlers = new();
         private Dictionary<UIEventHandle, (bool readOnly, int idx)> _handleLookup = new();
 
-        public UIEventHandle RegisterHandler(UIEventHandle handle, WriteableUIEvent<TControl,TEvent> del)
+        public UIEventHandle RegisterHandler(UIEventHandle handle, UIRequest<TControl,TEvent> del)
         {
             _handleLookup.Add(handle, (false, Handlers.Count));
             Handlers.Add((del, handle));

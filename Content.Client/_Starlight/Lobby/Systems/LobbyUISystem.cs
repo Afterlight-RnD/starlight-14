@@ -50,7 +50,7 @@ public sealed class LobbySystem : UISystem
             lobbyBackground = _resourceCache.GetResource<TextureResource>(_gameTicker.LobbyBackground);
 
         RaiseUIEvent(new LobbyBackgroundChangedUIEvent(lobbyBackground));
-        RaiseUIEvent(new RoundStateChangedUIEvent());
+        RaiseUIEvent(new RoundStateChangedUIEvent(_gameTicker.IsGameStarted, _gameTicker.Paused));
 
         // RaiseUIEvent(new LobbyUpdatedUIEvent(_gameTicker.StartTime, _gameTicker.RoundStartTimeSpan, _gameTicker.IsGameStarted, _gameTicker.Paused, lobbyBackground, _gameTicker.AreWeReady));
     }

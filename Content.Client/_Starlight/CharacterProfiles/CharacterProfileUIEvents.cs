@@ -6,8 +6,12 @@ using Robust.Client.GameObjects;
 
 namespace Content.Client._Starlight.CharacterProfiles;
 
-public record struct CharacterProfileCreatedUIEvent(CharacterProfile Profile, Entity<SpriteComponent> PreviewEntity);
+//== UI Requests ==
 
-public record struct CharacterProfileUpdatedUIEvent(CharacterProfile Profile);
 
-public record struct CharacterProfileDeletedUIEvent(CharacterProfile Profile);
+
+//== UI Events ==
+public record struct CharacterSlotUpdatedUIEvent(int Slot, CharacterProfile? Profile, Entity<SpriteComponent>? Preview)
+{
+    public bool Deleted => Profile == null;
+}

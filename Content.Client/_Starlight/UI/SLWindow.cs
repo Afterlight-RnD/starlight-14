@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Content.Client._Starlight.UI.Core;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
 using Robust.Client.Graphics;
@@ -67,4 +68,51 @@ internal sealed class SLWindow : DefaultWindow
         Contents.AddChild(select);
         return this;
     }
+
+    [MustCallBase]
+    protected override void ExitedTree()
+    {
+        UnsubscribeAllUIEvents();
+    }
+
+    #region UIEvents
+    private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
+
+    public void SubscribeUIRequest<T>(UIRequest<T> handler) where T: struct
+    {
+        _uiEventHandles.Add(UIEvents.SubscribeRequest(handler));
+    }
+
+    public void SubscribeUIEvent<T>(UIEvent<T> handler) where T: struct
+    {
+        _uiEventHandles.Add(UIEvents.Subscribe(handler));
+    }
+
+    public void RaiseUIEvent<T>(T args) where T : struct
+    {
+        UIEvents.RaiseEvent(args);
+    }
+
+    public void RaiseRequest<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseRequest(ref args);
+    }
+
+    public void UnsubscribeUIEvent(ref UIEventHandle handle)
+    {
+        //EventType is never null if handle is valid
+        if (!handle.IsValid || _uiEventHandles.Remove(handle))
+            return;
+        handle.Unsubscribe();
+    }
+
+    public void UnsubscribeAllUIEvents()
+    {
+        foreach (var handle in _uiEventHandles)
+        {
+            handle.Unsubscribe();
+        }
+        _uiEventHandles.Clear();
+    }
+    #endregion
 }
