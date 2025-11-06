@@ -86,12 +86,13 @@ public sealed partial class CharacterPreviewWidget : SLWidget
         var locPrefix = "character-editor-preview-mode-";
         var labels = Enum.GetNames<CharacterPreviewMode>();
         for (var i = 0; i < labels.Length; i++)
-            PreviewMode.AddItem(locPrefix+(labels[i].ToLower(), i));
+            PreviewMode.AddItem(Loc.GetString(locPrefix+(labels[i].ToLower())), i);
         PreviewMode.OnItemSelected += HandlePreviewModeSelected;
     }
 
     private void HandlePreviewModeSelected(OptionButton.ItemSelectedEventArgs obj)
     {
         RaiseUIEvent(new ChangeCharacterEditorPreviewMode((CharacterPreviewMode)obj.Id));
+        obj.Button.Select(obj.Id);
     }
 }
