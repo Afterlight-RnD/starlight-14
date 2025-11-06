@@ -23,23 +23,23 @@ public sealed partial class CharacterMenuWidget : SLWidget
 
     private void OnDiscardPressed(BaseButton.ButtonEventArgs obj)
     {
-        // _editorSystem.DiscardChanges();
+        RaiseUIEvent(new DiscardCharacterProfileChangesUIEvent());
         SaveChanges.Disabled = true;
     }
 
     private void OnSaveChangesPressed(BaseButton.ButtonEventArgs obj)
     {
-        // _editorSystem.ApplyChanges();
         SaveChanges.Disabled = true;
+        RaiseUIEvent(new SaveCharacterProfileChangesUIEvent());
     }
 
     protected override void EnteredTree()
     {
         SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(OnCharacterDirtied);
-        SubscribeUIEvent<CharacterEditorProfileAppliedUIEvent>(OnCharacterApplied);
+        SubscribeUIEvent<ApplyCharacterProfileChangesUIEvent>(OnCharacterApplied);
     }
 
-    private void OnCharacterApplied(ref readonly CharacterEditorProfileAppliedUIEvent args)
+    private void OnCharacterApplied(ref readonly ApplyCharacterProfileChangesUIEvent args)
     {
         SaveChanges.Disabled = true;
     }

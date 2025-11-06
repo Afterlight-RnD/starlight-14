@@ -3,6 +3,7 @@
 
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.GameObjects;
+using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.CharacterEditor.Systems;
 
@@ -12,16 +13,17 @@ public record struct EnterCharacterEditorUIEvent();
 public record struct ExitCharacterEditorUIEvent(bool SaveChanges);
 public record struct CharacterEditorCreateProfileUIEvent();
 public record struct CharacterEditorProfileDirtiedUIEvent(CharacterProfile Profile);
-
-public record struct CharacterEditorProfileAppliedUIEvent(CharacterProfile Profile);
-
-public record struct CharacterEditorPreviewChangedUIEvent(Entity<SpriteComponent> PreviewEntity, string Name);
+public record struct ApplyCharacterProfileChangesUIEvent(int Slot);
+public record struct CharacterEditorPreviewChangedUIEvent(Entity<SpriteComponent> PreviewEntity);
 
 public record struct CharacterEditorPreviewNameChangedUIEvent(string NewName);
 
-public record struct ChangeCharacterEditorPreviewMode(CharacterPreviewMode NewMode);
+public record struct ChangeCharacterEditorPreviewModeUIEvent(CharacterPreviewMode NewMode);
 
 public record struct SelectCharacterProfileUIEvent(int Slot);
 public record struct DeleteCharacterProfileUIEvent(int Slot);
+public record struct DiscardCharacterProfileChangesUIEvent();
+public record struct SaveCharacterProfileChangesUIEvent();
 public record struct SetEnableCharacterProfileUIEvent(int Slot, bool ActiveState);
 //== UI Requests ==
+public record struct InjectCharacterEditorSystemUIRequest(CharacterEditorSystem EditorSystem);

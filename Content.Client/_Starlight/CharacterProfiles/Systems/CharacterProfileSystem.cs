@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using System.Diagnostics.CodeAnalysis;
+using Content.Client._Starlight.CharacterEditor.Systems;
 using Content.Client._Starlight.Medical.Cybernetics.Systems;
 using Content.Client._Starlight.UI.Core;
 using Content.Client.Humanoid;
@@ -10,19 +11,19 @@ using Content.Shared._Starlight.CharacterProfiles;
 using Content.Shared._Starlight.CharacterProfiles.Systems;
 using Content.Shared.Clothing;
 using Robust.Client.GameObjects;
-using Robust.Client.UserInterface;
 using Robust.Shared.Prototypes;
 
 namespace Content.Client._Starlight.CharacterProfiles.Systems;
 
 public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
 {
-    [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
+    [Dependency] private readonly UIEventBus _uiEventBus = default!;
     [Dependency] private readonly IClientPreferencesManager _preferences = default!;
     [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
     [Dependency] private readonly CyberneticsSystem _cyberSystem = default!;
     [Dependency] private readonly LoadoutSystem _loadoutSystem = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
+    [Dependency] private readonly CharacterEditorSystem _characterEditor = default!;
 
     private CharacterProfileRegistry _characterRegistry = new();
     private Dictionary<int, Entity<SpriteComponent>> _profilePreviews = new();
@@ -44,7 +45,9 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
             existingProfile.SetData(ev.Data);
             previewEnt = EnsurePreviewEntity(ev.Slot, existingProfile);
             ApplyToDoll(previewEnt, existingProfile);
-            //_uiManager.RaiseUIEvent(new CharacterProfileUpdatedUIEvent(existingProfile));
+            _uiEventBus.RaiseEvent(new CharacterSlotUpdatedUIEvent(ev.Slot,existingProfile, previewEnt));
+            if (!_characterEditor.HasLiveProfile)
+                _characterEditor.StartEditingSlot(ev.Slot);
             return;
         }
         if (ev.PartialData)
@@ -56,7 +59,9 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         _characterRegistry.AddProfile(ev.Slot,newProfile);
         previewEnt = EnsurePreviewEntity(ev.Slot, newProfile);
         ApplyToDoll(previewEnt, newProfile);
-        //_uiManager.RaiseUIEvent(new CharacterProfileCreatedUIEvent(newProfile, previewEnt));
+        _uiEventBus.RaiseEvent(new CharacterSlotUpdatedUIEvent(ev.Slot, newProfile, previewEnt));
+        if (!_characterEditor.HasLiveProfile)
+            _characterEditor.StartEditingSlot(ev.Slot);
     }
 
     private void HandleCharacterDeleted(MsgDeleteCharacterProfile ev)
@@ -95,7 +100,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         ClearPreviewEntity(slot);
         if (raiseOnServer)
             RaiseNetworkEvent(new MsgDeleteCharacterProfile(slot));
-        //_uiManager.RaiseUIEvent(new CharacterProfileDeletedUIEvent(oldProfile));
+        _uiEventBus.RaiseEvent(new CharacterSlotUpdatedUIEvent(slot,null, null));
         return true;
     }
 
@@ -121,7 +126,7 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         RaiseNetworkEvent(new MsgUpdateCharacterProfile(slot, profile));
         _characterRegistry.AddProfile(slot, profile);
         var previewEnt = EnsurePreviewEntity(slot, profile);
-        //_uiManager.RaiseUIEvent(new CharacterProfileCreatedUIEvent(profile, previewEnt));
+        _uiEventBus.RaiseEvent(new CharacterSlotUpdatedUIEvent(slot,profile, previewEnt));
         return true;
     }
 

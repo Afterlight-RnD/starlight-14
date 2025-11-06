@@ -3,7 +3,6 @@
 
 using System.Numerics;
 using Content.Client._Starlight.CharacterEditor.Systems;
-using Content.Client._Starlight.CharacterProfiles;
 using Content.Client._Starlight.UI;
 using Content.Client.Stylesheets;
 using Content.Shared._Starlight.CharacterProfiles;

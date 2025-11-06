@@ -78,7 +78,6 @@ public sealed partial class CharacterPreviewWidget : SLWidget
     private void OnPreviewUpdated(ref readonly CharacterEditorPreviewChangedUIEvent args)
     {
         CharacterSpritePreview.SetEntity(args.PreviewEntity);
-        CharacterName.Text = args.Name;
     }
 
     private void SetupDropdown()
@@ -92,7 +91,7 @@ public sealed partial class CharacterPreviewWidget : SLWidget
 
     private void HandlePreviewModeSelected(OptionButton.ItemSelectedEventArgs obj)
     {
-        RaiseUIEvent(new ChangeCharacterEditorPreviewMode((CharacterPreviewMode)obj.Id));
+        RaiseUIEvent(new ChangeCharacterEditorPreviewModeUIEvent((CharacterPreviewMode)obj.Id));
         obj.Button.Select(obj.Id);
     }
 }

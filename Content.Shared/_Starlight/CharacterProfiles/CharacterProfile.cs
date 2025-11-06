@@ -13,11 +13,14 @@ public sealed partial class CharacterProfile
     [DataField] public int Slot;
 
     //TODO: probably should have some custom serialization stuff so that types aren't serialized into yaml?
-    [DataField] private Dictionary<Type, ICharacterData> _data = new();
+    private List<Type> _dataTypes = new();
+
+    [DataField] private List<ICharacterData> _data = new();
 
     [Access(typeof(SharedCharacterProfileSystem))]
 
-    [DataField] public bool Activate { get; set; }
+    [DataField]
+    public bool Activate { get; set; }
     public bool HasDirtyData => _dirtyData.Count > 0 || _fullDirty;
 
     [Access(typeof(SharedCharacterProfileSystem))]
@@ -36,52 +39,46 @@ public sealed partial class CharacterProfile
         SetData(dataList, false);
     }
 
-    public Dictionary<Type, ICharacterData> GetTypedData(bool onlyDirty = true)
-    {
-        if (!onlyDirty || _fullDirty) return _data;
-        var list = new Dictionary<Type, ICharacterData>();
-        foreach (var (type, data) in _data)
-        {
-            if (!_data.ContainsKey(type))
-                continue;
-            list.Add(type, data);
-        }
-
-        return list;
-    }
-
     public List<ICharacterData> GetData(bool onlyDirty = true)
     {
-        if (!onlyDirty || _fullDirty) return _data.Values.ToList();
+        if (!onlyDirty || _fullDirty) return _data;
         var list = new List<ICharacterData>();
-        foreach (var (type, data) in _data)
+        foreach (var data in _data)
         {
-            if (!_data.ContainsKey(type))
-                continue;
-            list.Add(data);
+            if (_dirtyData.Contains(data.GetType()))
+                list.Add(data);
         }
         return list;
     }
-
 
 
     public IEnumerable<ICharacterData> IterateCharacterData()
     {
-        foreach (var (_, data) in _data)
+        foreach (var  data in _data)
             yield return data;
     }
 
     public T GetData<T>() where T: struct, ICharacterData
     {
-        return (T)_data[typeof(T)];
+        return (T)_data[_dataTypes.IndexOf(typeof(T))];
     }
 
     public void SetData<T>(T data, bool dirty = true) where T: struct, ICharacterData
     {
-        _data[typeof(T)] = data;
+        _data[_dataTypes.IndexOf(typeof(T))] = data;
 
         if (!dirty) return;
         _dirtyData.Add(typeof(T));
+    }
+
+    public void SetData<T>(CharacterDataSetterDelegate<T> setterDelegate) where T: struct, ICharacterData
+    {
+        var dataIdx = _dataTypes.IndexOf(typeof(T));
+        var data = (T)_data[dataIdx];
+        var dirty = setterDelegate.Invoke(ref data);
+        _data[dataIdx] = data;
+        if (dirty)
+            _dirtyData.Add(typeof(T));
     }
 
     public void MarkDirty()
@@ -101,12 +98,25 @@ public sealed partial class CharacterProfile
 
     public void SetData(List<ICharacterData> newData, bool shouldDirty = true)
     {
+
+        void UpdateData(Type dataType, ICharacterData data)
+        {
+            var dataIdx = _dataTypes.IndexOf(dataType);
+            if (dataIdx == -1)
+            {
+                _data.Add(data);
+                _dataTypes.Add(dataType);
+                return;
+            }
+            _data[dataIdx] = data;
+        }
+
         if (shouldDirty)
         {
             foreach (var data in newData)
             {
                 var dataType = data.GetType();
-                _data.Add(dataType, data);
+                UpdateData(dataType, data);
                 _dirtyData.Add(dataType);
             }
             return;
@@ -114,9 +124,11 @@ public sealed partial class CharacterProfile
         foreach (var data in newData)
         {
             var dataType = data.GetType();
-            _data.Add(dataType, data);
+            UpdateData(dataType, data);
         }
     }
 };
 
 public interface ICharacterData;
+
+public delegate bool CharacterDataSetterDelegate<TData>(ref TData data);
