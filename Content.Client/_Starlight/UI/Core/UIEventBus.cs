@@ -40,7 +40,7 @@ public sealed partial class UIEventBus: IPostInjectInit
     {
         _freeHandles.Enqueue(new UIEventHandle(handle.Id, handle.Generation + 1, this, handle.EventType,
             handle.ControlType));
-        handle.Unsubscribe();
+        handle.Invalidate();
     }
 
     private UIEventHandle GetNextHandle(Type handleType, Type? controlType)
