@@ -25,11 +25,12 @@ public sealed class CharacterEditorSystem : UISystem
     {
         SubscribeUIEvent<ChangeCharacterEditorPreviewModeUIEvent>(HandlePreviewModeChange);
         SubscribeUIEvent<SelectCharacterProfileUIEvent>(HandleCharacterSelected);
-        SubscribeUIRequest<InjectCharacterEditorSystemUIRequest>(HandleFieldEditorReg);
+        SubscribeUIRequest<EditCharacterProfileFieldUIRequest>(HandleEditProfileRequest);
     }
-    private void HandleFieldEditorReg(ref InjectCharacterEditorSystemUIRequest args)
+
+    private void HandleEditProfileRequest(ref EditCharacterProfileFieldUIRequest args)
     {
-        args.EditorSystem = this;
+        args.Profile = _liveProfile;
     }
 
     private void HandleCharacterSelected(ref readonly SelectCharacterProfileUIEvent args)
@@ -151,9 +152,10 @@ public sealed class CharacterEditorSystem : UISystem
         }
     }
 
-    public void SetLiveData<TData>(CharacterDataSetterDelegate<TData> setter) where TData : struct, ICharacterData
+    public void SetLiveData<TData>(CharacterDataSetterDelegate<TData> setter)
+        where TData : struct, ICharacterData
     {
-        _liveProfile?.SetData(setter);
+        _liveProfile?.EditData(setter);
     }
 
     public void SetLiveData<TData>(TData data, bool dirty = true) where TData : struct, ICharacterData

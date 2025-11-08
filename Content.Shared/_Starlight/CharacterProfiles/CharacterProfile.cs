@@ -1,7 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using System.Linq;
 using Content.Shared._Starlight.CharacterProfiles.Systems;
 using Robust.Shared.Serialization;
 
@@ -71,14 +70,15 @@ public sealed partial class CharacterProfile
         _dirtyData.Add(typeof(T));
     }
 
-    public void SetData<T>(CharacterDataSetterDelegate<T> setterDelegate) where T: struct, ICharacterData
+    public bool EditData<TData>(CharacterDataSetterDelegate<TData> setterDelegate) where TData: struct, ICharacterData
     {
-        var dataIdx = _dataTypes.IndexOf(typeof(T));
-        var data = (T)_data[dataIdx];
+        var dataIdx = _dataTypes.IndexOf(typeof(TData));
+        var data = (TData)_data[dataIdx];
         var dirty = setterDelegate.Invoke(ref data);
         _data[dataIdx] = data;
         if (dirty)
-            _dirtyData.Add(typeof(T));
+            _dirtyData.Add(typeof(TData));
+        return dirty;
     }
 
     public void MarkDirty()

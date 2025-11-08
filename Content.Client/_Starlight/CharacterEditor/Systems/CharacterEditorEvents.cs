@@ -3,7 +3,6 @@
 
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.GameObjects;
-using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.CharacterEditor.Systems;
 
@@ -26,4 +25,7 @@ public record struct DiscardCharacterProfileChangesUIEvent();
 public record struct SaveCharacterProfileChangesUIEvent();
 public record struct SetEnableCharacterProfileUIEvent(int Slot, bool ActiveState);
 //== UI Requests ==
-public record struct InjectCharacterEditorSystemUIRequest(CharacterEditorSystem EditorSystem);
+public record struct EditCharacterProfileFieldUIRequest(CharacterProfile? Profile)
+{
+    public bool HasProfile => Profile != null;
+}

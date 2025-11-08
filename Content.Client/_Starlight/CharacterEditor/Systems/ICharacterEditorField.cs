@@ -8,17 +8,14 @@ namespace Content.Client._Starlight.CharacterEditor.Systems;
 
 public interface ICharacterEditorField
 {
-    protected CharacterEditorSystem EditorSystem { get; set; }
-
-    protected void SetupEditorField()
+    protected void SetData<TData>(CharacterDataSetterDelegate<TData> setter)
+        where TData : struct, ICharacterData
     {
-        var systemRequest = new InjectCharacterEditorSystemUIRequest();
-        UIEvents.RaiseRequest(ref systemRequest);
-        EditorSystem = systemRequest.EditorSystem;
-    }
-
-    protected void SetData<TData>(CharacterDataSetterDelegate<TData> setter) where TData : struct, ICharacterData
-    {
-        EditorSystem.SetLiveData(setter);
+        var profileEv = new EditCharacterProfileFieldUIRequest(null);
+        UIEvents.RaiseRequest(ref profileEv);
+        var dirty = profileEv.Profile?.EditData(setter);
+        if (dirty == null || !dirty.Value)
+            return;
+        UIEvents.RaiseEvent(new CharacterEditorProfileDirtiedUIEvent(profileEv.Profile!));
     }
 }
