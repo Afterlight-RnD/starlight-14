@@ -76,7 +76,7 @@ public sealed class CharacterEditorSystem : UISystem
         _livePreview = EnsureLivePreview(_previewmode);
         RefreshPreviewVisuals();
         RaiseUIEvent(new CharacterEditorPreviewChangedUIEvent(_livePreview.Value));
-        RaiseUIEvent(new CharacterEditorPreviewNameChangedUIEvent(_liveProfile.GetData<LegacyCharacterData>().LegacyProfile.Name));
+        RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(_liveProfile));
     }
 
     public void ApplyChanges()

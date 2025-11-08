@@ -10,8 +10,11 @@ namespace Content.Client._Starlight.CharacterEditor.Editors.BodyType;
 [GenerateTypedNameReferences]
 public sealed partial class BodyTypePanel : CharacterEditorPanel
 {
+    public override CharacterEditorPanelLayout Layout => CharacterEditorPanelLayout.Main;
+
     public BodyTypePanel()
     {
         RobustXamlLoader.Load(this);
     }
+
 }

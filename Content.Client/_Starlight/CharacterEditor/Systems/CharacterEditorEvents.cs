@@ -14,9 +14,6 @@ public record struct CharacterEditorCreateProfileUIEvent();
 public record struct CharacterEditorProfileDirtiedUIEvent(CharacterProfile Profile);
 public record struct ApplyCharacterProfileChangesUIEvent(int Slot);
 public record struct CharacterEditorPreviewChangedUIEvent(Entity<SpriteComponent> PreviewEntity);
-
-public record struct CharacterEditorPreviewNameChangedUIEvent(string NewName);
-
 public record struct ChangeCharacterEditorPreviewModeUIEvent(CharacterPreviewMode NewMode);
 
 public record struct SelectCharacterProfileUIEvent(int Slot);

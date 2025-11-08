@@ -6,7 +6,7 @@ namespace Content.Client._Starlight.CharacterEditor.Controls;
 
 public abstract class CharacterEditorPanel : SLBox
 {
-    public CharacterEditorPanelLayout Layout => CharacterEditorPanelLayout.Main;
+    public abstract CharacterEditorPanelLayout Layout { get; }
 
     public bool IsSide => Layout == CharacterEditorPanelLayout.Side;
 
