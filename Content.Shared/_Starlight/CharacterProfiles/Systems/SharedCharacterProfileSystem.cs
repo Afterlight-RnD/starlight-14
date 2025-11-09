@@ -9,7 +9,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Reflection;
 
 namespace Content.Shared._Starlight.CharacterProfiles.Systems;
-public abstract class SharedCharacterProfileSystem : EntitySystem
+public abstract partial class SharedCharacterProfileSystem : EntitySystem
 {
     [Dependency] protected readonly IReflectionManager ReflectionManager = default!;
     [Dependency] protected readonly IConfigurationManager Cfg = default!;
@@ -150,4 +150,10 @@ public abstract class SharedCharacterProfileSystem : EntitySystem
         ApplyToDoll(doll, profile, previewMode);
         return doll;
     }
+
+    public void RaiseProfileDataEvent<TEvent>(CharacterProfile profile, TEvent args) where TEvent : struct
+    {
+        RaiseLocalEvent(new ProfileEvent<TEvent>(profile, args));
+    }
+    public record struct ProfileEvent<TEvent>(CharacterProfile Profile, TEvent Event) where TEvent : struct;
 }

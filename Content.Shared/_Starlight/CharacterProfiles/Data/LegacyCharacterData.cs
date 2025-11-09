@@ -21,6 +21,21 @@ public sealed class LegacyCharacterDataSystem : CharacterDataSystem<LegacyCharac
     [Dependency] private readonly SharedHumanoidAppearanceSystem _appearanceSystem = default!;
     [Dependency] private readonly LoadoutSystem _loadoutSystem = default!;
     [Dependency] private readonly SharedCyberneticsSystem _cyberneticsSystem = default!;
+
+
+    public override void Initialize()
+    {
+        SubscribeProfileEvent<CharacterSpeciesData.SpeciesChangedEvent>(OnSpeciesChanged);
+    }
+
+    private void OnSpeciesChanged(CharacterProfile profile, CharacterSpeciesData.SpeciesChangedEvent args)
+    {
+        var legacyData = profile.GetData<LegacyCharacterData>();
+        legacyData.LegacyProfile = legacyData.LegacyProfile.WithSpecies(args.NewSpecies.ID);
+        profile.SetData(legacyData);
+    }
+
+
     protected override void Apply(EntityUid target, LegacyCharacterData data)
     {
         _appearanceSystem.LoadProfile(target, data.LegacyProfile);

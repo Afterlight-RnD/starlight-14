@@ -15,6 +15,8 @@ public partial struct CharacterSpeciesData(): ICharacterData
 {
     [DataField] public ProtoId<SpeciesPrototype> BaseSpecies = new();
     [DataField] public EntProtoId DollPrototype = new();
+
+    public record struct SpeciesChangedEvent(SpeciesPrototype NewSpecies);
 }
 
 public sealed class CharacterSpeciesDataSystem : CharacterDataSystem<CharacterSpeciesData>,
@@ -23,6 +25,16 @@ public sealed class CharacterSpeciesDataSystem : CharacterDataSystem<CharacterSp
     public override Type[]? ApplyAfterData => [typeof(LegacyCharacterData)];
 
     public override bool HasInit => true;
+
+    public void ChangeSpecies(CharacterProfile profile, ProtoId<SpeciesPrototype> newSpecies)
+    {
+        var existing = profile.GetData<CharacterSpeciesData>();
+        if (existing.BaseSpecies == newSpecies)
+            return;
+        existing.BaseSpecies = newSpecies;
+        profile.SetData(existing);
+        RaiseProfileEvent(profile, new CharacterSpeciesData.SpeciesChangedEvent(PrototypeManager.Index(newSpecies)));
+    }
 
     protected override void InitData(CharacterProfile profile,  ref CharacterSpeciesData data)
     {

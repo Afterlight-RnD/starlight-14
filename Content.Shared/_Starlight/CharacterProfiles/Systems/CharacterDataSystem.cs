@@ -154,4 +154,17 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
 
         profile.SetData(data, false);
     }
+
+    protected void SubscribeProfileEvent<TEvent>(Action<CharacterProfile,TEvent> handler) where TEvent : struct
+    {
+        SubscribeLocalEvent<SharedCharacterProfileSystem.ProfileEvent<TEvent>>(args =>
+        {
+            handler.Invoke(args.Profile, args.Event);
+        });
+    }
+
+    public void RaiseProfileEvent<TEvent>(CharacterProfile profile, TEvent args) where TEvent : struct
+    {
+        RaiseLocalEvent(new SharedCharacterProfileSystem.ProfileEvent<TEvent>(profile, args));
+    }
 }
