@@ -9,9 +9,9 @@ namespace Content.Shared._Starlight.CharacterProfiles.Data;
 [Serializable, NetSerializable]
 public partial struct CharacterIdentityData() : ICharacterData
 {
-    [DataField] public string Name = "";
-    [DataField] public string? Nickname = null;
-    [DataField] public string? LastName = null;
+    [DataField] public string Name = string.Empty;
+    [DataField] public string Nickname = string.Empty;
+    [DataField] public string LastName = string.Empty;
 }
 
 public sealed partial class CharacterIdentityDataSystem : CharacterDataSystem<CharacterIdentityData>,

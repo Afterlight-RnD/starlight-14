@@ -79,7 +79,7 @@ public sealed partial class CharacterPreviewWidget : SLWidget
     {
         var identityData = args.Profile.GetData<CharacterIdentityData>();
         var lastName = " " + identityData.LastName ?? "";
-        CharacterNickname.Visible = identityData.Nickname != null;
+        CharacterNickname.Visible = identityData.Nickname != string.Empty;
         CharacterNickname.Text = $"'{identityData.Nickname}'";
         CharacterName.Text = $"{identityData.Name}{lastName}";
     }
@@ -128,10 +128,10 @@ public sealed partial class CharacterPreviewWidget : SLWidget
         FirstNameField.InitializeAsTextField( data => { return data.Name; },
                 (string name, ref CharacterIdentityData data) => { data.Name = name; });
 
-        NicknameField.InitializeAsTextField( data => { return data.Nickname ?? ""; },
+        NicknameField.InitializeAsTextField( data => { return data.Nickname; },
             (string name, ref CharacterIdentityData data) => { data.Nickname = name;});
 
-        LastNameField.InitializeAsTextField(data => { return data.LastName ?? ""; },
+        LastNameField.InitializeAsTextField(data => { return data.LastName; },
             (string name, ref CharacterIdentityData data) => { data.LastName = name; });
     }
 
