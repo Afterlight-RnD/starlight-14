@@ -81,6 +81,7 @@ public sealed partial class SpeciesGroupList : SLBox
     public void ClearSpecies()
     {
         SpeciesGrid.RemoveAllChildren();
+        _speciesSelectors.Clear();
         _populated = false;
     }
 

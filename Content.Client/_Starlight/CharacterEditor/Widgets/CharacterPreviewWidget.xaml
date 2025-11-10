@@ -20,7 +20,7 @@
                 Name="CharacterSpritePreview" Access="Protected"
                 VerticalExpand="True" HorizontalExpand="True"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
-                Scale="8 8" Margin="4" SizeFlagsStretchRatio="1" SetSize="256 384"/>
+                Scale="8 8" Margin="4" SizeFlagsStretchRatio="1" SetSize="256 384" />
             <BoxContainer Orientation="Horizontal" HorizontalExpand="True"
                           VerticalAlignment="Bottom" HorizontalAlignment="Center"
                           Margin="0 5">
@@ -28,24 +28,68 @@
                     Name="ViewLeft" Access="Protected"
                     TexturePath="filled_left_arrow.svg.192dpi"
                     ModulateSelfOverride="#DEDEDE"
-                    Scale="0.5 0.5"/>
-                <OptionButton Name="PreviewMode" Access="Protected"/>
+                    Scale="0.5 0.5" />
+                <OptionButton Name="PreviewMode" Access="Protected" />
                 <TextureButton
                     Name="ViewRight" Access="Protected"
                     TexturePath="filled_right_arrow.svg.192dpi"
                     ModulateSelfOverride="#DEDEDE"
-                    Scale="0.5 0.5"/>
+                    Scale="0.5 0.5" />
             </BoxContainer>
         </BoxContainer>
-        <BoxContainer
-            HorizontalExpand="True" VerticalExpand="False"
-            HorizontalAlignment="Stretch" VerticalAlignment="Top">
-            <Control HorizontalExpand="True" HorizontalAlignment="Stretch"/>
-            <Button
-                HorizontalAlignment="Right"
-                Margin="5 2 5 2"
-                Text="Randomize"
-                Name="RandomizeCharacter" Access="Protected"/>
+        <BoxContainer Orientation="Vertical">
+            <BoxContainer
+                HorizontalExpand="True" VerticalExpand="False"
+                HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <Button
+                    ToggleMode="True"
+                    HorizontalAlignment="Left"
+                    Margin="5 2 5 2"
+                    Text="Edit Name"
+                    Name="EditName" Access="Protected" />
+                <Control HorizontalExpand="True" HorizontalAlignment="Stretch" />
+                <Button
+                    HorizontalAlignment="Right"
+                    Margin="5 2 5 2"
+                    Text="Randomize"
+                    Name="RandomizeCharacter" Access="Protected" />
+            </BoxContainer>
+                <BoxContainer Name="CharacterNameEditor" Access="Protected" Visible="False" Orientation="Vertical"
+                              HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <BoxContainer
+                        Orientation="Horizontal">
+                        <Label Text="First Name: "></Label>
+                        <LineEdit Name="FirstNameField" Access="Protected" SetWidth="250" />
+                        <Button
+                            HorizontalAlignment="Left" Disabled="True"
+                            Margin="5 2 5 2"
+                            Text="R"
+                            Name="RandomizeFirstName" Access="Protected" />
+                    </BoxContainer>
+                    <BoxContainer
+                        Orientation="Horizontal">
+                        <Label Text="Nickname:  "></Label>
+                        <LineEdit Name="NicknameField" Access="Protected" SetWidth="250" />
+                        <Button
+                            HorizontalAlignment="Left" Disabled="True"
+                            Margin="5 2 5 2"
+                            Text="R"
+                            Name="RandomizeNickname" Access="Protected" />
+                    </BoxContainer>
+                    <BoxContainer
+                        Orientation="Horizontal">
+                        <Label Text="Last Name: "></Label>
+                        <LineEdit Name="LastnameField" Access="Protected" SetWidth="250" />
+                        <Button
+                            HorizontalAlignment="Left" Disabled="True"
+                            Margin="5 2 5 2"
+                            Text="R"
+                            Name="RandomizeLastName" Access="Protected" />
+                    </BoxContainer>
+                    <PanelContainer>
+                        <Label Name="NameRuleDisclaimer" Access="Protected" />
+                    </PanelContainer>
+                </BoxContainer>
         </BoxContainer>
     </Control>
 </widgets:CharacterPreviewWidget>
