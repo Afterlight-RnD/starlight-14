@@ -12,6 +12,8 @@ public record struct EnterCharacterEditorUIEvent();
 public record struct ExitCharacterEditorUIEvent(bool SaveChanges);
 public record struct CharacterEditorCreateProfileUIEvent();
 public record struct CharacterEditorProfileDirtiedUIEvent(CharacterProfile Profile);
+
+public record struct CharacterEditorProfileResetUIEvent(CharacterProfile Profile);
 public record struct ApplyCharacterProfileChangesUIEvent(int Slot);
 public record struct CharacterEditorPreviewChangedUIEvent(Entity<SpriteComponent> PreviewEntity);
 public record struct ChangeCharacterEditorPreviewModeUIEvent(CharacterPreviewMode NewMode);

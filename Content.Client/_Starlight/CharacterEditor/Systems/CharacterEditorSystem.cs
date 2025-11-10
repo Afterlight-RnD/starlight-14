@@ -152,10 +152,10 @@ public sealed class CharacterEditorSystem : UISystem
         }
     }
 
-    public void SetLiveData<TData>(CharacterDataSetterDelegate<TData> setter)
-        where TData : struct, ICharacterData
+    public void SetLiveData<TProfileData, TValue>(TValue value,CharacterDataSetterDelegate<TProfileData, TValue> setter)
+        where TProfileData : struct, ICharacterData
     {
-        _liveProfile?.EditData(setter);
+        _liveProfile?.EditData(value, setter);
     }
 
     public void SetLiveData<TData>(TData data, bool dirty = true) where TData : struct, ICharacterData

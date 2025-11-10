@@ -70,14 +70,15 @@ public sealed partial class CharacterProfile
         _dirtyData.Add(typeof(T));
     }
 
-    public bool EditData<TData>(CharacterDataSetterDelegate<TData> setterDelegate) where TData: struct, ICharacterData
+    public bool EditData<TProfileData, TData>(TData data, CharacterDataSetterDelegate<TProfileData, TData> setterDelegate)
+        where TProfileData: struct, ICharacterData
     {
-        var dataIdx = _dataTypes.IndexOf(typeof(TData));
-        var data = (TData)_data[dataIdx];
-        var dirty = setterDelegate.Invoke(ref data);
-        _data[dataIdx] = data;
+        var dataIdx = _dataTypes.IndexOf(typeof(TProfileData));
+        var profileData = (TProfileData)_data[dataIdx];
+        var dirty = setterDelegate.Invoke(data, ref profileData);
+        _data[dataIdx] = profileData;
         if (dirty)
-            _dirtyData.Add(typeof(TData));
+            _dirtyData.Add(typeof(TProfileData));
         return dirty;
     }
 
@@ -131,4 +132,8 @@ public sealed partial class CharacterProfile
 
 public interface ICharacterData;
 
-public delegate bool CharacterDataSetterDelegate<TData>(ref TData data);
+public delegate bool CharacterDataSetterDelegate<TCharacterData, in TValue>( TValue value, ref TCharacterData profileData)
+    where TCharacterData: struct, ICharacterData;
+
+public delegate TValue CharacterDataGetterDelegate<in TCharacterData, out TValue>(TCharacterData data)
+    where TCharacterData: struct, ICharacterData;
