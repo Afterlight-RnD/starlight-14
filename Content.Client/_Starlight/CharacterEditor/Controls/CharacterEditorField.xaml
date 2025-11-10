@@ -1,0 +1,11 @@
+﻿<controls:CharacterEditorField
+    xmlns="https://spacestation14.io"
+    xmlns:controls="clr-namespace:Content.Client._Starlight.CharacterEditor.Controls"
+    xmlns:ui="clr-namespace:Content.Client._Starlight.UI"
+    Orientation="Horizontal">
+    <Label Name="FieldLabel" Access="Protected"/>
+    <ui:SLTextureButton
+        Name="RandomizeFieldButton" Access="Protected"
+        Visible="False" Disabled="True"
+        TexturePath="filled_right_arrow.svg.192dpi"/>
+</controls:CharacterEditorField>

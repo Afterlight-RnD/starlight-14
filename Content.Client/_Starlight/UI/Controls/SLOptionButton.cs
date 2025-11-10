@@ -12,13 +12,19 @@ namespace Content.Client._Starlight.UI.Controls;
 public abstract class SLOptionButton<TData> : OptionButton
 {
     public virtual string? LocPrefix { get; init; } = null;
-
     public event Action<TData>? OnDataSelected = null;
+
+    public TData CurrentOption => _optionData[SelectedId];
+
+    public int OptionCount => _optionData.Count;
 
     private bool _optionsSetup = false;
 
     private ValueList<TData> _optionData = new();
     public abstract IEnumerable<TData> EnumerateOptions();
+
+    public virtual void DataAdded(TData data, int id){}
+
 
     [MustCallBase(true)]
     protected virtual void ItemSelected(TData item){}
@@ -48,6 +54,7 @@ public abstract class SLOptionButton<TData> : OptionButton
         {
             var optionId = _optionData.Count;
             _optionData.Add(option);
+            DataAdded(option, optionId);
             var optionIcon = GetOptionIcon(option);
 
             string optionLabel;
@@ -77,6 +84,25 @@ public abstract class SLOptionButton<TData> : OptionButton
         Clear();
         _optionData.Clear();
         _optionsSetup = false;
+    }
+
+    public void SelectByData(TData data)
+    {
+        var id = GetOptionId(data);
+        if (id == -1)
+            return;
+        SelectId(id);
+    }
+
+    public int GetOptionId(TData data)
+    {
+        for (var i = 0; i < _optionData.Count; i++)
+        {
+            var entry = _optionData[i];
+            if (EqualityComparer<TData>.Default.Equals(entry, data))
+                return i;
+        }
+        return -1;
     }
 
     private void HandleItemSelected(ItemSelectedEventArgs args)

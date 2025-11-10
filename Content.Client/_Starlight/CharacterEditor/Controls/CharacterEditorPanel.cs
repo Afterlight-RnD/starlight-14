@@ -2,15 +2,19 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Client._Starlight.UI;
+using Robust.Client.UserInterface;
+
 namespace Content.Client._Starlight.CharacterEditor.Controls;
 
-public abstract class CharacterEditorPanel : SLBox
+public abstract partial class CharacterEditorPanel : SLBox
 {
     public abstract CharacterEditorPanelLayout Layout { get; }
 
     public bool IsSide => Layout == CharacterEditorPanelLayout.Side;
 
     public bool IsMain => Layout == CharacterEditorPanelLayout.Main;
+
+    private bool _allowFieldRegistrations = true;
     protected CharacterEditorPanel()
     {
         HorizontalExpand = true;
@@ -18,6 +22,19 @@ public abstract class CharacterEditorPanel : SLBox
         HorizontalAlignment = HAlignment.Stretch;
         VerticalAlignment = VAlignment.Stretch;
     }
+    protected override void EnteredTree()
+    {
+        base.EnteredTree();
+        _allowFieldRegistrations = false;
+    }
+
+    private void FieldRegsAllowed(Control newField)
+    {
+        if (!_allowFieldRegistrations)
+            throw new InvalidOperationException(
+                $"Tried to create EditorField:{newField} outside of constructor!");
+    }
+
 };
 
 public enum CharacterEditorPanelLayout
