@@ -40,8 +40,8 @@ public interface ICharacterEditorField
 
     public static CharacterEditorDropdownEnumField<TData, TEnum> AddEnumField<TData,TEnum>(
         Control parent,
-        CharacterDataGetterDelegate<TData, TEnum> getter,
         CharacterDataSetterDelegate<TData, TEnum> setter,
+        CharacterDataGetterDelegate<TData, TEnum> getter,
         string? locPrefix = null)
         where TData: struct, ICharacterData
         where TEnum : struct, Enum
@@ -58,8 +58,8 @@ public interface ICharacterEditorField
 
     public static CharacterEditorDropdownPrototypeField<TData, TPrototype> AddPrototypeField<TData, TPrototype>(
         Control parent,
-        CharacterDataGetterDelegate<TData, TPrototype> getter,
         CharacterDataSetterDelegate<TData, TPrototype> setter,
+        CharacterDataGetterDelegate<TData, TPrototype> getter,
         Func<TPrototype, string>? localizedNameGetter = null)
         where TData : struct, ICharacterData
         where TPrototype : class, IPrototype
@@ -75,14 +75,14 @@ public interface ICharacterEditorField
         return dropdown;
     }
 
-    public static CharacterEditorLineEditField<TData> AddTextField<TData>(
+    public static CharacterEditorTextField<TData> AddTextField<TData>(
         Control parent,
-        CharacterDataGetterDelegate<TData, string> getter,
-        CharacterDataSetterDelegate<TData, string> setter)
+        CharacterDataSetterDelegate<TData, string> setter,
+        CharacterDataGetterDelegate<TData, string> getter)
         where TData : struct, ICharacterData
     {
         var editField =
-            new CharacterEditorLineEditField<TData>
+            new CharacterEditorTextField<TData>
             {
                 ProfileDataSetter = setter,
                 ProfileDataGetter = getter,

@@ -58,8 +58,11 @@
                             HorizontalExpand="True" HorizontalAlignment="Stretch"
                             Color="{x:Static style:StyleNano.NanoGold}" Thickness="2" />
                         <ScrollContainer HScrollEnabled="False"
-                                         VerticalExpand="True" HorizontalExpand="True">
-                            <Control Name="MainPanel" Access="Public"/>
+                                         VerticalExpand="True" HorizontalExpand="True"
+                                         VerticalAlignment="Stretch">
+                            <Control Name="MainPanel" Access="Public"
+                                     HorizontalExpand="True" VerticalExpand="True"
+                                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
                         </ScrollContainer>
                     </BoxContainer>
                     <BoxContainer Orientation="Horizontal"
@@ -70,8 +73,11 @@
                                       HorizontalExpand="True" VerticalExpand="True"
                                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                             <ScrollContainer HScrollEnabled="False"
-                                             VerticalExpand="True" HorizontalExpand="True">
-                                <Control Name="SidePanel" Access="Public"/>
+                                             VerticalExpand="True" HorizontalExpand="True"
+                                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <Control Name="SidePanel" Access="Public"
+                                         VerticalExpand="True" HorizontalExpand="True"
+                                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                             </ScrollContainer>
 
                             <BoxContainer Orientation="Vertical"

@@ -1,5 +1,0 @@
-﻿<bodyType:BodyTypePanel
-    xmlns="https://spacestation14.io"
-    xmlns:bodyType="clr-namespace:Content.Client._Starlight.CharacterEditor.Editors.BodyType">
-    <Label Text="Blah blah blah blah"/>
-</bodyType:BodyTypePanel>

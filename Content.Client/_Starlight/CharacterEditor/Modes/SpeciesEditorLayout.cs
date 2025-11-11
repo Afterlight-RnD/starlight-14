@@ -13,6 +13,6 @@ public sealed class SpeciesEditorMode : CharacterEditorMode
     protected override void RegisterPanels()
     {
         RegisterPanel<SpeciesSelectorPanel>();
-        RegisterPanel<BodyTypePanel>();
+        RegisterPanel<IdentityPanel>();
     }
 }

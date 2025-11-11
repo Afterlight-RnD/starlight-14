@@ -14,6 +14,7 @@ namespace Content.Shared._Starlight.CharacterProfiles.Data;
 public partial struct CharacterSpeciesData(): ICharacterData
 {
     [DataField] public ProtoId<SpeciesPrototype> BaseSpecies = new();
+    [DataField] public string CustomSpeciesName = string.Empty;
     [DataField] public EntProtoId DollPrototype = new();
 
     public record struct SpeciesChangedEvent(SpeciesPrototype NewSpecies);

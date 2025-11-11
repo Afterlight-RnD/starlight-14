@@ -46,12 +46,6 @@
             <BoxContainer
                 HorizontalExpand="True" VerticalExpand="False"
                 HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                <Button
-                    ToggleMode="True"
-                    HorizontalAlignment="Left"
-                    Margin="5 2 5 2"
-                    Text="Edit Name"
-                    Name="EditName" Access="Protected" />
                 <Control HorizontalExpand="True" HorizontalAlignment="Stretch" />
                 <Button
                     HorizontalAlignment="Right"
@@ -59,21 +53,6 @@
                     Text="Randomize"
                     Name="RandomizeCharacter" Access="Protected" />
             </BoxContainer>
-                <BoxContainer Name="CharacterNameEditor" Access="Protected" Visible="False" Orientation="Vertical"
-                              HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <controls:CharacterEditorField
-                        Name="FirstNameField" Access="Protected"
-                        Text="First Name: " TextEditWidth="250"/>
-                    <controls:CharacterEditorField
-                        Name="NicknameField" Access="Protected"
-                        Text="Nickname: " TextEditWidth="250"/>
-                    <controls:CharacterEditorField
-                        Name="LastNameField" Access="Protected"
-                        Text="Last Name: " TextEditWidth="250"/>
-                    <PanelContainer>
-                        <Label Name="NameRuleDisclaimer" Access="Protected" />
-                    </PanelContainer>
-                </BoxContainer>
         </BoxContainer>
     </Control>
 </widgets:CharacterPreviewWidget>

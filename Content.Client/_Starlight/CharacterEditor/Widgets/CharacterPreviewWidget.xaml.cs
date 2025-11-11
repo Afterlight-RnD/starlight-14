@@ -20,10 +20,8 @@ public sealed partial class CharacterPreviewWidget : SLWidget
         RobustXamlLoader.Load(this);
         ViewRight.OnPressed += OnShiftViewRight;
         ViewLeft.OnPressed += OnShiftViewLeft;
-        EditName.OnToggled += OnToggleNameEditor;
         CharacterSpritePreview.OverrideDirection = Direction.South;
         SetupDropdown();
-        SetupNameEditor();
     }
 
 
@@ -103,36 +101,4 @@ public sealed partial class CharacterPreviewWidget : SLWidget
         RaiseUIEvent(new ChangeCharacterEditorPreviewModeUIEvent((CharacterPreviewMode)obj.Id));
         obj.Button.Select(obj.Id);
     }
-
-
-    private void OnToggleNameEditor(BaseButton.ButtonToggledEventArgs args)
-    {
-        void ToggleField(CharacterEditorField field, bool pressed)
-        {
-            field.Disabled = !pressed;
-            field.Visible = pressed;
-        }
-        CharacterNameEditor.Visible = args.Pressed;
-        ToggleField(FirstNameField, args.Pressed);
-        ToggleField(NicknameField, args.Pressed);
-        ToggleField(LastNameField, args.Pressed);
-    }
-
-    private void SetupNameEditor()
-    {
-        NameRuleDisclaimer.Text =
-            "Warning: Offensive or LRP IC names \n will lead to admin intervention on this server. \n Read our [Rules] for more.";
-        NameRuleDisclaimer.FontColorOverride = Color.Red;
-        CharacterNameEditor.Margin = new Thickness(10, 0);
-
-        FirstNameField.InitializeAsTextField( data => { return data.Name; },
-                (string name, ref CharacterIdentityData data) => { data.Name = name; });
-
-        NicknameField.InitializeAsTextField( data => { return data.Nickname; },
-            (string name, ref CharacterIdentityData data) => { data.Nickname = name;});
-
-        LastNameField.InitializeAsTextField(data => { return data.LastName; },
-            (string name, ref CharacterIdentityData data) => { data.LastName = name; });
-    }
-
 }

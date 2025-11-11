@@ -17,10 +17,12 @@ public abstract partial class CharacterEditorPanel : SLBox
     private bool _allowFieldRegistrations = true;
     protected CharacterEditorPanel()
     {
+        Orientation = LayoutOrientation.Vertical;
         HorizontalExpand = true;
         VerticalExpand = true;
         HorizontalAlignment = HAlignment.Stretch;
         VerticalAlignment = VAlignment.Stretch;
+        Margin = new(10);
     }
     protected override void EnteredTree()
     {

@@ -8,7 +8,7 @@ using Content.Shared._Starlight.CharacterProfiles;
 namespace Content.Client._Starlight.CharacterEditor.Controls;
 
 [Virtual]
-public class CharacterEditorLineEditField<TProfileData> : SLLineEdit, ICharacterEditorField
+public class CharacterEditorTextField<TProfileData> : SLLineEdit, ICharacterEditorField
 where TProfileData: struct, ICharacterData
 {
     public bool Disabled { get => !Editable; set => Editable = !value; }
@@ -43,12 +43,12 @@ where TProfileData: struct, ICharacterData
         ICharacterEditorField.RandomizeField(DataRandomizer, ProfileDataSetter);
     }
 
-    public CharacterEditorLineEditField()
+    public CharacterEditorTextField()
     {
         OnTextEntered += HandleTextEntered;
     }
 
-    private void HandleTextEntered(LineEditEventArgs obj)
+    protected virtual void HandleTextEntered(LineEditEventArgs obj)
     {
         if (ProfileDataSetter == null) return;
         ICharacterEditorField.SetData(obj.Text, ProfileDataSetter);
