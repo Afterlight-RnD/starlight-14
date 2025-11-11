@@ -37,6 +37,7 @@ public sealed partial class CharacterIdentityDataSystem : CharacterDataSystem<Ch
     {
         newData.Name = oldData.LegacyProfile.Name;
         newData.PhysicalAge = oldData.LegacyProfile.Age;
+        newData.ChronologicalAge = oldData.LegacyProfile.Age;
         newData.BodyType = oldData.LegacyProfile.Sex;
         newData.Gender = oldData.LegacyProfile.Gender;
     }

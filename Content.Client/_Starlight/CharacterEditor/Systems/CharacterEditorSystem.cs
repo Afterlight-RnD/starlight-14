@@ -26,6 +26,25 @@ public sealed class CharacterEditorSystem : UISystem
         SubscribeUIEvent<ChangeCharacterEditorPreviewModeUIEvent>(HandlePreviewModeChange);
         SubscribeUIEvent<SelectCharacterProfileUIEvent>(HandleCharacterSelected);
         SubscribeUIRequest<EditCharacterProfileFieldUIRequest>(HandleEditProfileRequest);
+        SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(HandleProfileDirtied);
+    }
+
+    //TODO: handling legacy profile data conversions, remove this eventually
+
+    private void HandleProfileDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)
+    {
+        var legacyProfile = args.Profile.GetData<LegacyCharacterData>().LegacyProfile;
+        var identityData = args.Profile.GetData<CharacterIdentityData>();
+        var speciesData = args.Profile.GetData<CharacterSpeciesData>();
+        legacyProfile = legacyProfile.WithName(identityData.Name);
+        legacyProfile = legacyProfile.WithAge(identityData.PhysicalAge);
+        legacyProfile = legacyProfile.WithGender(identityData.Gender);
+        legacyProfile = legacyProfile.WithSex(identityData.BodyType);
+        legacyProfile = legacyProfile.WithSpecies(speciesData.BaseSpecies);
+        legacyProfile = legacyProfile.WithCustomSpecieName(speciesData.CustomSpeciesName);
+        args.Profile.SetData(new LegacyCharacterData{LegacyProfile =  legacyProfile});
+        ClearPreviewEntity();
+        RefreshPreviewVisuals();
     }
 
     private void HandleEditProfileRequest(ref EditCharacterProfileFieldUIRequest args)
