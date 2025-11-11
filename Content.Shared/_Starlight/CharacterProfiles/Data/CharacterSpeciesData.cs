@@ -13,9 +13,16 @@ namespace Content.Shared._Starlight.CharacterProfiles.Data;
 [Serializable, NetSerializable]
 public partial struct CharacterSpeciesData(): ICharacterData
 {
+    private const int AbsoluteMinAge = 18;
+
     [DataField] public ProtoId<SpeciesPrototype> BaseSpecies = new();
     [DataField] public string CustomSpeciesName = string.Empty;
     [DataField] public EntProtoId DollPrototype = new();
+
+    [DataField] public int MinAge = AbsoluteMinAge;
+    [DataField] public int MaxAge = int.MaxValue;
+    [DataField] public int YoungAge = 25;
+    [DataField] public int OldAge = 65;
 
     public record struct SpeciesChangedEvent(SpeciesPrototype NewSpecies);
 }
@@ -26,6 +33,30 @@ public sealed class CharacterSpeciesDataSystem : CharacterDataSystem<CharacterSp
     public override Type[]? ApplyAfterData => [typeof(LegacyCharacterData)];
 
     public override bool HasInit => true;
+
+    public override void Initialize()
+    {
+        RegisterProtoReloadListener<SpeciesPrototype>(OnSpeciesProtoReloaded);
+    }
+
+    private void OnSpeciesProtoReloaded(CharacterProfile profile)
+    {
+
+        var speciesData = profile.GetData<CharacterSpeciesData>();
+        var proto = PrototypeManager.Index(speciesData.BaseSpecies);
+        speciesData.DollPrototype = proto.DollPrototype;
+
+        speciesData.MinAge = proto.MinAge;
+        speciesData.MaxAge = proto.MaxAge;
+
+        speciesData.OldAge = proto.OldAge;
+        speciesData.YoungAge = proto.YoungAge;
+        profile.SetData(speciesData);
+        var identityData = profile.GetData<CharacterIdentityData>();
+        identityData.PhysicalAge = int.Clamp(identityData.PhysicalAge, speciesData.MinAge, speciesData.MaxAge);
+        profile.SetData(identityData);
+    }
+
 
     public void ChangeSpecies(CharacterProfile profile, ProtoId<SpeciesPrototype> newSpecies)
     {
@@ -60,5 +91,12 @@ public sealed class CharacterSpeciesDataSystem : CharacterDataSystem<CharacterSp
     public void MigrateData(LegacyCharacterData oldData, ref CharacterSpeciesData newData)
     {
         newData.BaseSpecies = oldData.LegacyProfile.Species;
+        newData.CustomSpeciesName = oldData.LegacyProfile.CustomSpecieName;
+        var speciesProto = PrototypeManager.Index(newData.BaseSpecies);
+
+        newData.MinAge = speciesProto.MinAge;
+        newData.MaxAge = speciesProto.MaxAge;
+        newData.YoungAge = speciesProto.YoungAge;
+        newData.OldAge = speciesProto.OldAge;
     }
 }

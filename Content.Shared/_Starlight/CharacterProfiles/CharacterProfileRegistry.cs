@@ -20,6 +20,12 @@ public sealed class CharacterProfileRegistry
         }
     }
 
+    public IEnumerable<CharacterProfile> IterateProfiles()
+    {
+        foreach (var (_, profile) in _profiles)
+            yield return profile;
+    }
+
     public bool AddProfile(int slot, CharacterProfile profile)
     {
         profile.Slot = slot;

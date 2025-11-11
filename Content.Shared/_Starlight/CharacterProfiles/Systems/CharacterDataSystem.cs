@@ -56,6 +56,7 @@ public interface ICharacterDataSystem
 
 public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataSystem where TData: struct, ICharacterData
 {
+    [Dependency] protected SharedCharacterProfileSystem ProfileSystem = default!;
     [Dependency] protected IPrototypeManager PrototypeManager = default!;
     [Dependency] protected IRobustRandom Random = default!;
     [Dependency] private IDynamicTypeFactory _typeFactory = default!;
@@ -73,7 +74,6 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
     /// Should we run init on this data
     /// </summary>
     public virtual bool HasInit => false;
-
 
     Type ICharacterDataSystem.DataType => typeof(TData);
 
@@ -110,6 +110,11 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
     /// <param name="profile">owning profile</param>
     /// <param name="data">data to change</param>
     protected virtual void InitData(CharacterProfile profile, ref TData data){}
+
+    protected void RegisterProtoReloadListener<TProto>(Action<CharacterProfile> protoReloaded) where TProto : class, IPrototype
+    {
+        ProfileSystem.RegisterProtoReloadListener<TProto>(protoReloaded);
+    }
 
     void ICharacterDataSystem.ApplyProfile(EntityUid target, CharacterProfile profile)
     {

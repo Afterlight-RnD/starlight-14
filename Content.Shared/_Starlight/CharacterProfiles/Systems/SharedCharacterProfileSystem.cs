@@ -20,11 +20,22 @@ public abstract partial class SharedCharacterProfileSystem : EntitySystem
     protected readonly List<ICharacterDataMigrationSystem> CharacterDataMigrations = new();
     protected readonly List<ICharacterDataSystem> InitSystems = new();
 
+    protected Dictionary<Type, (Action<SharedCharacterProfileSystem, CharacterProfile, Action<CharacterProfile>>, Action<CharacterProfile>)> ProtoReloadEvents = new();
+
     public override void Initialize()
     {
         CacheReflectionData();
         Cfg.OnValueChanged(CCVars.GameMaxCharacterSlots, MaxCharactersChanged);
+        PrototypeManager.PrototypesReloaded += HandleProtoReloaded;
     }
+
+    public override void Shutdown()
+    {
+        base.Shutdown();
+        PrototypeManager.PrototypesReloaded -= HandleProtoReloaded;
+        ProtoReloadEvents.Clear();
+    }
+    protected virtual void HandleProtoReloaded(PrototypesReloadedEventArgs args) {}
 
     private void MaxCharactersChanged(int slots)
     {
@@ -151,9 +162,31 @@ public abstract partial class SharedCharacterProfileSystem : EntitySystem
         return doll;
     }
 
-    public void RaiseProfileDataEvent<TEvent>(CharacterProfile profile, TEvent args) where TEvent : struct
+    public void RaiseProfileEvent<TEvent>(CharacterProfile profile, TEvent args) where TEvent : struct
     {
         RaiseLocalEvent(new ProfileEvent<TEvent>(profile, args));
     }
+
+    protected void RaiseProtoReloadOnProfile(HashSet<Type> changeSet, CharacterProfile profile)
+    {
+        foreach (var type in changeSet)
+        {
+            if (!ProtoReloadEvents.TryGetValue(type, out var data))
+                continue;
+            data.Item1.Invoke(this, profile, data.Item2);
+        }
+    }
+
+    public void RegisterProtoReloadListener<TProto>(Action<CharacterProfile> handler) where TProto : class, IPrototype
+    {
+        if (!ProtoReloadEvents.TryAdd(typeof(TProto), (static (system, profile, handlerIn) =>
+            {
+                system.RaiseProfileEvent(profile, new PrototypeReloadedProfileEvent<TProto>(handlerIn));
+            }, handler)))
+            Log.Error($"Tried to register protoReload event twice for proto:{typeof(TProto)}");
+    }
+
     public record struct ProfileEvent<TEvent>(CharacterProfile Profile, TEvent Event) where TEvent : struct;
+
+    public record struct PrototypeReloadedProfileEvent<TProto>(Action<CharacterProfile> Handler) where TProto: class, IPrototype;
 }

@@ -27,6 +27,16 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         SubscribeNetworkEvent<MsgDeleteCharacterProfile>(HandleDeleteCharacter);
     }
 
+    protected override void HandleProtoReloaded(PrototypesReloadedEventArgs args)
+    {
+        var changeSet = new HashSet<Type>(args.Modified);
+        changeSet.IntersectWith(ProtoReloadEvents.Keys);
+
+        foreach (var (_, registry) in _characterProfiles)
+            foreach (var profile in registry.IterateProfiles())
+                RaiseProtoReloadOnProfile(changeSet, profile);
+    }
+
     private void HandleDeleteCharacter(MsgDeleteCharacterProfile msg, EntitySessionEventArgs args)
     {
         //Don't raise on the client if we received a delete request to prevent recursive loops

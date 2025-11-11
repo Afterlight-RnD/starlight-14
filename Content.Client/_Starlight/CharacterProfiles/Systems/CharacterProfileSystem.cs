@@ -37,7 +37,17 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         SubscribeNetworkEvent<MsgDeleteCharacterProfile>(HandleCharacterDeleted);
     }
 
-    private void HandleCharacterSync(MsgSyncCharacterProfile ev)
+    protected override void HandleProtoReloaded(PrototypesReloadedEventArgs args)
+    {
+        var changeSet = new HashSet<Type>(args.Modified);
+        changeSet.IntersectWith(ProtoReloadEvents.Keys);
+        foreach (var profile in _characterRegistry.IterateProfiles())
+            RaiseProtoReloadOnProfile(changeSet, profile);
+        if (_characterEditor.LiveProfile != null)
+            RaiseProtoReloadOnProfile(changeSet, _characterEditor.LiveProfile);
+    }
+
+private void HandleCharacterSync(MsgSyncCharacterProfile ev)
     {
         Entity<SpriteComponent> previewEnt;
         if (TryGetCharacterProfile(ev.Slot, out var existingProfile))

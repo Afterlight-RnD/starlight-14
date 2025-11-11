@@ -75,7 +75,7 @@ public sealed partial class CharacterProfile
     {
         var dataIdx = _dataTypes.IndexOf(typeof(TProfileData));
         var profileData = (TProfileData)_data[dataIdx];
-        setterDelegate.Invoke(data, ref profileData);
+        setterDelegate.Invoke(data, this, ref profileData);
         _data[dataIdx] = profileData;
         _dirtyData.Add(typeof(TProfileData));
     }
@@ -130,7 +130,7 @@ public sealed partial class CharacterProfile
 
 public interface ICharacterData;
 
-public delegate void CharacterDataSetterDelegate<TCharacterData, in TValue>( TValue value, ref TCharacterData profileData)
+public delegate void CharacterDataSetterDelegate<TCharacterData, in TValue>( TValue value, CharacterProfile profile,  ref TCharacterData profileData)
     where TCharacterData: struct, ICharacterData;
 
 public delegate TValue CharacterDataGetterDelegate<in TCharacterData, out TValue>(TCharacterData data)

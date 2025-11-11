@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Shared._Starlight.CharacterProfiles;
+using Content.Shared.Humanoid.Prototypes;
 using Robust.Client.GameObjects;
 
 namespace Content.Client._Starlight.CharacterEditor.Systems;
@@ -17,7 +18,7 @@ public record struct CharacterEditorProfileResetUIEvent(CharacterProfile Profile
 public record struct ApplyCharacterProfileChangesUIEvent(int Slot);
 public record struct CharacterEditorPreviewChangedUIEvent(Entity<SpriteComponent> PreviewEntity);
 public record struct ChangeCharacterEditorPreviewModeUIEvent(CharacterPreviewMode NewMode);
-
+public record struct CharacterEditorSpeciesChangedUIEvent(CharacterProfile Profile, SpeciesPrototype NewSpecies);
 public record struct SelectCharacterProfileUIEvent(int Slot);
 public record struct DeleteCharacterProfileUIEvent(int Slot);
 public record struct DiscardCharacterProfileChangesUIEvent();
