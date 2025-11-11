@@ -28,6 +28,18 @@ public sealed partial class CharacterIdentityDataSystem : CharacterDataSystem<Ch
 
     public override Type[]? ApplyAfterData => [typeof(LegacyCharacterData)];
 
+    public override void Initialize()
+    {
+        SubscribeProfileEvent<CharacterSpeciesData.SpeciesChangedEvent>(OnSpeciesChanged);
+    }
+
+    private void OnSpeciesChanged(CharacterProfile profile, CharacterSpeciesData.SpeciesChangedEvent args)
+    {
+        var identityData = profile.GetData<CharacterIdentityData>();
+        identityData.PhysicalAge = int.Clamp(identityData.PhysicalAge, args.NewSpecies.MinAge, args.NewSpecies.MaxAge);
+        profile.SetData(identityData);
+    }
+
     protected override void Apply(EntityUid target, CharacterIdentityData data)
     {
         //TODO

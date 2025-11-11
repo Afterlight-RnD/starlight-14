@@ -24,6 +24,8 @@ public sealed partial class SpeciesGroupList : SLBox
 
     private Dictionary<ProtoId<SpeciesPrototype>, SpeciesSelectorButton> _speciesSelectors = new();
 
+    private ProtoId<SpeciesPrototype>? _selectedSpecies;
+
     private ButtonGroup _speciesButtonGroup = new (false);
 
     private SpriteSystem? _spriteSystem = null;
@@ -59,19 +61,21 @@ public sealed partial class SpeciesGroupList : SLBox
     private void OnCharacterDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)
     {
         EnsureSpeciesList(); //we have to do a differed init because UIScreen lifecycle bs
-        SelectSpeciesButton(args.Profile.GetData<CharacterSpeciesData>().BaseSpecies);
+        SelectSpecies(args.Profile.GetData<CharacterSpeciesData>().BaseSpecies, false);
     }
-    public void SelectSpeciesButton(ProtoId<SpeciesPrototype> species)
+    public void SelectSpecies(ProtoId<SpeciesPrototype> species, bool applyProfileChanges)
     {
-        if (_speciesSelectors.TryGetValue(species, out var button))
-        {
-            button.SetClickPressed(true);
-            var req = new EditCharacterProfileFieldUIRequest();
-            RaiseRequest(ref req);
-            if (req.Profile == null)
-                return;
-            req.Profile.EditData<CharacterSpeciesData, ProtoId<SpeciesPrototype>>(species, SetProfileSpecies);
-        }
+        if (_selectedSpecies == species || !_speciesSelectors.TryGetValue(species, out var button)) return;
+        button.Pressed = true;
+        _selectedSpecies = species;
+        if (!applyProfileChanges)
+            return;
+        var req = new EditCharacterProfileFieldUIRequest();
+        RaiseRequest(ref req);
+        if (req.Profile == null)
+            return;
+        req.Profile.EditData<CharacterSpeciesData, ProtoId<SpeciesPrototype>>(species, SetProfileSpecies);
+
     }
 
     private void SetProfileSpecies(ProtoId<SpeciesPrototype> value, CharacterProfile profile, ref CharacterSpeciesData profileData)
@@ -91,8 +95,14 @@ public sealed partial class SpeciesGroupList : SLBox
     public void AddSpecies(ProtoId<SpeciesPrototype> species, Texture icon, string localizedName)
     {
         var newSpeciesSelector = new SpeciesSelectorButton(species, icon, localizedName, _speciesButtonGroup);
+        newSpeciesSelector.OnSelected += HandleButtonSelect;
         SpeciesGrid.AddChild(newSpeciesSelector);
         _speciesSelectors.Add(species, newSpeciesSelector);
+    }
+
+    private void HandleButtonSelect(ProtoId<SpeciesPrototype> species)
+    {
+        SelectSpecies(species, true);
     }
 
     public void ClearSpecies()

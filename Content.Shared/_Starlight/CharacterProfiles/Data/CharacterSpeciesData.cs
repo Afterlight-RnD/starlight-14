@@ -13,13 +13,11 @@ namespace Content.Shared._Starlight.CharacterProfiles.Data;
 [Serializable, NetSerializable]
 public partial struct CharacterSpeciesData(): ICharacterData
 {
-    private const int AbsoluteMinAge = 18;
-
     [DataField] public ProtoId<SpeciesPrototype> BaseSpecies = new();
     [DataField] public string CustomSpeciesName = string.Empty;
     [DataField] public EntProtoId DollPrototype = new();
 
-    [DataField] public int MinAge = AbsoluteMinAge;
+    [DataField] public int MinAge = 18;
     [DataField] public int MaxAge = int.MaxValue;
     [DataField] public int YoungAge = 25;
     [DataField] public int OldAge = 65;
@@ -44,28 +42,29 @@ public sealed class CharacterSpeciesDataSystem : CharacterDataSystem<CharacterSp
 
         var speciesData = profile.GetData<CharacterSpeciesData>();
         var proto = PrototypeManager.Index(speciesData.BaseSpecies);
-        speciesData.DollPrototype = proto.DollPrototype;
-
-        speciesData.MinAge = proto.MinAge;
-        speciesData.MaxAge = proto.MaxAge;
-
-        speciesData.OldAge = proto.OldAge;
-        speciesData.YoungAge = proto.YoungAge;
-        profile.SetData(speciesData);
-        var identityData = profile.GetData<CharacterIdentityData>();
-        identityData.PhysicalAge = int.Clamp(identityData.PhysicalAge, speciesData.MinAge, speciesData.MaxAge);
-        profile.SetData(identityData);
+        ChangeSpecies(profile, proto);
     }
 
-
-    public void ChangeSpecies(CharacterProfile profile, ProtoId<SpeciesPrototype> newSpecies)
+    public void ChangeSpecies(CharacterProfile profile, SpeciesPrototype newSpecies)
     {
         var existing = profile.GetData<CharacterSpeciesData>();
         if (existing.BaseSpecies == newSpecies)
             return;
         existing.BaseSpecies = newSpecies;
+        existing.DollPrototype = newSpecies.DollPrototype;
+
+        existing.MaxAge = newSpecies.MaxAge;
+        existing.MinAge = newSpecies.MinAge;
+
+        existing.OldAge = newSpecies.OldAge;
+        existing.YoungAge = newSpecies.YoungAge;
         profile.SetData(existing);
-        RaiseProfileEvent(profile, new CharacterSpeciesData.SpeciesChangedEvent(PrototypeManager.Index(newSpecies)));
+        RaiseProfileEvent(profile, new CharacterSpeciesData.SpeciesChangedEvent(newSpecies));
+    }
+
+    public void ChangeSpecies(CharacterProfile profile, ProtoId<SpeciesPrototype> newSpecies)
+    {
+       ChangeSpecies(profile,PrototypeManager.Index(newSpecies));
     }
 
     protected override void InitData(CharacterProfile profile,  ref CharacterSpeciesData data)

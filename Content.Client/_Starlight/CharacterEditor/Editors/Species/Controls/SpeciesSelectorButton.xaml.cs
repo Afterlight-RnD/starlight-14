@@ -15,10 +15,18 @@ namespace Content.Client._Starlight.CharacterEditor.Editors.Species.Controls;
 public sealed partial class SpeciesSelectorButton : ContainerButton
 {
     public ProtoId<SpeciesPrototype> Species { get; set; }
+
+    public event Action<ProtoId<SpeciesPrototype>>? OnSelected;
     public SpeciesSelectorButton()
     {
         RobustXamlLoader.Load(this);
         AddStyleClass(StyleClassButton);
+        OnPressed += HandlePressed;
+    }
+
+    private void HandlePressed(ButtonEventArgs obj)
+    {
+        OnSelected?.Invoke(Species);
     }
 
     public SpeciesSelectorButton(ProtoId<SpeciesPrototype> newSpecies, Texture newIcon, string localizedName, ButtonGroup buttonGroup) : this()
