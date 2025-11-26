@@ -9,147 +9,56 @@ namespace Content.Client._Starlight.ProfileEditor;
 
 public interface IProfileEditorControl : ISLControl
 {
+    public bool EditorControlsInjected { get; set; }
 };
 
-public interface IProfileEditor
-{
-    public bool SetStep(int stepIndex);
-    public int CurrentStepIndex { get; }
-
-    public Type StepType { get; }
-    public Type EditorControlType { get; }
-
-    public void RegisterStep(IProfileEditorStep editorSteps);
-
-    public void CleanupSteps();
-
-    public void Initialize(Control editorControl);
-
-    public bool IsSetup { get; }
-    public void FinishSetup();
-}
-
-public sealed class ProfileEditor<TEditorControl, TStep> : IProfileEditor
+public sealed class ProfileEditor<TEditorControl, TStep>
     where TEditorControl : Control, ISLControl, IProfileEditorControl
     where TStep : ProfileEditorStep<TEditorControl>
 {
-    [Dependency] private ILogManager _logManager = default!;
+    public int CurrentStep { get; private set; } = -1;
 
-    public Type StepType => typeof(TStep);
-    public Type EditorControlType => typeof(TEditorControl);
+    public int StepCount => _steps.Count;
 
-    public event Action<TStep>? OnStepExited;
-    public event Action<TStep>? OnStepEntered;
+    private readonly List<TStep> _steps = new();
 
-    public TStep CurrentStep => _editorSteps[CurrentStepIndex];
-
-    private TEditorControl _editorControl = default!;
-    private List<TStep> _editorSteps = new();
-    private ISawmill _log;
-
-    public int CurrentStepIndex { get; private set; } = 0;
-
-    public ProfileEditor()
+    public IEnumerable<TStep> IterateSteps()
     {
-        _log = _logManager.GetSawmill($"ProfileEditor<{typeof(TEditorControl)}, {typeof(TStep)}>");
+        foreach (var step in _steps)
+            yield return step;
     }
 
-    void IProfileEditor.RegisterStep(IProfileEditorStep editorStep)
+    public TStep GetCurrentStep => _steps[CurrentStep];
+
+    public TStep GetStep(int stepIndex)
     {
-        var typedStep = (TStep)editorStep;
-        _editorSteps.Add(typedStep);
-        typedStep.InjectStepControls(_editorControl);
-        OrderSteps();
+        return _steps[stepIndex];
     }
 
-    void IProfileEditor.CleanupSteps()
+    public bool SetStep(int step, TEditorControl editorControl)
     {
-        foreach (var step in _editorSteps)
-            step.RemoveStepControls(_editorControl);
-        _editorSteps.Clear();
-        IsSetup = false;
-    }
-
-    void IProfileEditor.Initialize(Control editorControl)
-    {
-        _editorControl = (TEditorControl)editorControl;
-    }
-
-    public bool IsSetup { get; private set; }
-
-    void IProfileEditor.FinishSetup()
-    {
-        IsSetup = true;
-        var curStep = CurrentStep;
-        OnStepEntered?.Invoke(curStep);
-        curStep.StepEntered(_editorControl);
-    }
-
-    public bool SetStep(int stepIndex)
-    {
-        if (!IsSetup)
+        if (step >= StepCount || step < 0)
+            throw new InvalidOperationException("Tried to set step out of range!");
+        if (CurrentStep == step)
+            return false;
+        if (CurrentStep >= 0)
         {
-            _log.Error("Profile Editor not setup yet!");
-            return false;
+            GetCurrentStep.Deactivated(editorControl);
         }
-        if (stepIndex >= _editorSteps.Count)
-        {
-            _log.Error($"Index:{stepIndex} is out of range of steps:{_editorSteps.Count}");
-            return false;
-        }
-        if (stepIndex == CurrentStepIndex)
-            return false;
-        var currentStep = CurrentStep;
-        OnStepExited?.Invoke(currentStep);
-        currentStep.StepExited(_editorControl);
-        var nextStep = _editorSteps[stepIndex];
 
-        OnStepEntered?.Invoke(nextStep);
-        nextStep.StepEntered(_editorControl);
+        CurrentStep = step;
+        GetCurrentStep.Activated(editorControl);
         return true;
     }
 
-    private void OrderSteps()
+    public void InjectControls(TEditorControl editorControl)
     {
-        _editorSteps.Sort(((stepA, stepB) =>
-        {
-            var stepAType = stepA.GetType();
-            var stepBType = stepB.GetType();
+        foreach (var step in _steps)
+            step.InjectControls(editorControl);
+    }
 
-            if (stepA.BeforeSteps != null)
-            {
-                foreach (var before in stepA.BeforeSteps)
-                {
-                    if (before == stepBType)
-                        return -1;
-                }
-            }
-            if (stepA.AfterSteps != null)
-            {
-                foreach (var after in stepA.AfterSteps)
-                {
-                    if (after == stepBType)
-                        return 1;
-                }
-            }
-
-            if (stepB.BeforeSteps != null)
-            {
-                foreach (var before in stepB.BeforeSteps)
-                {
-                    if (before == stepAType)
-                        return 1;
-                }
-            }
-            if (stepB.AfterSteps != null)
-            {
-                foreach (var after in stepB.AfterSteps)
-                {
-                    if (after == stepAType)
-                        return -1;
-                }
-            }
-            return 0;
-        }));
+    public void RegisterStep(IProfileEditorStep step)
+    {
+        _steps.Add((TStep)step);
     }
 }

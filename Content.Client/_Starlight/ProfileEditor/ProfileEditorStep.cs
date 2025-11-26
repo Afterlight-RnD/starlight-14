@@ -8,22 +8,35 @@ namespace Content.Client._Starlight.ProfileEditor;
 
 public interface IProfileEditorStep
 {
-    public Type[]? BeforeSteps { get; }
-    public Type[]? AfterSteps { get; }
+    public void InjectControls(Control root);
+
+    public void Enter(Control root);
+
+    public void Exit(Control root);
 }
 
 
 public abstract class ProfileEditorStep<TEditorControl> : IProfileEditorStep
     where TEditorControl: Control, ISLControl, IProfileEditorControl
 {
-    public virtual Type[]? BeforeSteps => null;
-    public virtual Type[]? AfterSteps => null;
+    public abstract void InjectControls(TEditorControl editorControl);
 
-    public abstract void InjectStepControls(TEditorControl editorControl);
+    public abstract void Activated(TEditorControl editorControl);
+    public abstract void Deactivated(TEditorControl editorControl);
 
-    public abstract void RemoveStepControls(TEditorControl editorControl);
+    void IProfileEditorStep.InjectControls(Control root)
+    {
+        InjectControls((TEditorControl)root);
+    }
 
-    public virtual void StepEntered(TEditorControl editorControl){}
+    void IProfileEditorStep.Enter(Control root)
+    {
+        Activated((TEditorControl)root);
+    }
 
-    public virtual void StepExited(TEditorControl editorControl){}
+    void IProfileEditorStep.Exit(Control root)
+    {
+        Deactivated((TEditorControl)root);
+    }
+
 }

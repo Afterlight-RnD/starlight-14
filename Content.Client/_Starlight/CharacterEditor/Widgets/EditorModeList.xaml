@@ -1,6 +1,0 @@
-﻿<widgets:EditorModeList
-    xmlns="https://spacestation14.io"
-    xmlns:widgets="clr-namespace:Content.Client._Starlight.CharacterEditor.Widgets"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Orientation="Vertical">
-</widgets:EditorModeList>

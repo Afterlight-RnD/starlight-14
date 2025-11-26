@@ -43,8 +43,8 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         changeSet.IntersectWith(ProtoReloadEvents.Keys);
         foreach (var profile in _characterRegistry.IterateProfiles())
             RaiseProtoReloadOnProfile(changeSet, profile);
-        if (_characterEditor.LiveProfile != null)
-            RaiseProtoReloadOnProfile(changeSet, _characterEditor.LiveProfile);
+        // if (_characterEditor.LiveProfile != null)
+        //     RaiseProtoReloadOnProfile(changeSet, _characterEditor.LiveProfile);
     }
 
 private void HandleCharacterSync(MsgSyncCharacterProfile ev)
@@ -56,8 +56,8 @@ private void HandleCharacterSync(MsgSyncCharacterProfile ev)
             previewEnt = EnsurePreviewEntity(ev.Slot, existingProfile);
             ApplyToDoll(previewEnt, existingProfile);
             _uiEventBus.RaiseEvent(new CharacterSlotUpdatedUIEvent(ev.Slot,existingProfile, previewEnt));
-            if (!_characterEditor.HasLiveProfile)
-                _characterEditor.StartEditingSlot(ev.Slot);
+            // if (!_characterEditor.HasLiveProfile)
+            //     _characterEditor.StartEditingSlot(ev.Slot);
             return;
         }
         if (ev.PartialData)
@@ -70,8 +70,8 @@ private void HandleCharacterSync(MsgSyncCharacterProfile ev)
         previewEnt = EnsurePreviewEntity(ev.Slot, newProfile);
         ApplyToDoll(previewEnt, newProfile);
         _uiEventBus.RaiseEvent(new CharacterSlotUpdatedUIEvent(ev.Slot, newProfile, previewEnt));
-        if (!_characterEditor.HasLiveProfile)
-            _characterEditor.StartEditingSlot(ev.Slot);
+        // if (!_characterEditor.HasLiveProfile)
+        //     _characterEditor.StartEditingSlot(ev.Slot);
     }
 
     private void HandleCharacterDeleted(MsgDeleteCharacterProfile ev)

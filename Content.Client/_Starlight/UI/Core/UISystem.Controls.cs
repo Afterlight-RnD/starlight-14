@@ -7,6 +7,7 @@ namespace Content.Client._Starlight.UI.Core;
 
 public abstract class BoundUISystem<TControl> : UISystem where TControl: Control, ISLControl,new()
 {
+    [MustCallBase]
     public override void Initialize()
     {
         base.Initialize();

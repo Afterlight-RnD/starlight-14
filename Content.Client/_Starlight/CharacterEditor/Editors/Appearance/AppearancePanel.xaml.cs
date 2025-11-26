@@ -13,7 +13,6 @@ namespace Content.Client._Starlight.CharacterEditor.Editors.Appearance;
 [GenerateTypedNameReferences]
 public sealed partial class AppearancePanel : CharacterEditorPanel
 {
-    public override CharacterEditorPanelLayout Layout => CharacterEditorPanelLayout.Main;
     public AppearancePanel()
     {
         RobustXamlLoader.Load(this);

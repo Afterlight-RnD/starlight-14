@@ -10,8 +10,6 @@ namespace Content.Client._Starlight.CharacterEditor.Editors.Appearance;
 [GenerateTypedNameReferences]
 public sealed partial class MarkingsPanel : CharacterEditorPanel
 {
-
-    public override CharacterEditorPanelLayout Layout => CharacterEditorPanelLayout.Side;
     public MarkingsPanel()
     {
         RobustXamlLoader.Load(this);

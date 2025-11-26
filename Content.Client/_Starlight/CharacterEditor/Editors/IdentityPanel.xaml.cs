@@ -1,7 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using Content.Client._Starlight.CharacterEditor.Controls;
 using Content.Shared._Starlight.CharacterProfiles;
 using Content.Shared._Starlight.CharacterProfiles.Data;
 using Content.Shared.Humanoid;
@@ -15,7 +14,6 @@ namespace Content.Client._Starlight.CharacterEditor.Editors;
 public sealed partial class IdentityPanel : CharacterEditorPanel
 {
     private const int MinAge = 18;
-    public override CharacterEditorPanelLayout Layout => CharacterEditorPanelLayout.Main;
 
     public IdentityPanel()
     {
