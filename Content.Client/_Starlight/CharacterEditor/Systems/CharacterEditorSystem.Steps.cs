@@ -12,7 +12,7 @@ public sealed partial class CharacterEditorSystem
     protected override void DefineSteps()
     {
         RegisterStep(new CharacterEditorStep("Identity",new IdentityPanel(), null));
-        RegisterStep(new CharacterEditorStep("Species",new SpeciesSelectorPanel(), null));
+        RegisterStep(new CharacterEditorStep("Species",null, new SpeciesSelectorPanel()));
         RegisterStep(new CharacterEditorStep("Appearance",new AppearancePanel(), new MarkingsPanel()));
     }
 }

@@ -63,7 +63,7 @@ public sealed partial class CharacterEditorControl : SLControl, IProfileEditorCo
 
     public void RegisterEditorStep(CharacterEditorStep step)
     {
-        var newButton = new CharacterEditorStepButton{EditorStep = EditorStepSelector.ChildCount,Group = _stepSelectorGroup};
+        var newButton = new CharacterEditorStepButton{Group = _stepSelectorGroup};
         if (_stepSelectorGroup.Buttons.Count != 1)
         {
             newButton.Pressed = true;
