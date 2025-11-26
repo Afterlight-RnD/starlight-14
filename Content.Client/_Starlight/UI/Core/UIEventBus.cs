@@ -7,12 +7,10 @@ using Robust.Shared.Collections;
 
 namespace Content.Client._Starlight.UI.Core;
 
-public sealed partial class UIEventBus: IPostInjectInit
+public sealed partial class UIEventBus
 {
     [Dependency] private readonly IDynamicTypeFactory _typeFactory = default!;
-    [Dependency] private readonly IEntitySystemManager _systemManager = default!;
     [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
-
     private readonly Dictionary<Type, Subscriptions> _subscriptions = new();
 
     private bool TryGetSubscription<TEvent>([NotNullWhen(true)] out Subscriptions<TEvent>? subscriptions) where TEvent : struct
@@ -114,10 +112,5 @@ public sealed partial class UIEventBus: IPostInjectInit
                 _handleLookup[oldHandler.handle] = (false, handlerData.idx);
             }
         }
-    }
-
-    public void PostInject()
-    {
-        _uiManager.OnScreenChanged += OnUIScreenChanged;
     }
 }

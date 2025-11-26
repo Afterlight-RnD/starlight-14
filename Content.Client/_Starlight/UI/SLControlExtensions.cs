@@ -13,7 +13,7 @@ public static class SLControlExtensions
         Action<IDisposable>? subscription = null)
     {
         parent.OnPressed += OnPressed;
-        subscription?.Invoke(new Subscription(() => parent.OnPressed -= OnPressed));
+        subscription?.Invoke(new SLButtonSubscription(() => parent.OnPressed -= OnPressed));
         return parent;
     }
 
@@ -21,7 +21,7 @@ public static class SLControlExtensions
         Action<IDisposable>? subscription = null)
     {
         parent.OnMouseEntered += OnPressed;
-        subscription?.Invoke(new Subscription(() => parent.OnMouseEntered -= OnPressed));
+        subscription?.Invoke(new SLButtonSubscription(() => parent.OnMouseEntered -= OnPressed));
         return parent;
     }
 
@@ -29,7 +29,7 @@ public static class SLControlExtensions
         Action<IDisposable>? subscription = null)
     {
         parent.OnMouseExited += OnPressed;
-        subscription?.Invoke(new Subscription(() => parent.OnMouseEntered -= OnPressed));
+        subscription?.Invoke(new SLButtonSubscription(() => parent.OnMouseEntered -= OnPressed));
         return parent;
     }
 

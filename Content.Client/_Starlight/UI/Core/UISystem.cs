@@ -7,6 +7,7 @@ namespace Content.Client._Starlight.UI.Core;
 
 public abstract class UISystem : EntitySystem
 {
+    [Dependency] protected readonly SLUIManager SLUIManager = default!;
     [Dependency] protected readonly UIEventBus UIEvents = default!;
 
     private HashSet<UIEventHandle> _uiEventHandles = new();

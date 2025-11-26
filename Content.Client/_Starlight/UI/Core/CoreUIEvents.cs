@@ -11,3 +11,6 @@ namespace Content.Client._Starlight.UI.Core;
 /// <param name="Old">Previous UIScreen</param>
 /// <param name="New">New UIScreen</param>
 public record struct ScreenChangedUIEvent(UIScreen? Old, UIScreen? New);
+
+public record struct ControlEnteredTreeUIEvent;
+public record struct ControlExitedTreeUIEvent;

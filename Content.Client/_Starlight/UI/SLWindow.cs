@@ -1,20 +1,12 @@
-﻿using System.Numerics;
-using Content.Client._Starlight.UI.Core;
+﻿using Content.Client._Starlight.UI.Core;
 using Content.Client.Stylesheets;
-using Content.Client.UserInterface.Controls;
-using Robust.Client.Graphics;
-using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
-using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
-using Robust.Shared.Prototypes;
-using static Robust.Client.UserInterface.Control;
-using static Robust.Client.UserInterface.Controls.BaseButton;
 using static Robust.Client.UserInterface.Controls.BoxContainer;
 
 namespace Content.Client._Starlight.UI;
 [Virtual]
-public class SLWindow : DefaultWindow
+public class SLWindow : DefaultWindow, ISLControl
 {
     private readonly IStylesheetManager _stylesheetManager = default!;
     internal SLWindow()
@@ -70,9 +62,18 @@ public class SLWindow : DefaultWindow
         return this;
     }
 
+
+    [MustCallBase]
+    protected override void EnteredTree()
+    {
+        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+    }
+
+
     [MustCallBase]
     protected override void ExitedTree()
     {
+        RaiseUIEvent(new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 

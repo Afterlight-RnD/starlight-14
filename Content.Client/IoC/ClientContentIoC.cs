@@ -77,6 +77,7 @@ namespace Content.Client.IoC
 
             //starlight start
             collection.Register<UIEventBus>();
+            collection.Register<SLUIManager>();
             //starlight end
         }
     }

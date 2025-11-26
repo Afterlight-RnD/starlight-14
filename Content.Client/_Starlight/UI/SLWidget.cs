@@ -6,9 +6,14 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.UI;
 
-public abstract class SLWidget : UIWidget
+public abstract class SLWidget : UIWidget, ISLControl
 {
     [Dependency] protected readonly IEntityManager EntityManager = default!;
+    [MustCallBase]
+    protected override void EnteredTree()
+    {
+        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+    }
 
     protected SLWidget()
     {
@@ -18,6 +23,7 @@ public abstract class SLWidget : UIWidget
     [MustCallBase]
     protected override void ExitedTree()
     {
+        RaiseUIEvent(new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 

@@ -3,13 +3,14 @@
 
 using Content.Client._Starlight.UI.Core;
 using Robust.Client.Graphics;
+using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Collections;
 
 namespace Content.Client._Starlight.UI.Controls;
 
 
-public abstract class SLOptionButton<TData> : OptionButton
+public abstract class SLOptionButton<TData> : OptionButton, ISLControl
 {
     public virtual string? LocPrefix { get; init; } = null;
     public event Action<TData>? OnDataSelected = null;
@@ -21,6 +22,9 @@ public abstract class SLOptionButton<TData> : OptionButton
     private bool _optionsSetup = false;
 
     private ValueList<TData> _optionData = new();
+    public event Action<Control>? OnControlEnteredTree;
+    public event Action<Control>? OnControlExitedTree;
+
     public abstract IEnumerable<TData> EnumerateOptions();
 
     public virtual void DataAdded(TData data, int id){}
@@ -37,11 +41,13 @@ public abstract class SLOptionButton<TData> : OptionButton
     protected override void EnteredTree()
     {
         SetupOptions();
+        OnControlEnteredTree?.Invoke(this);
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
+        OnControlExitedTree?.Invoke(this);
         ClearOptions();
         UnsubscribeAllUIEvents();
     }

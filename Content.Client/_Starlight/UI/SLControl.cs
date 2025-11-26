@@ -7,11 +7,18 @@ using Robust.Client.UserInterface;
 namespace Content.Client._Starlight.UI;
 
 [Virtual]
-public  class SLControl : Control
+public  class SLControl : Control, ISLControl
 {
+    [MustCallBase]
+    protected override void EnteredTree()
+    {
+        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+    }
+
     [MustCallBase]
     protected override void ExitedTree()
     {
+        RaiseUIEvent(new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
