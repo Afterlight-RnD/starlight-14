@@ -1,7 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using Content.Client._Starlight.CharacterProfiles;
 using Content.Client._Starlight.CharacterProfiles.Systems;
 using Content.Client._Starlight.UI.Core;
 using Content.Shared._Starlight.CharacterProfiles;
@@ -10,7 +9,7 @@ using Robust.Client.GameObjects;
 
 namespace Content.Client._Starlight.CharacterEditor.Systems;
 
-public sealed class CharacterEditorSystem : UISystem
+public sealed partial class CharacterEditorSystem : UISystem
 {
     [Dependency] private readonly CharacterProfileSystem _characterProfileSystem = default!;
 

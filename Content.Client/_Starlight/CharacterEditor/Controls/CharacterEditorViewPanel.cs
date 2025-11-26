@@ -6,6 +6,12 @@ using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.CharacterEditor.Controls;
 
+
+public sealed class CharacterEditorPanelRoot : SLControl
+{
+    public CharacterEditorPanelLayout LayoutPosition { get; set; }= default;
+}
+
 public abstract partial class CharacterEditorPanel : SLBox
 {
     public abstract CharacterEditorPanelLayout Layout { get; }
@@ -13,8 +19,6 @@ public abstract partial class CharacterEditorPanel : SLBox
     public bool IsSide => Layout == CharacterEditorPanelLayout.Side;
 
     public bool IsMain => Layout == CharacterEditorPanelLayout.Main;
-
-    private bool _allowFieldRegistrations = true;
     protected CharacterEditorPanel()
     {
         Orientation = LayoutOrientation.Vertical;
@@ -24,20 +28,17 @@ public abstract partial class CharacterEditorPanel : SLBox
         VerticalAlignment = VAlignment.Stretch;
         Margin = new(10);
     }
-    protected override void EnteredTree()
-    {
-        base.EnteredTree();
-        _allowFieldRegistrations = false;
-    }
-
-    private void FieldRegsAllowed(Control newField)
-    {
-        if (!_allowFieldRegistrations)
-            throw new InvalidOperationException(
-                $"Tried to create EditorField:{newField} outside of constructor!");
-    }
-
 };
+
+public abstract class MainCharacterEditorPanel : CharacterEditorPanel
+{
+    public override CharacterEditorPanelLayout Layout => CharacterEditorPanelLayout.Main;
+}
+
+public abstract class SideCharacterEditorPanel : CharacterEditorPanel
+{
+    public override CharacterEditorPanelLayout Layout => CharacterEditorPanelLayout.Side;
+}
 
 public enum CharacterEditorPanelLayout
 {

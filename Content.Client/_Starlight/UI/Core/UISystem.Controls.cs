@@ -24,6 +24,8 @@ public abstract class BoundUISystem<TControl> : UISystem where TControl: Control
         BoundControlExitedTree(control);
     }
 
-    public abstract void BoundControlEnteredTree(TControl boundControl);
-    public abstract void BoundControlExitedTree(TControl boundControl);
+    [MustCallBase(true)]
+    protected abstract void BoundControlEnteredTree(TControl boundControl);
+    [MustCallBase(true)]
+    protected abstract void BoundControlExitedTree(TControl boundControl);
 }
