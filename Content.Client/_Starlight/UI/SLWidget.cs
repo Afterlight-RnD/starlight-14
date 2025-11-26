@@ -12,7 +12,7 @@ public abstract class SLWidget : UIWidget, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this,new ControlEnteredTreeUIEvent());
     }
 
     protected SLWidget()
@@ -23,7 +23,7 @@ public abstract class SLWidget : UIWidget, ISLControl
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 

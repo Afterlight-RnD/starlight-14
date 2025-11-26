@@ -14,3 +14,6 @@ public record struct ScreenChangedUIEvent(UIScreen? Old, UIScreen? New);
 
 public record struct ControlEnteredTreeUIEvent;
 public record struct ControlExitedTreeUIEvent;
+
+public record struct ButtonPressedUIEvent;
+public record struct ButtonToggledUIEvent(bool Pressed);

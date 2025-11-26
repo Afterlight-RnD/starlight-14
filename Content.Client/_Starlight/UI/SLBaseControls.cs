@@ -15,13 +15,13 @@ public class SLLayout : LayoutContainer, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -82,13 +82,13 @@ public class SLGrid : GridContainer, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -179,13 +179,13 @@ public class SLSelect<T> : OptionButton, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -239,13 +239,13 @@ public sealed class SLStripe : StripeBack, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -300,13 +300,13 @@ public class SLTextureRect : TextureRect, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -362,13 +362,13 @@ public class SLLayeredTextureRect : LayeredTextureRect, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -423,13 +423,13 @@ public class SLScroll : ScrollContainer, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -484,13 +484,13 @@ public class SLPanel : PanelContainer, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -542,16 +542,33 @@ public class SLPanel : PanelContainer, ISLControl
 [Virtual]
 public class SLButton : Button, ISLControl
 {
+
+    public SLButton()
+    {
+        OnPressed += HandlePressed;
+        OnToggled += HandleToggled;
+    }
+
+    private void HandlePressed(ButtonEventArgs obj)
+    {
+        UIEvents.RaiseControlEvent(this, new ButtonPressedUIEvent());
+    }
+
+    private void HandleToggled(ButtonToggledEventArgs obj)
+    {
+        UIEvents.RaiseControlEvent(this, new ButtonToggledUIEvent(obj.Pressed));
+    }
+
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -603,16 +620,33 @@ public class SLButton : Button, ISLControl
 [Virtual]
 public class SLContainerButton : ContainerButton, ISLControl
 {
+
+    public SLContainerButton()
+    {
+        OnPressed += HandlePressed;
+        OnToggled += HandleToggled;
+    }
+
+    private void HandlePressed(ButtonEventArgs obj)
+    {
+        UIEvents.RaiseControlEvent(this, new ButtonPressedUIEvent());
+    }
+
+    private void HandleToggled(ButtonToggledEventArgs obj)
+    {
+        UIEvents.RaiseControlEvent(this, new ButtonToggledUIEvent(obj.Pressed));
+    }
+
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -682,14 +716,30 @@ public class SLButtonWithShader : Button, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
+    }
+
+    public SLButtonWithShader()
+    {
+        OnPressed += HandlePressed;
+        OnToggled += HandleToggled;
+    }
+
+    private void HandlePressed(ButtonEventArgs obj)
+    {
+        UIEvents.RaiseControlEvent(this, new ButtonPressedUIEvent());
+    }
+
+    private void HandleToggled(ButtonToggledEventArgs obj)
+    {
+        UIEvents.RaiseControlEvent(this, new ButtonToggledUIEvent(obj.Pressed));
     }
 
     #region UIEvents
@@ -739,14 +789,30 @@ public class SLTextureButton : TextureButton, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
+    }
+
+    public SLTextureButton()
+    {
+        OnPressed += HandlePressed;
+        OnToggled += HandleToggled;
+    }
+
+    private void HandlePressed(ButtonEventArgs obj)
+    {
+        UIEvents.RaiseControlEvent(this, new ButtonPressedUIEvent());
+    }
+
+    private void HandleToggled(ButtonToggledEventArgs obj)
+    {
+        UIEvents.RaiseControlEvent(this, new ButtonToggledUIEvent(obj.Pressed));
     }
 
     #region UIEvents
@@ -812,12 +878,12 @@ public class SLLabel : Label, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -868,12 +934,12 @@ public class SLLineEdit : LineEdit, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
@@ -929,13 +995,13 @@ public class SLRichTextLabel : RichTextLabel, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 

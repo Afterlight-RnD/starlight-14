@@ -66,14 +66,14 @@ public class SLWindow : DefaultWindow, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
-        RaiseUIEvent(new ControlEnteredTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
 
     [MustCallBase]
     protected override void ExitedTree()
     {
-        RaiseUIEvent(new ControlExitedTreeUIEvent());
+        UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
         UnsubscribeAllUIEvents();
     }
 
