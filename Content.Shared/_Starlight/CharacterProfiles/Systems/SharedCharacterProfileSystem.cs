@@ -123,7 +123,7 @@ public abstract partial class SharedCharacterProfileSystem : EntitySystem
     /// </summary>
     /// <param name="existingData">pre-existing data</param>
     /// <returns>new profile</returns>
-    protected CharacterProfile LoadExistingProfile(List<ICharacterData> existingData)
+    protected CharacterProfile LoadExistingProfile(List<CharacterData> existingData)
     {
         var newProfile = new CharacterProfile(existingData);
         //Migrate existing data

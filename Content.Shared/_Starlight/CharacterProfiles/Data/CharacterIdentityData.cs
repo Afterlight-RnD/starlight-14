@@ -9,7 +9,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Starlight.CharacterProfiles.Data;
 
 [Serializable, NetSerializable]
-public partial struct CharacterIdentityData() : ICharacterData
+public sealed partial class CharacterIdentityData() : CharacterData
 {
     [DataField] public string Name = string.Empty;
     [DataField] public string Nickname = string.Empty;
@@ -37,7 +37,7 @@ public sealed partial class CharacterIdentityDataSystem : CharacterDataSystem<Ch
     {
         var identityData = profile.GetData<CharacterIdentityData>();
         identityData.PhysicalAge = int.Clamp(identityData.PhysicalAge, args.NewSpecies.MinAge, args.NewSpecies.MaxAge);
-        profile.SetData(identityData);
+
     }
 
     protected override void Apply(EntityUid target, CharacterIdentityData data)

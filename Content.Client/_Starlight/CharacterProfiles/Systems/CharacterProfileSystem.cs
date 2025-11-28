@@ -66,12 +66,10 @@ private void HandleCharacterSync(MsgSyncCharacterProfile ev)
             return;
         }
         var newProfile = LoadExistingProfile(ev.Data);
-        _characterRegistry.AddProfile(ev.Slot,newProfile);
+        _characterRegistry.AddProfile(newProfile);
         previewEnt = EnsurePreviewEntity(ev.Slot, newProfile);
         ApplyToDoll(previewEnt, newProfile);
         _uiEventBus.RaiseEvent(new CharacterSlotUpdatedUIEvent(ev.Slot, newProfile, previewEnt));
-        // if (!_characterEditor.HasLiveProfile)
-        //     _characterEditor.StartEditingSlot(ev.Slot);
     }
 
     private void HandleCharacterDeleted(MsgDeleteCharacterProfile ev)
@@ -134,7 +132,7 @@ private void HandleCharacterSync(MsgSyncCharacterProfile ev)
         profile = CreateRandomProfile();
         ValidateProfile(profile);
         RaiseNetworkEvent(new MsgUpdateCharacterProfile(slot, profile));
-        _characterRegistry.AddProfile(slot, profile);
+        _characterRegistry.AddProfile(profile);
         var previewEnt = EnsurePreviewEntity(slot, profile);
         _uiEventBus.RaiseEvent(new CharacterSlotUpdatedUIEvent(slot,profile, previewEnt));
         return true;

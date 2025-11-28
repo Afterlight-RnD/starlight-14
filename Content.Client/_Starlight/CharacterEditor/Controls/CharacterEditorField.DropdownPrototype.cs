@@ -9,7 +9,7 @@ namespace Content.Client._Starlight.CharacterEditor.Controls;
 [Virtual]
 public class CharacterEditorDropdownPrototypeField<TProfileData, TPrototype>
     : CharacterEditorDropdownField<TProfileData, TPrototype>
-    where TProfileData : struct, ICharacterData
+    where TProfileData : CharacterData, new()
     where TPrototype: class, IPrototype
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;

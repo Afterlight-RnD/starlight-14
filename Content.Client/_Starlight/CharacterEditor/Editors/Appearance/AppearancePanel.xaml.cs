@@ -21,7 +21,7 @@ public sealed partial class AppearancePanel : CharacterEditorPanel
 
     private void SetupEditorFields()
     {
-        CharacterBodyTypeField.InitializeAsEnumField((Sex bodyType, CharacterProfile profile, ref CharacterIdentityData data) =>
+        CharacterBodyTypeField.InitializeAsEnumField((Sex bodyType, CharacterProfile profile, CharacterIdentityData data) =>
         {
             data.BodyType = bodyType;
         }, data => data.BodyType);

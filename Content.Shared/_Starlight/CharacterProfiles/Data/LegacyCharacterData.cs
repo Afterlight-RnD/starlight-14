@@ -11,7 +11,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Starlight.CharacterProfiles.Data;
 
 [Serializable, NetSerializable]
-public partial struct LegacyCharacterData() : ICharacterData
+public sealed partial class LegacyCharacterData() : CharacterData
 {
     [DataField] public HumanoidCharacterProfile LegacyProfile = HumanoidCharacterProfile.DefaultWithSpecies();
 }
@@ -32,7 +32,6 @@ public sealed class LegacyCharacterDataSystem : CharacterDataSystem<LegacyCharac
     {
         var legacyData = profile.GetData<LegacyCharacterData>();
         legacyData.LegacyProfile = legacyData.LegacyProfile.WithSpecies(args.NewSpecies.ID);
-        profile.SetData(legacyData);
     }
 
 

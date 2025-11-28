@@ -10,9 +10,11 @@ namespace Content.Client._Starlight.CharacterEditor.Controls;
 
 public abstract class CharacterEditorDropdownField<TProfileData, TData> :
     SLOptionButton<TData>, ICharacterEditorField
-    where TProfileData: struct, ICharacterData
+    where TProfileData: CharacterData, new()
 {
     [Dependency] private readonly IRobustRandom _random = default!;
+
+    private CharacterProfile? _profile = null;
 
     public CharacterDataSetterDelegate<TProfileData, TData>? ProfileDataSetter;
     public CharacterDataGetterDelegate<TProfileData, TData>? ProfileDataGetter;
@@ -20,7 +22,7 @@ public abstract class CharacterEditorDropdownField<TProfileData, TData> :
     protected override void ItemSelected(TData value)
     {
         if (ProfileDataSetter == null) return;
-        ICharacterEditorField.SetData(value, ProfileDataSetter);
+        ICharacterEditorField.SetData(_profile, value, ProfileDataSetter);
     }
 
     protected override void EnteredTree()
@@ -32,12 +34,14 @@ public abstract class CharacterEditorDropdownField<TProfileData, TData> :
 
     private void HandleProfileDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)
     {
+        _profile = args.Profile;
         if (ProfileDataGetter == null) return;
         SelectByData(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
     }
 
     private void HandleProfileReset(ref readonly CharacterEditorProfileResetUIEvent args)
     {
+        _profile = args.Profile;
         if (ProfileDataGetter == null) return;
         SelectByData(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
     }

@@ -98,11 +98,11 @@ public sealed class CharacterProfileSystem : SharedCharacterProfileSystem
         return newRegistry;
     }
 
-    public CharacterProfile LoadProfile(ICommonSession userSession, int slot, List<ICharacterData> characterData)
+    public CharacterProfile LoadProfile(ICommonSession userSession, int slot, List<CharacterData> characterData)
     {
         var registry = EnsureRegistry(userSession.UserId);
         var newProfile = LoadExistingProfile(characterData);
-        registry.AddProfile(slot, newProfile);
+        registry.AddProfile(newProfile);
         RaiseNetworkEvent(new MsgSyncCharacterProfile(slot, newProfile), userSession);
         return newProfile;
     }

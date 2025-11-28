@@ -1,7 +1,6 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
-using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Starlight.CharacterProfiles;
@@ -12,10 +11,10 @@ public record struct CharacterProfileRandomizeEvent(CharacterProfile Profile);
 // == NetEvents ==
 
 [Serializable, NetSerializable]
-public sealed class MsgUpdateCharacterProfile(int slot, List<ICharacterData> data) : EntityEventArgs
+public sealed class MsgUpdateCharacterProfile(int slot, List<CharacterData> data) : EntityEventArgs
 {
     public int Slot = slot;
-    public List<ICharacterData> Data = data;
+    public List<CharacterData> Data = data;
 
     public MsgUpdateCharacterProfile(int slot, CharacterProfile profile, bool onlyDirty = false) : this(slot,
         profile.GetData(onlyDirty))
@@ -25,11 +24,11 @@ public sealed class MsgUpdateCharacterProfile(int slot, List<ICharacterData> dat
 }
 
 [Serializable, NetSerializable]
-public sealed class MsgSyncCharacterProfile(int slot, List<ICharacterData> data, bool partialData = true) : EntityEventArgs
+public sealed class MsgSyncCharacterProfile(int slot, List<CharacterData> data, bool partialData = true) : EntityEventArgs
 {
     public bool PartialData = partialData;
     public int Slot = slot;
-    public List<ICharacterData> Data = data;
+    public List<CharacterData> Data = data;
 
     public MsgSyncCharacterProfile(int slot, CharacterProfile profile, bool onlyDirty = false) : this(slot,
         profile.GetData(onlyDirty), false)

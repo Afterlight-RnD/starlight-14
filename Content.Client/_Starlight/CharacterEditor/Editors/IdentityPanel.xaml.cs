@@ -28,26 +28,26 @@ public sealed partial class IdentityPanel : CharacterEditorPanel
     }
     private void SetupEditorFields()
     {
-        CharacterBodyTypeField.InitializeAsEnumField((Sex bodyType, CharacterProfile profile, ref CharacterIdentityData data) =>
+        CharacterBodyTypeField.InitializeAsEnumField((Sex bodyType, CharacterProfile profile, CharacterIdentityData data) =>
         {
             data.BodyType = bodyType;
         }, data => data.BodyType);
 
-        CharacterPronounField.InitializeAsEnumField((Gender gender, CharacterProfile profile, ref CharacterIdentityData data) =>
+        CharacterPronounField.InitializeAsEnumField((Gender gender, CharacterProfile profile, CharacterIdentityData data) =>
         {
             data.Gender = gender;
         }, data => data.Gender);
 
-        FirstNameField.InitializeAsTextField( (string name, CharacterProfile profile, ref CharacterIdentityData data) => { data.Name = name; },
+        FirstNameField.InitializeAsTextField( (string name, CharacterProfile profile, CharacterIdentityData data) => { data.Name = name; },
             data => data.Name);
 
-        NicknameField.InitializeAsTextField( (string name,CharacterProfile profile,  ref CharacterIdentityData data) => { data.Nickname = name;},
+        NicknameField.InitializeAsTextField( (string name,CharacterProfile profile,  CharacterIdentityData data) => { data.Nickname = name;},
             data => data.Nickname);
 
-        LastNameField.InitializeAsTextField((string name, CharacterProfile profile, ref CharacterIdentityData data) => { data.LastName = name; },
+        LastNameField.InitializeAsTextField((string name, CharacterProfile profile, CharacterIdentityData data) => { data.LastName = name; },
             data => data.LastName);
 
-        CharacterPhysicalAgeField.InitializeAsTextField((string ageIn, CharacterProfile profile, ref CharacterIdentityData data) =>
+        CharacterPhysicalAgeField.InitializeAsTextField((string ageIn, CharacterProfile profile, CharacterIdentityData data) =>
         {
             if (int.TryParse(ageIn, out var age))
             {
@@ -58,7 +58,7 @@ public sealed partial class IdentityPanel : CharacterEditorPanel
             CharacterPhysicalAgeField.SetTextFieldValue(data.PhysicalAge.ToString());
         }, data => data.PhysicalAge.ToString());
 
-        CharacterChronologicalAgeField.InitializeAsTextField((string ageIn, CharacterProfile profile, ref CharacterIdentityData data) =>
+        CharacterChronologicalAgeField.InitializeAsTextField((string ageIn, CharacterProfile profile, CharacterIdentityData data) =>
         {
             if (int.TryParse(ageIn, out var age))
             {

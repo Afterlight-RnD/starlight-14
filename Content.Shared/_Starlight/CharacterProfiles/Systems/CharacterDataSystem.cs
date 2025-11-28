@@ -11,15 +11,14 @@ public interface ICharacterDataMigrationSystem
 }
 
 public interface ICharacterDataMigration<in TOld, TNew>: ICharacterDataMigrationSystem
-    where TOld: struct, ICharacterData
-    where TNew: struct, ICharacterData
+    where TOld: CharacterData, new()
+    where TNew: CharacterData, new()
 {
     void ICharacterDataMigrationSystem.MigrateProfileData(CharacterProfile profile)
     {
         var oldData = profile.GetData<TOld>();
         var newData = profile.GetData<TNew>();
         MigrateData(oldData, ref newData);
-        profile.SetData(newData, false);
     }
     public void MigrateData(TOld oldData, ref TNew newData);
 }
@@ -54,7 +53,7 @@ public interface ICharacterDataSystem
     public void InitProfile(CharacterProfile profile);
 }
 
-public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataSystem where TData: struct, ICharacterData
+public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataSystem where TData: CharacterData, new()
 {
     [Dependency] protected SharedCharacterProfileSystem ProfileSystem = default!;
     [Dependency] protected IPrototypeManager PrototypeManager = default!;
@@ -129,7 +128,7 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
     void ICharacterDataSystem.RandomizeProfile(CharacterProfile profile)
     {
         var data = _typeFactory.CreateInstance<TData>();
-        profile.SetData(data);
+        Randomize(profile, ref data);
     }
 
     bool ICharacterDataSystem.ValidateProfile(CharacterProfile profile)
@@ -140,24 +139,20 @@ public abstract class CharacterDataSystem<TData> : EntitySystem, ICharacterDataS
     void ICharacterDataSystem.FixProfile(CharacterProfile profile)
     {
         var data = profile.GetData<TData>();
-        if (!FixData(profile, ref data))
-            return;
-        profile.SetData(data);
+        if (FixData(profile, ref data))
+            data.Dirty();
     }
 
     public void InitProfile(CharacterProfile profile)
     {
         var data = profile.GetData<TData>();
         InitData(profile, ref data);
-        profile.SetData(data);
     }
 
     void ICharacterDataSystem.SetProfileDefaults(CharacterProfile profile)
     {
         var data = _typeFactory.CreateInstance<TData>();
         SetDefaults(profile, ref data);
-
-        profile.SetData(data, false);
     }
 
     protected void SubscribeProfileEvent<TEvent>(Action<CharacterProfile,TEvent> handler) where TEvent : struct

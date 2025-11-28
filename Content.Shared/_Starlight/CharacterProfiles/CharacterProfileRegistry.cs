@@ -26,9 +26,9 @@ public sealed class CharacterProfileRegistry
             yield return profile;
     }
 
-    public bool AddProfile(int slot, CharacterProfile profile)
+    public bool AddProfile(int slot, List<CharacterData> characterData)
     {
-        profile.Slot = slot;
+        var profile = new CharacterProfile(characterData) { Slot = slot };
         return AddProfile(profile);
     }
 
@@ -64,14 +64,9 @@ public sealed class CharacterProfileRegistry
     {
         return _profiles.TryGetValue(slot, out profile);
     }
-    public void SetProfileData(int slot, List<ICharacterData> characterData)
+    public T GetProfileData<T>(int slot) where T:CharacterData, new()
     {
-        _profiles[slot].SetData(characterData);
-    }
-
-    private void SetProfileData<T>(int slot, List<ICharacterData> characterData)
-    {
-        _profiles[slot].SetData(characterData);
+        return _profiles[slot].GetData<T>();
     }
 
     public void MarkDirtyProfile(int slot)

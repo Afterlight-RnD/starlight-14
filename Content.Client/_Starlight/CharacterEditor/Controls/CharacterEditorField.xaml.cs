@@ -90,7 +90,7 @@ public sealed partial class CharacterEditorField : SLBox
         CharacterDataSetterDelegate<TData, TEnum> setter,
         CharacterDataGetterDelegate<TData, TEnum> getter,
         string? locPrefix = null)
-        where TData: struct, ICharacterData
+        where TData: CharacterData, new()
         where TEnum : struct, Enum
     {
         InitializationGuard();
@@ -101,7 +101,7 @@ public sealed partial class CharacterEditorField : SLBox
         CharacterDataSetterDelegate<TData, TPrototype> setter,
         CharacterDataGetterDelegate<TData, TPrototype> getter,
         Func<TPrototype, string>? localizedNameGetter = null)
-        where TData : struct, ICharacterData
+        where TData : CharacterData, new()
         where TPrototype : class, IPrototype
     {
         InitializationGuard();
@@ -112,7 +112,7 @@ public sealed partial class CharacterEditorField : SLBox
         CharacterDataSetterDelegate<TData, string> setter,
         CharacterDataGetterDelegate<TData, string> getter,
         bool allowRandomize = false)
-        where TData : struct, ICharacterData
+        where TData : CharacterData, new()
     {
         InitializationGuard();
         var field = ICharacterEditorField.AddTextField(this,  setter, getter);

@@ -30,6 +30,9 @@ public sealed partial class SpeciesGroupList : SLBox
 
     private SpriteSystem? _spriteSystem = null;
     private bool _populated = false;
+
+    private CharacterProfile? _profile = null;
+
     public SpeciesGroupList()
     {
         RobustXamlLoader.Load(this);
@@ -38,6 +41,7 @@ public sealed partial class SpeciesGroupList : SLBox
 
     protected override void EnteredTree()
     {
+        base.EnteredTree();
         SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(OnCharacterDirtied);
         _prototypeManager.PrototypesReloaded += OnProtoReloaded;
         EnsureSpeciesList();
@@ -68,14 +72,16 @@ public sealed partial class SpeciesGroupList : SLBox
         if (_selectedSpecies == species || !_speciesSelectors.TryGetValue(species, out var button)) return;
         button.Pressed = true;
         _selectedSpecies = species;
-        if (!applyProfileChanges)
+        if (!applyProfileChanges || _profile == null)
             return;
-        var req = new EditCharacterProfileFieldUIRequest();
-        RaiseRequest(ref req);
-        if (req.Profile == null)
-            return;
-        req.Profile.EditData<CharacterSpeciesData, ProtoId<SpeciesPrototype>>(species, SetProfileSpecies);
 
+        var speciesProto = _prototypeManager.Index(species);
+        var speciesData = _profile.GetData<CharacterSpeciesData>();
+        speciesData.DollPrototype = speciesProto.DollPrototype;
+        speciesData.BaseSpecies = species;
+        speciesData.Dirty();
+        RaiseUIEvent(new CharacterEditorSpeciesChangedUIEvent(_profile, speciesProto));
+        RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(_profile));
     }
 
     private void SetProfileSpecies(ProtoId<SpeciesPrototype> value, CharacterProfile profile, ref CharacterSpeciesData profileData)
@@ -83,6 +89,7 @@ public sealed partial class SpeciesGroupList : SLBox
         var speciesProto = _prototypeManager.Index(value);
         profileData.DollPrototype = speciesProto.DollPrototype;
         profileData.BaseSpecies = value;
+        profileData.Dirty();
         RaiseUIEvent(new CharacterEditorSpeciesChangedUIEvent(profile, speciesProto));
         RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(profile));
     }

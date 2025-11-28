@@ -37,7 +37,7 @@ public sealed partial class SpeciesSelectorPanel : CharacterEditorPanel
         return data.CustomSpeciesName == string.Empty ? _localizedSpeciesName : data.CustomSpeciesName;
     }
 
-    private void SetCustomSpeciesField(string name, CharacterProfile profile, ref CharacterSpeciesData data)
+    private void SetCustomSpeciesField(string name, CharacterProfile profile, CharacterSpeciesData data)
     {
         if (name != _localizedSpeciesName) data.CustomSpeciesName = name;
     }

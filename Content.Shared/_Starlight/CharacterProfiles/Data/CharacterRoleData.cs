@@ -12,7 +12,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Starlight.CharacterProfiles.Data;
 
 [Serializable, NetSerializable]
-public partial struct CharacterRoleData() : ICharacterData
+public sealed partial class CharacterRoleData() : CharacterData
 {
     [DataField] public ProtoId<JobPrototype> FavoriteJob = new();
 

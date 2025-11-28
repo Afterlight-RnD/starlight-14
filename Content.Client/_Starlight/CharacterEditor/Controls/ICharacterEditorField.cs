@@ -14,36 +14,28 @@ public interface ICharacterEditorField
     public bool Disabled { get; set; }
     public void Randomize();
 
-    public static void SetData<TProfileData, TValue>(TValue value,CharacterDataSetterDelegate<TProfileData, TValue> setter)
-        where TProfileData : struct, ICharacterData
+    public static void SetData<TProfileData, TValue>(CharacterProfile? profile,TValue value, CharacterDataSetterDelegate<TProfileData, TValue> setter)
+        where TProfileData : CharacterData, new()
     {
-        var profileEv = new EditCharacterProfileFieldUIRequest(null);
-        UIEvents.RaiseRequest(ref profileEv);
-        if (profileEv.Profile == null)
+        if (profile == null)
             return;
-        profileEv.Profile?.EditData(value, setter);
-        UIEvents.RaiseEvent(new CharacterEditorProfileDirtiedUIEvent(profileEv.Profile!));
+        var data = profile.GetData<TProfileData>();
+        setter.Invoke(value, profile, data);
+        data.Dirty();
+        UIEvents.RaiseEvent(new CharacterEditorProfileDirtiedUIEvent(profile));
     }
 
-    public static void RandomizeField<TProfileData, TValue>(Func<TValue> dataRandomizer,
-        CharacterDataSetterDelegate<TProfileData, TValue> setter)
-        where TProfileData : struct, ICharacterData
+    public static void RandomizeField<TProfileData, TValue>(CharacterProfile? profile, Func<TValue> dataRandomizer, CharacterDataSetterDelegate<TProfileData, TValue> setter)
+        where TProfileData : CharacterData, new()
     {
-        var profileEv = new EditCharacterProfileFieldUIRequest(null);
-        UIEvents.RaiseRequest(ref profileEv);
-        if (profileEv.Profile == null)
-            return;
         var value = dataRandomizer.Invoke();
-        profileEv.Profile?.EditData(value, setter);
-        UIEvents.RaiseEvent(new CharacterEditorProfileDirtiedUIEvent(profileEv.Profile!));
+        SetData(profile, value, setter);
     }
 
     public static CharacterEditorDropdownEnumField<TData, TEnum> AddEnumField<TData,TEnum>(
-        Control parent,
-        CharacterDataSetterDelegate<TData, TEnum> setter,
-        CharacterDataGetterDelegate<TData, TEnum> getter,
+        Control parent, CharacterDataSetterDelegate<TData, TEnum> setter, CharacterDataGetterDelegate<TData, TEnum> getter,
         string? locPrefix = null)
-        where TData: struct, ICharacterData
+        where TData: CharacterData, new()
         where TEnum : struct, Enum
     {
         var dropdown = new CharacterEditorDropdownEnumField<TData, TEnum>
@@ -57,11 +49,9 @@ public interface ICharacterEditorField
     }
 
     public static CharacterEditorDropdownPrototypeField<TData, TPrototype> AddPrototypeField<TData, TPrototype>(
-        Control parent,
-        CharacterDataSetterDelegate<TData, TPrototype> setter,
-        CharacterDataGetterDelegate<TData, TPrototype> getter,
+        Control parent, CharacterDataSetterDelegate<TData, TPrototype> setter, CharacterDataGetterDelegate<TData, TPrototype> getter,
         Func<TPrototype, string>? localizedNameGetter = null)
-        where TData : struct, ICharacterData
+        where TData : CharacterData, new()
         where TPrototype : class, IPrototype
     {
         var dropdown =
@@ -76,10 +66,8 @@ public interface ICharacterEditorField
     }
 
     public static CharacterEditorTextField<TData> AddTextField<TData>(
-        Control parent,
-        CharacterDataSetterDelegate<TData, string> setter,
-        CharacterDataGetterDelegate<TData, string> getter)
-        where TData : struct, ICharacterData
+        Control parent, CharacterDataSetterDelegate<TData, string> setter, CharacterDataGetterDelegate<TData, string> getter)
+        where TData : CharacterData, new()
     {
         var editField =
             new CharacterEditorTextField<TData>

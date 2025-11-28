@@ -8,7 +8,7 @@ namespace Content.Client._Starlight.CharacterEditor.Controls;
 [Virtual]
 public class CharacterEditorDropdownEnumField<TProfileData, TEnum>
     : CharacterEditorDropdownField<TProfileData, TEnum>
-    where TProfileData : struct, ICharacterData
+    where TProfileData : CharacterData, new()
     where TEnum: struct, Enum
 {
     public override IEnumerable<TEnum> EnumerateOptions()

@@ -11,7 +11,7 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Starlight.CharacterProfiles.Data;
 
 [Serializable, NetSerializable]
-public partial struct CharacterSpeciesData(): ICharacterData
+public sealed partial class CharacterSpeciesData(): CharacterData
 {
     [DataField] public ProtoId<SpeciesPrototype> BaseSpecies = new();
     [DataField] public string CustomSpeciesName = string.Empty;
@@ -58,7 +58,6 @@ public sealed class CharacterSpeciesDataSystem : CharacterDataSystem<CharacterSp
 
         existing.OldAge = newSpecies.OldAge;
         existing.YoungAge = newSpecies.YoungAge;
-        profile.SetData(existing);
         RaiseProfileEvent(profile, new CharacterSpeciesData.SpeciesChangedEvent(newSpecies));
     }
 

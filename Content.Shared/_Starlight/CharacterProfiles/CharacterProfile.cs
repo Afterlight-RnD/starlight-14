@@ -1,88 +1,96 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using System.Linq;
 using Content.Shared._Starlight.CharacterProfiles.Systems;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager;
 
 namespace Content.Shared._Starlight.CharacterProfiles;
 
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition]
 public sealed partial class CharacterProfile
 {
+    [Dependency] private readonly ISerializationManager _serMan = default!;
     [DataField] public int Slot;
 
-    //TODO: probably should have some custom serialization stuff so that types aren't serialized into yaml?
-    private List<Type> _dataTypes = new();
-
-    [DataField] private List<ICharacterData> _data = new();
+    [DataField] private Dictionary<Type,CharacterData> _data = new();
 
     [Access(typeof(SharedCharacterProfileSystem))]
 
     [DataField]
-    public bool Activate { get; set; }
-    public bool HasDirtyData => _dirtyData.Count > 0 || _fullDirty;
+    public bool Active { get; set; }
+
+    public bool HasDirtyData
+    {
+        get
+        {
+            foreach (var (_,data) in _data)
+            {
+                if (data.IsDirty)
+                    return true;
+            }
+            return false;
+        }
+    }
 
     [Access(typeof(SharedCharacterProfileSystem))]
     public bool HasInvalidData { get; set; } = false;
 
-    private bool _fullDirty = false;
-    private HashSet<Type> _dirtyData = new();
-
     public CharacterProfile(CharacterProfile other)
     {
-        SetData(other.GetData(), false);
+        IoCManager.InjectDependencies(this);
+        foreach (var (type, data) in other._data)
+            _data.Add(type, _serMan.CreateCopy(data, notNullableOverride:true));
     }
 
-    public CharacterProfile(List<ICharacterData> dataList)
+    public CharacterProfile(List<CharacterData> dataList)
     {
-        SetData(dataList, false);
+        IoCManager.InjectDependencies(this);
+        foreach (var data in dataList)
+            _data.Add(data.GetType(), data);
     }
 
-    public List<ICharacterData> GetData(bool onlyDirty = true)
+
+    public void SetData(List<CharacterData> dataList)
     {
-        if (!onlyDirty || _fullDirty) return _data;
-        var list = new List<ICharacterData>();
-        foreach (var data in _data)
+        foreach (var newData in dataList)
         {
-            if (_dirtyData.Contains(data.GetType()))
-                list.Add(data);
+            var newDataType = newData.GetType();
+            if (_data.TryGetValue(newDataType, out var data))
+            {
+                _serMan.CopyTo(newData, ref data, notNullableOverride:true);
+                continue;
+            }
+            _data.Add(newDataType,newData);
         }
+    }
+
+    public List<CharacterData> GetData(bool onlyDirty = true)
+    {
+        if (!onlyDirty) return _data.Values.ToList();
+        var list = new List<CharacterData>();
+        foreach (var (_,data) in _data)
+            if (data.IsDirty)
+                list.Add(data);
         return list;
     }
 
-
-    public IEnumerable<ICharacterData> IterateCharacterData()
+    public IEnumerable<CharacterData> IterateCharacterData()
     {
-        foreach (var  data in _data)
+        foreach (var  (_,data) in _data)
             yield return data;
     }
 
-    public T GetData<T>() where T: struct, ICharacterData
+    public T GetData<T>() where T : CharacterData, new()
     {
-        return (T)_data[_dataTypes.IndexOf(typeof(T))];
-    }
-
-    public void SetData<T>(T data, bool dirty = true) where T: struct, ICharacterData
-    {
-        _data[_dataTypes.IndexOf(typeof(T))] = data;
-
-        if (!dirty) return;
-        _dirtyData.Add(typeof(T));
-    }
-
-    public void EditData<TProfileData, TData>(TData data, CharacterDataSetterDelegate<TProfileData, TData> setterDelegate)
-        where TProfileData: struct, ICharacterData
-    {
-        var dataIdx = _dataTypes.IndexOf(typeof(TProfileData));
-        var profileData = (TProfileData)_data[dataIdx];
-        setterDelegate.Invoke(data, this, ref profileData);
-        _data[dataIdx] = profileData;
-        _dirtyData.Add(typeof(TProfileData));
+        return (T)_data[typeof(T)];
     }
 
     public void MarkDirty()
     {
-        _fullDirty = true;
+        foreach (var (_,data) in _data)
+            data.IsDirty = true;
     }
 
     [Access(typeof(CharacterProfileRegistry),
@@ -91,47 +99,22 @@ public sealed partial class CharacterProfile
         typeof(MsgSyncCharacterProfile))]
     public void ClearDirty()
     {
-        _dirtyData.Clear();
-        _fullDirty = false;
-    }
-
-    public void SetData(List<ICharacterData> newData, bool shouldDirty = true)
-    {
-
-        void UpdateData(Type dataType, ICharacterData data)
-        {
-            var dataIdx = _dataTypes.IndexOf(dataType);
-            if (dataIdx == -1)
-            {
-                _data.Add(data);
-                _dataTypes.Add(dataType);
-                return;
-            }
-            _data[dataIdx] = data;
-        }
-
-        if (shouldDirty)
-        {
-            foreach (var data in newData)
-            {
-                var dataType = data.GetType();
-                UpdateData(dataType, data);
-                _dirtyData.Add(dataType);
-            }
-            return;
-        }
-        foreach (var data in newData)
-        {
-            var dataType = data.GetType();
-            UpdateData(dataType, data);
-        }
+        foreach (var (_,data) in _data)
+            data.IsDirty = false;
     }
 };
 
-public interface ICharacterData;
+[DataDefinition, NetSerializable, Serializable]
+public abstract partial class CharacterData
+{
+    [Access(typeof(CharacterProfile))] public bool IsDirty { get => _dirty; set => _dirty = value; }
+    [NonSerialized] private bool _dirty;
 
-public delegate void CharacterDataSetterDelegate<TCharacterData, in TValue>( TValue value, CharacterProfile profile,  ref TCharacterData profileData)
-    where TCharacterData: struct, ICharacterData;
+    public void Dirty() { _dirty = true; }
+}
+
+public delegate void CharacterDataSetterDelegate<in TCharacterData, in TValue>(TValue value, CharacterProfile profile, TCharacterData profileData)
+    where TCharacterData: CharacterData, new();
 
 public delegate TValue CharacterDataGetterDelegate<in TCharacterData, out TValue>(TCharacterData data)
-    where TCharacterData: struct, ICharacterData;
+    where TCharacterData: CharacterData, new();
