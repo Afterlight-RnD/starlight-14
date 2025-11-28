@@ -11,10 +11,11 @@ namespace Content.Client._Starlight.CharacterEditor.Systems;
 public sealed partial class CharacterEditorSystem : ProfileEditorSystem<CharacterEditorControl, CharacterEditorStep>
 {
     [Dependency] private readonly CharacterProfileSystem _characterProfileSystem = default!;
+
     public Entity<SpriteComponent> EnsurePreviewEntity(CharacterEditorControl editorControl)
     {
         if (editorControl.LiveProfile == null)
-             throw new InvalidOperationException("Cannot ensure preview without a live profile!");
+            throw new InvalidOperationException("Cannot ensure preview without a live profile!");
         if (editorControl.PreviewEntity != null)
             return editorControl.PreviewEntity.Value;
         var dollEnt = _characterProfileSystem.CreateProfileDoll(editorControl.LiveProfile, editorControl.PreviewMode);
@@ -24,44 +25,44 @@ public sealed partial class CharacterEditorSystem : ProfileEditorSystem<Characte
     }
 
     public void StartEditingSlot(CharacterEditorControl editorControl, int slot)
-     {
-         if (!_characterProfileSystem.TryGetCharacterProfile(slot, out var profile))
-         {
-             Log.Error($"Tried to start editing slot:{slot} but it doesn't have a profile!");
-             return;
-         }
-         if (editorControl.LiveProfile != null)
-         {
-             if (editorControl.LiveProfile.Slot == slot)
-                 return;
-         }
-         else ClearPreviewEntity(editorControl);
-         editorControl.LiveProfile = new CharacterProfile(profile.GetData(false)) { Slot = slot };
-         editorControl.PreviewEntity = EnsurePreviewEntity(editorControl);
-         RefreshPreviewVisuals(editorControl);
-         RaiseUIEvent(new CharacterEditorPreviewChangedUIEvent(editorControl.PreviewEntity.Value));
-         RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(editorControl.LiveProfile));
-     }
+    {
+        if (!_characterProfileSystem.TryGetCharacterProfile(slot, out var profile))
+        {
+            Log.Error($"Tried to start editing slot:{slot} but it doesn't have a profile!");
+            return;
+        }
 
-         public void RefreshPreviewVisuals(CharacterEditorControl editorControl)
-     {
-         if (editorControl.LiveProfile == null)
+        if (editorControl.LiveProfile != null)
+        {
+            if (editorControl.LiveProfile.Slot == slot)
+                return;
+        }
+        else ClearPreviewEntity(editorControl);
+
+        editorControl.LiveProfile = new CharacterProfile(profile.GetData(false)) { Slot = slot };
+        editorControl.PreviewEntity = EnsurePreviewEntity(editorControl);
+        RefreshPreviewVisuals(editorControl);
+        RaiseUIEvent(new CharacterEditorPreviewChangedUIEvent(editorControl.PreviewEntity.Value));
+        RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(editorControl.LiveProfile));
+    }
+
+    public void RefreshPreviewVisuals(CharacterEditorControl editorControl)
+    {
+        if (editorControl.LiveProfile == null)
             ClearPreviewEntity(editorControl);
 
-         editorControl.PreviewEntity = EnsurePreviewEntity(editorControl);
-     }
+        editorControl.PreviewEntity = EnsurePreviewEntity(editorControl);
+    }
 
-     public void ClearPreviewEntity(CharacterEditorControl editorControl)
-     {
-         if (editorControl.PreviewEntity != null)
-         {
-             EntityManager.DeleteEntity(editorControl.PreviewEntity);
-             editorControl.PreviewEntity = null;
-         }
-     }
-
+    public void ClearPreviewEntity(CharacterEditorControl editorControl)
+    {
+        if (editorControl.PreviewEntity != null)
+        {
+            EntityManager.DeleteEntity(editorControl.PreviewEntity);
+            editorControl.PreviewEntity = null;
+        }
+    }
 }
-
 
 // public sealed partial class CharacterEditorSystem : UISystem
 // {
