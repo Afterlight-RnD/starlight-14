@@ -45,13 +45,15 @@ public abstract class DataRegistry<TBaseData> : IDataRegistry
     }
 
     public bool TryGetData<TData>(Guid id, [NotNullWhen(true)] out TData? data)
-        where TData: class,TBaseData, new()
+        where TData: class, IDataEntry, new()
     {
         data = null;
         if (!TryGetEntry(id, out var entry))
             return false;
-        data = entry.GetData<TData>();
-        return true;
+        var foundData = entry.GetData(typeof(TData));
+        if (foundData is TData cast)
+            data = cast;
+        return data != null;
     }
 
     public IEnumerable<IDataEntry> IterateEntries(Guid id)

@@ -59,6 +59,11 @@ where TBaseData: class, IDataEntry
         return (TData)_data[typeof(TData)];
     }
 
+    public TBaseData GetData(Type type)
+    {
+        return _data[type];
+    }
+
     public void CopyData<TData>(ISerializationManager serialization, TData data) where TData : TBaseData, new()
     {
         var target = GetData<TData>();
