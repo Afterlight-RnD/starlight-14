@@ -38,6 +38,7 @@ public abstract class ProfileEditorSystem<TEditorControl, TStep> : BoundUISystem
             _editor.InjectControls(boundControl);
             foreach (var step in  _editor.IterateSteps())
                 StepInitialized(boundControl, step);
+            boundControl.EditorControlsInjected = true;
         }
         if (_editor is { CurrentStep: -1, StepCount: > 0 })
             SetEditorStep(boundControl, 0);

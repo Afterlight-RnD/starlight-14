@@ -9,8 +9,6 @@ public record struct LobbyInfoUpdatedUIEvent(string? NewInfo);
 
 public record struct RoundStateChangedUIEvent(bool Started, bool Paused);
 
-public record struct LobbyBackgroundChangedUIEvent(Texture? BackgroundTexture);
-
 public record struct PlayerReadyStatusChangedUIEvent(bool NewReady);
 
 public record struct RoundStartTimeChangedUIEvent(TimeSpan StartTime);

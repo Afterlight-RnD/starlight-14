@@ -17,7 +17,7 @@ public abstract class BoundUISystem<TControl> : UISystem where TControl: Control
         UIEvents.Subscribe<TControl, ControlExitedTreeUIEvent>(HandleBoundControlExitedTree);
     }
 
-    public IEnumerable<TControl> IterateBoundControl()
+    public IEnumerable<TControl> IterateBoundControls()
     {
         foreach (var control in _boundControls)
             yield return control;

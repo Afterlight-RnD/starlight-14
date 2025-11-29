@@ -6,13 +6,25 @@ using Content.Client._Starlight.UI.Core;
 
 namespace Content.Client._Starlight.CharacterProfiles.UI;
 
-public sealed class CharacterSlotViewSystem : UISystem
+public sealed class CharacterSlotViewSystem : BoundUISystem<CharacterSlotView>
 {
     [Dependency] private readonly CharacterProfileSystem _characterProfileSystem = default!;
     public override void Initialize()
     {
+        base.Initialize();
         SubscribeUIEvent<CharacterSlotView,CharacterSlotView.SlotChangedUIEvent>(OnSlotChanged);
     }
+
+    protected override void BoundControlEnteredTree(CharacterSlotView boundControl)
+    {
+        UpdateLinkedEntity(boundControl, boundControl.Slot);
+    }
+
+    protected override void BoundControlExitedTree(CharacterSlotView boundControl)
+    {
+        boundControl.SetEntity(null);
+    }
+
     private void OnSlotChanged(CharacterSlotView viewControl, ref readonly CharacterSlotView.SlotChangedUIEvent ev)
     {
         UpdateLinkedEntity(viewControl, viewControl.Slot);

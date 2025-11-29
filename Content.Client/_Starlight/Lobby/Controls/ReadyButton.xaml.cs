@@ -18,11 +18,8 @@ namespace Content.Client._Starlight.Lobby.Controls;
 public sealed partial class ReadyButton : SLBox
 {
     [Dependency] private readonly IClientPreferencesManager _preferences = default!;
-    [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
 
     private LateJoinGui? _lateJoinWindow = null;
-
-    private bool _gameStarted = false;
 
     public ReadyButton()
     {
@@ -30,24 +27,11 @@ public sealed partial class ReadyButton : SLBox
         IoCManager.InjectDependencies(this);
         Ready.TooltipSupplier = GetReadyButtonTooltip;
         LateJoinButton.TooltipSupplier = GetLateJoinButtonTooltip;
-        Ready.OnToggled += OnReadyToggled;
     }
 
-    protected override void EnteredTree()
+    public void Refresh(bool gameStarted, bool cannotLateJoin)
     {
-        SubscribeUIEvent<RoundStateChangedUIEvent>(OnRoundStateChanged);
-    }
-
-    private void OnRoundStateChanged(ref readonly RoundStateChangedUIEvent args)
-    {
-        _gameStarted = args.Started;
-        OnLobbyUpdated();
-    }
-
-
-    private void OnLobbyUpdated()
-    {
-        if (_gameStarted)
+        if (gameStarted)
         {
             Ready.Pressed = false;
             Ready.Disabled = false;
@@ -60,7 +44,7 @@ public sealed partial class ReadyButton : SLBox
                 tooltip.Text = LateJoinButtonTooltipText();
             }
             Observe.Disabled = false;
-            LateJoinButton.Disabled = (_preferences.Preferences?.JobPrioritiesFiltered().Count ?? 0) == 0;
+            LateJoinButton.Disabled = cannotLateJoin;
         }
         else
         {
@@ -102,20 +86,6 @@ public sealed partial class ReadyButton : SLBox
         // }
         // else
         //     //Lobby!.PlaytimeComment.Visible = false;
-    }
-
-    private void OnReadyToggled(BaseButton.ButtonToggledEventArgs args)
-    {
-        SetReady(args.Pressed);
-    }
-
-    public void SetReady(bool newReady)
-    {
-        if (_gameStarted)
-        {
-            return;
-        }
-        _consoleHost.ExecuteCommand($"toggleready {newReady}");
     }
 
     private string ReadyButtonTooltipText()

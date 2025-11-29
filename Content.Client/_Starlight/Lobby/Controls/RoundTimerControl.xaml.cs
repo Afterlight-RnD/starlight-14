@@ -13,9 +13,11 @@ public sealed partial class RoundTimerControl : SLBox
 {
     [Dependency] private readonly IGameTiming _gameTiming = default!;
 
-    private TimeSpan _roundStartTime;
-    private bool _isStarted = false;
-    private bool _isPaused = false;
+
+    public TimeSpan RoundStartTimeSpan;
+    public TimeSpan RoundStartTime;
+    public bool IsStarted = false;
+    public bool IsPaused = false;
 
     public RoundTimerControl()
     {
@@ -23,30 +25,12 @@ public sealed partial class RoundTimerControl : SLBox
         IoCManager.InjectDependencies(this);
     }
 
-
-    protected override void EnteredTree()
+    public void Refresh()
     {
-        SubscribeUIEvent<RoundStateChangedUIEvent>(OnRoundStateChanged);
-        SubscribeUIEvent<RoundStartTimeChangedUIEvent>(OnRoundStartTimeChanged);
-    }
-
-    private void OnRoundStartTimeChanged(ref readonly RoundStartTimeChangedUIEvent args)
-    {
-        _roundStartTime = args.StartTime;
-    }
-
-    private void OnRoundStateChanged(ref readonly RoundStateChangedUIEvent args)
-    {
-        _isStarted = args.Started;
-        _isPaused = args.Paused;
-    }
-
-    public void Update(TimeSpan roundStartTimeSpan)
-    {
-        if (_isStarted)
+        if (IsStarted)
         {
             StartTime.Text = string.Empty;
-            var roundTime = _gameTiming.CurTime.Subtract(_roundStartTime);
+            var roundTime = _gameTiming.CurTime.Subtract(RoundStartTime);
             StartTime.Text = string.Empty;
             StationTime.Text = Loc.GetString("lobby-state-player-status-round-time", ("hours", roundTime.Hours), ("minutes", roundTime.Minutes));
             return;
@@ -55,18 +39,18 @@ public sealed partial class RoundTimerControl : SLBox
 
         string text;
 
-        if (_isPaused)
+        if (IsPaused)
         {
             text = Loc.GetString("lobby-state-paused");
         }
-        else if (_roundStartTime < _gameTiming.CurTime)
+        else if (RoundStartTime < _gameTiming.CurTime)
         {
             StartTime.Text = Loc.GetString("lobby-state-soon");
             return;
         }
         else
         {
-            var difference = _roundStartTime - _gameTiming.CurTime;
+            var difference = RoundStartTime - _gameTiming.CurTime;
             var seconds = difference.TotalSeconds;
             if (seconds < 0)
             {
@@ -82,5 +66,10 @@ public sealed partial class RoundTimerControl : SLBox
             }
         }
         StartTime.Text = Loc.GetString("lobby-state-round-start-countdown-text", ("timeLeft", text));
+    }
+
+    protected override void FrameUpdate(FrameEventArgs args)
+    {
+        Refresh();
     }
 }
