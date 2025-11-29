@@ -10,6 +10,8 @@ namespace Content.Client._Starlight.ProfileEditor;
 public interface IProfileEditorControl : ISLControl
 {
     public bool EditorControlsInjected { get; set; }
+
+    public bool RequireExitConfirmation { get; set; }
 };
 
 public sealed class ProfileEditor<TEditorControl, TStep>

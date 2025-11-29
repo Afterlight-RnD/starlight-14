@@ -35,6 +35,13 @@ public abstract class BoundUISystem<TControl> : UISystem where TControl: Control
         BoundControlExitedTree(control);
     }
 
+    public override void Shutdown()
+    {
+        foreach (var boundControl in IterateBoundControls())
+            BoundControlExitedTree(boundControl);
+        base.Shutdown();
+    }
+
     [MustCallBase(true)]
     protected abstract void BoundControlEnteredTree(TControl boundControl);
     [MustCallBase(true)]

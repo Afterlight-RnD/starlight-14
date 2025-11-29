@@ -22,6 +22,6 @@ public sealed partial class LobbyPlayerBarWidget : SLWidget
 
     private void HandlePressed(BaseButton.ButtonEventArgs obj)
     {
-        UIEvents.RaiseEvent(new EnterCharacterEditorUIEvent());
+        // UIEvents.RaiseEvent(new EnterCharacterEditorUIEvent());
     }
 }

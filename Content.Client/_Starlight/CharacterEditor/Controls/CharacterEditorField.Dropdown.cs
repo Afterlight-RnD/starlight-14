@@ -28,23 +28,23 @@ public abstract class CharacterEditorDropdownField<TProfileData, TData> :
     protected override void EnteredTree()
     {
         base.EnteredTree();
-        SubscribeUIEvent<CharacterEditorProfileResetUIEvent>(HandleProfileReset);
-        SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(HandleProfileDirtied);
+        // SubscribeUIEvent<CharacterEditorProfileResetUIEvent>(HandleProfileReset);
+        // SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(HandleProfileDirtied);
     }
 
-    private void HandleProfileDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)
-    {
-        _profile = args.Profile;
-        if (ProfileDataGetter == null) return;
-        SelectByData(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
-    }
-
-    private void HandleProfileReset(ref readonly CharacterEditorProfileResetUIEvent args)
-    {
-        _profile = args.Profile;
-        if (ProfileDataGetter == null) return;
-        SelectByData(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
-    }
+    // private void HandleProfileDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)
+    // {
+    //     _profile = args.Profile;
+    //     if (ProfileDataGetter == null) return;
+    //     SelectByData(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
+    // }
+    //
+    // private void HandleProfileReset(ref readonly CharacterEditorProfileResetUIEvent args)
+    // {
+    //     _profile = args.Profile;
+    //     if (ProfileDataGetter == null) return;
+    //     SelectByData(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
+    // }
 
     public void Randomize()
     {

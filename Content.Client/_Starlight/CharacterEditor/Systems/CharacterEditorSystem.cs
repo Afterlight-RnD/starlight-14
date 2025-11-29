@@ -20,7 +20,7 @@ public sealed partial class CharacterEditorSystem : ProfileEditorSystem<Characte
             return editorControl.PreviewEntity.Value;
         var dollEnt = _characterProfileSystem.CreateProfileDoll(editorControl.LiveProfile, editorControl.PreviewMode);
         editorControl.PreviewEntity = (dollEnt, Comp<SpriteComponent>(dollEnt));
-        RaiseUIEvent(new CharacterEditorPreviewChangedUIEvent(editorControl.PreviewEntity.Value));
+        // RaiseUIEvent(new CharacterEditorPreviewChangedUIEvent(editorControl.PreviewEntity.Value));
         return editorControl.PreviewEntity.Value;
     }
 
@@ -42,8 +42,8 @@ public sealed partial class CharacterEditorSystem : ProfileEditorSystem<Characte
         editorControl.LiveProfile = new CharacterProfile(profile.GetData(false)) { Slot = slot };
         editorControl.PreviewEntity = EnsurePreviewEntity(editorControl);
         RefreshPreviewVisuals(editorControl);
-        RaiseUIEvent(new CharacterEditorPreviewChangedUIEvent(editorControl.PreviewEntity.Value));
-        RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(editorControl.LiveProfile));
+        // RaiseUIEvent(new CharacterEditorPreviewChangedUIEvent(editorControl.PreviewEntity.Value));
+        // RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(editorControl.LiveProfile));
     }
 
     public void RefreshPreviewVisuals(CharacterEditorControl editorControl)

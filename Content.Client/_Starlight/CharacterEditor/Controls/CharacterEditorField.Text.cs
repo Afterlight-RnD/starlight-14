@@ -23,23 +23,23 @@ where TProfileData: CharacterData, new()
     protected override void EnteredTree()
     {
         base.EnteredTree();
-        SubscribeUIEvent<CharacterEditorProfileResetUIEvent>(HandleProfileReset);
-        SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(HandleProfileDirtied);
+        // SubscribeUIEvent<CharacterEditorProfileResetUIEvent>(HandleProfileReset);
+        // SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(HandleProfileDirtied);
     }
 
-    private void HandleProfileDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)
-    {
-        _profile = args.Profile;
-        if (ProfileDataGetter == null) return;
-        SetText(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
-    }
-
-    private void HandleProfileReset(ref readonly CharacterEditorProfileResetUIEvent args)
-    {
-        _profile = args.Profile;
-        if (ProfileDataGetter == null) return;
-        SetText(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
-    }
+    // private void HandleProfileDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)
+    // {
+    //     _profile = args.Profile;
+    //     if (ProfileDataGetter == null) return;
+    //     SetText(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
+    // }
+    //
+    // private void HandleProfileReset(ref readonly CharacterEditorProfileResetUIEvent args)
+    // {
+    //     _profile = args.Profile;
+    //     if (ProfileDataGetter == null) return;
+    //     SetText(ProfileDataGetter.Invoke(args.Profile.GetData<TProfileData>()));
+    // }
 
     public void Randomize()
     {

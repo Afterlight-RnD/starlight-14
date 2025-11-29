@@ -42,7 +42,7 @@ public sealed partial class SpeciesGroupList : SLBox
     protected override void EnteredTree()
     {
         base.EnteredTree();
-        SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(OnCharacterDirtied);
+        // SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(OnCharacterDirtied);
         _prototypeManager.PrototypesReloaded += OnProtoReloaded;
         EnsureSpeciesList();
     }
@@ -62,11 +62,11 @@ public sealed partial class SpeciesGroupList : SLBox
         PopulateSpecies();
     }
 
-    private void OnCharacterDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)
-    {
-        EnsureSpeciesList(); //we have to do a differed init because UIScreen lifecycle bs
-        SelectSpecies(args.Profile.GetData<CharacterSpeciesData>().BaseSpecies, false);
-    }
+    // private void OnCharacterDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)
+    // {
+    //     EnsureSpeciesList(); //we have to do a differed init because UIScreen lifecycle bs
+    //     SelectSpecies(args.Profile.GetData<CharacterSpeciesData>().BaseSpecies, false);
+    // }
     public void SelectSpecies(ProtoId<SpeciesPrototype> species, bool applyProfileChanges)
     {
         if (_selectedSpecies == species || !_speciesSelectors.TryGetValue(species, out var button)) return;
@@ -80,8 +80,8 @@ public sealed partial class SpeciesGroupList : SLBox
         speciesData.DollPrototype = speciesProto.DollPrototype;
         speciesData.BaseSpecies = species;
         speciesData.Dirty();
-        RaiseUIEvent(new CharacterEditorSpeciesChangedUIEvent(_profile, speciesProto));
-        RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(_profile));
+        // RaiseUIEvent(new CharacterEditorSpeciesChangedUIEvent(_profile, speciesProto));
+        // RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(_profile));
     }
 
     private void SetProfileSpecies(ProtoId<SpeciesPrototype> value, CharacterProfile profile, ref CharacterSpeciesData profileData)
@@ -90,8 +90,8 @@ public sealed partial class SpeciesGroupList : SLBox
         profileData.DollPrototype = speciesProto.DollPrototype;
         profileData.BaseSpecies = value;
         profileData.Dirty();
-        RaiseUIEvent(new CharacterEditorSpeciesChangedUIEvent(profile, speciesProto));
-        RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(profile));
+        // RaiseUIEvent(new CharacterEditorSpeciesChangedUIEvent(profile, speciesProto));
+        // RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(profile));
     }
 
     public SpeciesSelectorButton GetButtonForSpecies(ProtoId<SpeciesPrototype> species)

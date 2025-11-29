@@ -4,11 +4,11 @@
     Orientation="Vertical">
     <BoxContainer Orientation="Horizontal" HorizontalExpand="True" HorizontalAlignment="Center">
         <Button Name="SelectCharacter" Access="Public" Text="{Loc 'character-editor-open-character-list-button'}"/>
-        <Button Name="CreateCharacter" Access="Protected" Text="{Loc 'character-editor-create-character-button'}"/>
-        <Button Name="SaveChanges" Access="Protected"
+        <Button Name="CreateCharacter" Access="Public" Text="{Loc 'character-editor-create-character-button'}"/>
+        <Button Name="SaveChanges" Access="Public"
                 Disabled="True"
                 Text="{Loc 'character-editor-save-character-changes-button'}"/>
-        <Button Name="DiscardChanges" Access="Protected"
+        <Button Name="DiscardChanges" Access="Public"
                 Disabled="True"
                 Text="{Loc 'character-editor-discard-character-changes-button'}"/>
     </BoxContainer>

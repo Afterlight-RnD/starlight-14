@@ -7,6 +7,7 @@ namespace Content.Client._Starlight.UI.Core;
 
 public abstract class UISystem : EntitySystem
 {
+    [Dependency] protected readonly IUserInterfaceManager UIManager = default!;
     [Dependency] protected readonly SLUIManager SLUIManager = default!;
     [Dependency] protected readonly UIEventBus UIEvents = default!;
 

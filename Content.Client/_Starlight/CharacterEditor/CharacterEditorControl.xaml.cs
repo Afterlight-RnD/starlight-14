@@ -14,9 +14,10 @@ using Robust.Client.UserInterface.XAML;
 namespace Content.Client._Starlight.CharacterEditor;
 
 [GenerateTypedNameReferences]
-public sealed partial class CharacterEditorControl : SLControl, IProfileEditorControl
+public sealed partial class CharacterEditorControl : SLWidget, IProfileEditorControl
 {
     public bool EditorControlsInjected { get; set; }
+    public bool RequireExitConfirmation { get; set; }
 
     public CharacterProfile? LiveProfile { get; set; } = null;
     public Entity<SpriteComponent>? PreviewEntity = null;
@@ -34,24 +35,6 @@ public sealed partial class CharacterEditorControl : SLControl, IProfileEditorCo
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
-        CharacterSelectorButtons.SelectCharacter.OnToggled += OnSelectCharacterPressed;
-    }
-
-    protected override void EnteredTree()
-    {
-        base.EnteredTree();
-        SubscribeUIEvent<SelectCharacterProfileUIEvent>(OnCharacterSelected);
-    }
-
-    private void OnSelectCharacterPressed(BaseButton.ButtonToggledEventArgs args)
-    {
-        TogglePopoutPanel(args.Pressed);
-    }
-
-    private void OnCharacterSelected(ref readonly SelectCharacterProfileUIEvent args)
-    {
-        TogglePopoutPanel(false);
-        CharacterSelectorButtons.SelectCharacter.Pressed = false;
     }
 
     public void TogglePopoutPanel(bool visible)

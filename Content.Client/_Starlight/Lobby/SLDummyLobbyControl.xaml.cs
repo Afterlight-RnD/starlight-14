@@ -25,8 +25,8 @@ public sealed partial class SLDummyLobbyControl : SLControl
     protected override void EnteredTree()
     {
         base.EnteredTree();
-        SubscribeUIEvent<EnterCharacterEditorUIEvent>(HandleEnterCharacterEditor);
-        SubscribeUIEvent<ExitCharacterEditorUIEvent>(HandleExitCharacterEditor);
+        // SubscribeUIEvent<EnterCharacterEditorUIEvent>(HandleEnterCharacterEditor);
+        // SubscribeUIEvent<ExitCharacterEditorUIEvent>(HandleExitCharacterEditor);
     }
 
     public void ChangeLobbyBackground(Texture? texture)
@@ -34,15 +34,15 @@ public sealed partial class SLDummyLobbyControl : SLControl
         Background.Texture = texture;
     }
 
-    private void HandleExitCharacterEditor(ref readonly ExitCharacterEditorUIEvent args)
-    {
-        CharacterEditor.Visible = false;
-        Lobby.Visible = true;
-    }
-
-    private void HandleEnterCharacterEditor(ref readonly EnterCharacterEditorUIEvent args)
-    {
-        Lobby.Visible = false;
-        CharacterEditor.Visible = true;
-    }
+    // private void HandleExitCharacterEditor(ref readonly ExitCharacterEditorUIEvent args)
+    // {
+    //     CharacterEditor.Visible = false;
+    //     Lobby.Visible = true;
+    // }
+    //
+    // private void HandleEnterCharacterEditor(ref readonly EnterCharacterEditorUIEvent args)
+    // {
+    //     Lobby.Visible = false;
+    //     CharacterEditor.Visible = true;
+    // }
 }

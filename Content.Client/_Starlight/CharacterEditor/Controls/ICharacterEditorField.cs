@@ -22,7 +22,7 @@ public interface ICharacterEditorField
         var data = profile.GetData<TProfileData>();
         setter.Invoke(value, profile, data);
         data.Dirty();
-        UIEvents.RaiseEvent(new CharacterEditorProfileDirtiedUIEvent(profile));
+        // UIEvents.RaiseEvent(new CharacterEditorProfileDirtiedUIEvent(profile));
     }
 
     public static void RandomizeField<TProfileData, TValue>(CharacterProfile? profile, Func<TValue> dataRandomizer, CharacterDataSetterDelegate<TProfileData, TValue> setter)
