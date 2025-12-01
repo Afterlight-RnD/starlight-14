@@ -54,13 +54,11 @@ public sealed partial class CharacterMenuWidget : CharacterEditorWidget
 
     private void DiscardPressed(BaseButton.ButtonEventArgs obj)
     {
-        if (OwningEditor != null)
-            RaiseUIEvent(new EditorChangesDiscardedUIEvent(OwningEditor));
+        RaiseEditorUIEvent(new EditorChangesDiscardedUIEvent());
     }
 
     private void SaveChangesPressed(BaseButton.ButtonEventArgs obj)
     {
-        if (OwningEditor != null)
-            RaiseUIEvent(new EditorChangesAppliedUIEvent(OwningEditor));
+        RaiseEditorUIEvent(new EditorChangesAppliedUIEvent());
     }
 }

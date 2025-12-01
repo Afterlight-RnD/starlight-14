@@ -8,7 +8,7 @@ using Robust.Client.UserInterface;
 namespace Content.Client._Starlight.ProfileEditor;
 
 public abstract class ProfileEditorSystem<TEditorControl, TStep> : BoundUISystem<TEditorControl>
-    where TEditorControl : Control, ISLControl, IProfileEditorControl, new()
+    where TEditorControl : Control, ISLControl, IProfileEditorControl<TEditorControl>, new()
     where TStep : ProfileEditorStep<TEditorControl>
 {
     private bool _stepLock = false;

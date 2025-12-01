@@ -9,9 +9,10 @@ namespace Content.Client._Starlight.CharacterEditor;
 // == Events ==
 
 //== UI Events ==
-public record struct ExitEditorUIEvent(CharacterEditorControl EditorControl);
-public record struct EditorIsDirtyUIEvent(CharacterEditorControl EditorControl);
-public record struct EditorChangesAppliedUIEvent(CharacterEditorControl EditorControl);
-public record struct EditorChangesDiscardedUIEvent(CharacterEditorControl EditorControl);
+public record struct EnterEditorUIEvent;
+public record struct ExitEditorUIEvent;
+public record struct EditorIsDirtyUIEvent;
+public record struct EditorChangesAppliedUIEvent;
+public record struct EditorChangesDiscardedUIEvent;
 
 public record struct ProfileSlotEnabledChangeUIEvent(int ProfileSlot, bool Enable);

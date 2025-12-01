@@ -27,8 +27,8 @@ public sealed partial class CharacterEditorMenuBarWidget : CharacterEditorWidget
         _closeConfirmWindow.Close();
         if (OwningEditor == null)
             return;
-        RaiseUIEvent(new EditorChangesAppliedUIEvent(OwningEditor));
-        RaiseUIEvent(new ExitEditorUIEvent(OwningEditor));
+        OwningEditor.SaveChanges();
+        OwningEditor.ExitEditor();
     }
 
     private void ExitWithoutChanges(BaseButton.ButtonEventArgs obj)
@@ -36,8 +36,8 @@ public sealed partial class CharacterEditorMenuBarWidget : CharacterEditorWidget
         _closeConfirmWindow.Close();
         if (OwningEditor == null)
             return;
-        RaiseUIEvent(new EditorChangesDiscardedUIEvent(OwningEditor));
-        RaiseUIEvent(new ExitEditorUIEvent(OwningEditor));
+        OwningEditor.DiscardChanges();
+        OwningEditor.ExitEditor();
     }
 
     private void OnClosePressed(BaseButton.ButtonEventArgs obj)
@@ -54,6 +54,7 @@ public sealed partial class CharacterEditorMenuBarWidget : CharacterEditorWidget
             _closeConfirmWindow.OpenCentered();
             return;
         }
-        RaiseUIEvent(new ExitEditorUIEvent(OwningEditor));
+        OwningEditor.DiscardChanges();
+        OwningEditor.ExitEditor();
     }
 }

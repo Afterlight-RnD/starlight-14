@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: ASL-1.0
 
 using Content.Client._Starlight.CharacterEditor.Controls;
-using Content.Client._Starlight.CharacterEditor.Systems;
 using Content.Client._Starlight.ProfileEditor;
 using Content.Client._Starlight.UI;
 using Content.Shared._Starlight.CharacterProfiles;
@@ -14,11 +13,34 @@ using Robust.Client.UserInterface.XAML;
 namespace Content.Client._Starlight.CharacterEditor;
 
 [GenerateTypedNameReferences]
-public sealed partial class CharacterEditorControl : SLWidget, IProfileEditorControl
+public sealed partial class CharacterEditorControl : SLWidget, IProfileEditorControl<CharacterEditorControl>
 {
     public bool EditorControlsInjected { get; set; }
     public bool RequireExitConfirmation { get; set; }
 
+    public event Action<CharacterEditorControl, int>? OnStepSelected;
+    public event Action<CharacterEditorControl>? OnEntered;
+    public event Action<CharacterEditorControl>? OnExited;
+    public event Action<CharacterEditorControl>? OnSaveChanges;
+    public event Action<CharacterEditorControl, bool>? OnDiscardChanges;
+
+    public void EnterEditor()
+    {
+        if ( Visible || !IsInsideTree)
+            return;
+        Visible = true;
+        OnEntered?.Invoke(this);
+    }
+
+    public void ExitEditor()
+    {
+        if (!Visible || !IsInsideTree)
+            return;
+        Visible = false;
+        OnExited?.Invoke(this);
+    }
+
+    public int CurrentSlot = -1;
     public CharacterProfile? LiveProfile { get; set; } = null;
     public Entity<SpriteComponent>? PreviewEntity = null;
     public CharacterPreviewMode PreviewMode = default;
@@ -27,9 +49,6 @@ public sealed partial class CharacterEditorControl : SLWidget, IProfileEditorCon
     public bool ProfileHasChanges => LiveProfile is { HasDirtyData: true };
 
     private ButtonGroup _stepSelectorGroup = new(false);
-
-    [Access(typeof(CharacterEditorSystem))]
-    public CharacterEditorSystem? _editorSystem { get; set; }= null;
 
     public CharacterEditorControl()
     {
@@ -51,14 +70,22 @@ public sealed partial class CharacterEditorControl : SLWidget, IProfileEditorCon
         {
             newButton.Pressed = true;
         }
-        newButton.Initialize(EditorStepSelector.ChildCount, step, OnStepSelected);
+        newButton.Initialize(EditorStepSelector.ChildCount, step, OnStepButtonPressed);
         EditorStepSelector.AddChild(newButton);
     }
 
-    private void OnStepSelected(int stepIndex)
+    private void OnStepButtonPressed(int step)
     {
-        if (_editorSystem == null || !_editorSystem.IsEditorStepInRange(stepIndex))
-            return;
-        _editorSystem.SetEditorStep(this, stepIndex);
+        OnStepSelected?.Invoke(this, step);
+    }
+
+    public void DiscardChanges(bool reloadLiveProfile = false)
+    {
+        OnDiscardChanges?.Invoke(this, reloadLiveProfile);
+    }
+
+    public void SaveChanges()
+    {
+        OnSaveChanges?.Invoke(this);
     }
 }

@@ -51,6 +51,17 @@ public class SLBox : BoxContainer, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid

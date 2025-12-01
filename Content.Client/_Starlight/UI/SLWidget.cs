@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Client._Starlight.UI.Core;
+using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.UI;
@@ -37,6 +38,17 @@ public abstract class SLWidget : UIWidget, ISLControl
     public void SubscribeUIEvent<T>(UIEvent<T> handler) where T: struct
     {
         _uiEventHandles.Add(UIEvents.Subscribe(handler));
+    }
+
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
     }
 
     public void RaiseUIEvent<T>(T args) where T : struct

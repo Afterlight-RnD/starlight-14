@@ -49,6 +49,17 @@ public class SLLayout : LayoutContainer, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
@@ -114,6 +125,17 @@ public class SLGrid : GridContainer, ISLControl
     public void RaiseRequest<T>(ref T args) where T : struct
     {
         UIEvents.RaiseRequest(ref args);
+    }
+
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
     }
 
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
@@ -193,24 +215,35 @@ public class SLSelect<T> : OptionButton, ISLControl
 
     private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
 
-    public void SubscribeUIRequest<T>(UIRequest<T> handler) where T : struct
+    public void SubscribeUIRequest<TEvent>(UIRequest<TEvent> handler) where TEvent : struct
     {
         _uiEventHandles.Add(UIEvents.SubscribeRequest(handler));
     }
 
-    public void SubscribeUIEvent<T>(UIEvent<T> handler) where T : struct
+    public void SubscribeUIEvent<TEvent>(UIEvent<TEvent> handler) where TEvent : struct
     {
         _uiEventHandles.Add(UIEvents.Subscribe(handler));
     }
 
-    public void RaiseUIEvent<T>(T args) where T : struct
+    public void RaiseUIEvent<TEvent>(TEvent args) where TEvent : struct
     {
         UIEvents.RaiseEvent(args);
     }
 
-    public void RaiseRequest<T>(ref T args) where T : struct
+    public void RaiseRequest<TEvent>(ref TEvent args) where TEvent : struct
     {
         UIEvents.RaiseRequest(ref args);
+    }
+
+    public void RaiseControlUIEvent<TEvent>(TEvent args)
+        where TEvent : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<TEvent>(ref TEvent args) where TEvent : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
     }
 
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
@@ -273,6 +306,17 @@ public sealed class SLStripe : StripeBack, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
@@ -332,6 +376,17 @@ public class SLTextureRect : TextureRect, ISLControl
     public void RaiseRequest<T>(ref T args) where T : struct
     {
         UIEvents.RaiseRequest(ref args);
+    }
+
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
     }
 
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
@@ -396,6 +451,17 @@ public class SLLayeredTextureRect : LayeredTextureRect, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
@@ -457,6 +523,17 @@ public class SLScroll : ScrollContainer, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
@@ -516,6 +593,17 @@ public class SLPanel : PanelContainer, ISLControl
     public void RaiseRequest<T>(ref T args) where T : struct
     {
         UIEvents.RaiseRequest(ref args);
+    }
+
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
     }
 
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
@@ -596,6 +684,17 @@ public class SLButton : Button, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
@@ -670,6 +769,17 @@ public class SLContainerButton : ContainerButton, ISLControl
     public void RaiseRequest<T>(ref T args) where T : struct
     {
         UIEvents.RaiseRequest(ref args);
+    }
+
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
     }
 
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
@@ -764,6 +874,17 @@ public class SLButtonWithShader : Button, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
@@ -839,6 +960,17 @@ public class SLTextureButton : TextureButton, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
@@ -909,6 +1041,17 @@ public class SLLabel : Label, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
@@ -963,6 +1106,17 @@ public class SLLineEdit : LineEdit, ISLControl
     public void RaiseRequest<T>(ref T args) where T : struct
     {
         UIEvents.RaiseRequest(ref args);
+    }
+
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
     }
 
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
@@ -1029,6 +1183,17 @@ public class SLRichTextLabel : RichTextLabel, ISLControl
         UIEvents.RaiseRequest(ref args);
     }
 
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
+    }
+
     public void UnsubscribeUIEvent(ref UIEventHandle handle)
     {
         //EventType is never null if handle is valid
@@ -1087,6 +1252,17 @@ public class SLSpriteView : SpriteView, ISLControl
     public void RaiseRequest<T>(ref T args) where T : struct
     {
         UIEvents.RaiseRequest(ref args);
+    }
+
+    public void RaiseControlUIEvent<T>(T args)
+        where T : struct
+    {
+        UIEvents.RaiseControlEvent(this,args);
+    }
+
+    public void RaiseControlUIEvent<T>(ref T args) where T : struct
+    {
+        UIEvents.RaiseControlRequest(this,ref args);
     }
 
     public void UnsubscribeUIEvent(ref UIEventHandle handle)

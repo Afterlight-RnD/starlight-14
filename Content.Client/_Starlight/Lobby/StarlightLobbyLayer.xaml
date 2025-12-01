@@ -65,9 +65,9 @@
                     <slwidgets:LobbyInfoWidget />
                     <controls:HSpacer Spacing="5" />
                     <controls:NanoHeading Text="{Loc 'lobby-character-preview-panel-header'}" />
-                    <slwidgets:CharacterMatrixWidget />
+                    <slwidgets:CharacterMatrixWidget/>
                     <controls:HSpacer Spacing="5" />
-                    <slwidgets:LobbyPlayerBarWidget />
+                    <slwidgets:LobbyPlayerBarWidget Name="LobbyPlayerMenu" Access="Public"/>
                     <controls:HSpacer Spacing="5" />
                     <slwidgets:JobMatrixWidget Name="JobPreferences" Access="Public" />
                     <controls:HSpacer Spacing="5" />

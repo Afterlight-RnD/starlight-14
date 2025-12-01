@@ -7,14 +7,20 @@ public sealed partial class CharacterEditorSystem
 {
     protected override void BoundControlEnteredTree(CharacterEditorControl boundControl)
     {
-        boundControl._editorSystem = this;
         base.BoundControlEnteredTree(boundControl);
+        boundControl.OnEntered += OnEntered;
+        boundControl.OnExited += OnExited;
+        boundControl.OnSaveChanges += OnSaveChanges;
+        boundControl.OnDiscardChanges += OnDiscardChanges;
     }
 
     protected override void BoundControlExitedTree(CharacterEditorControl boundControl)
     {
         base.BoundControlExitedTree(boundControl);
-        boundControl._editorSystem = null;
+        boundControl.OnEntered -= OnEntered;
+        boundControl.OnExited -= OnExited;
+        boundControl.OnSaveChanges -= OnSaveChanges;
+        boundControl.OnDiscardChanges -= OnDiscardChanges;
     }
 
     protected override void StepInitialized(CharacterEditorControl boundControl, CharacterEditorStep step)

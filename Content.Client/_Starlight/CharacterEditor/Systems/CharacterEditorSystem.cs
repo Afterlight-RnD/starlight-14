@@ -12,6 +12,22 @@ public sealed partial class CharacterEditorSystem : ProfileEditorSystem<Characte
 {
     [Dependency] private readonly CharacterProfileSystem _characterProfileSystem = default!;
 
+    private void OnEntered(CharacterEditorControl editor)
+    {
+    }
+
+    private void OnExited(CharacterEditorControl editor)
+    {
+    }
+
+    private void OnDiscardChanges(CharacterEditorControl boundControl, bool clearProfile)
+    {
+    }
+
+    private void OnSaveChanges(CharacterEditorControl boundControl)
+    {
+    }
+
     public Entity<SpriteComponent> EnsurePreviewEntity(CharacterEditorControl editorControl)
     {
         if (editorControl.LiveProfile == null)
@@ -22,6 +38,13 @@ public sealed partial class CharacterEditorSystem : ProfileEditorSystem<Characte
         editorControl.PreviewEntity = (dollEnt, Comp<SpriteComponent>(dollEnt));
         // RaiseUIEvent(new CharacterEditorPreviewChangedUIEvent(editorControl.PreviewEntity.Value));
         return editorControl.PreviewEntity.Value;
+    }
+
+    public void EnsureValidProfileSlot(CharacterEditorControl editorControl)
+    {
+        if (editorControl.CurrentSlot == -1
+            || !_characterProfileSystem.TryGetCharacterProfile(editorControl.CurrentSlot, out _))
+            editorControl.CurrentSlot = _characterProfileSystem.GetFirstProfileSlot();
     }
 
     public void StartEditingSlot(CharacterEditorControl editorControl, int slot)
@@ -42,8 +65,17 @@ public sealed partial class CharacterEditorSystem : ProfileEditorSystem<Characte
         editorControl.LiveProfile = new CharacterProfile(profile.GetData(false)) { Slot = slot };
         editorControl.PreviewEntity = EnsurePreviewEntity(editorControl);
         RefreshPreviewVisuals(editorControl);
-        // RaiseUIEvent(new CharacterEditorPreviewChangedUIEvent(editorControl.PreviewEntity.Value));
-        // RaiseUIEvent(new CharacterEditorProfileDirtiedUIEvent(editorControl.LiveProfile));
+    }
+
+    public void ApplyEdits(CharacterEditorControl editorControl, int slot)
+    {
+        if (editorControl.LiveProfile == null || !_characterProfileSystem.TryGetCharacterProfile(slot, out var profile))
+        {
+            Log.Error($"Tried to apply  slot:{slot} edits but it doesn't have a profile!");
+            return;
+        }
+        profile.SetData(editorControl.LiveProfile.GetData());
+        _characterProfileSystem.ApplyProfileChanges(slot);
     }
 
     public void RefreshPreviewVisuals(CharacterEditorControl editorControl)

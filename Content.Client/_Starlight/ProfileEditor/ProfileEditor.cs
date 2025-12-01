@@ -14,8 +14,26 @@ public interface IProfileEditorControl : ISLControl
     public bool RequireExitConfirmation { get; set; }
 };
 
+public interface IProfileEditorControl<out TSelf> : IProfileEditorControl
+    where TSelf : Control, ISLControl,  IProfileEditorControl<TSelf>
+{
+    public event Action<TSelf, int>? OnStepSelected;
+    public event Action<TSelf>? OnEntered;
+    public event Action<TSelf>? OnExited;
+    public event Action<TSelf>? OnSaveChanges;
+    public event Action<TSelf, bool>? OnDiscardChanges;
+
+    public void EnterEditor();
+
+    public void ExitEditor();
+
+    public void DiscardChanges(bool clearProfile = false);
+
+    public void SaveChanges();
+}
+
 public sealed class ProfileEditor<TEditorControl, TStep>
-    where TEditorControl : Control, ISLControl, IProfileEditorControl
+    where TEditorControl : Control, ISLControl, IProfileEditorControl<TEditorControl>
     where TStep : ProfileEditorStep<TEditorControl>
 {
     public int CurrentStep { get; private set; } = -1;
