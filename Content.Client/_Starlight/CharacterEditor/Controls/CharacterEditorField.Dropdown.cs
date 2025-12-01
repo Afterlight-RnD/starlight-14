@@ -1,7 +1,5 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
-
-using Content.Client._Starlight.CharacterEditor.Systems;
 using Content.Client._Starlight.UI.Controls;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Shared.Random;
@@ -16,6 +14,17 @@ public abstract class CharacterEditorDropdownField<TProfileData, TData> :
 
     private CharacterProfile? _profile = null;
 
+    public CharacterEditorField? ParentFieldControl
+    {
+        get
+        {
+            if (Parent is  CharacterEditorField field)
+                return field;
+            return null;
+        }
+    }
+
+
     public CharacterDataSetterDelegate<TProfileData, TData>? ProfileDataSetter;
     public CharacterDataGetterDelegate<TProfileData, TData>? ProfileDataGetter;
 
@@ -28,8 +37,8 @@ public abstract class CharacterEditorDropdownField<TProfileData, TData> :
     protected override void EnteredTree()
     {
         base.EnteredTree();
-        // SubscribeUIEvent<CharacterEditorProfileResetUIEvent>(HandleProfileReset);
-        // SubscribeUIEvent<CharacterEditorProfileDirtiedUIEvent>(HandleProfileDirtied);
+        if (ParentFieldControl == null)
+            return;
     }
 
     // private void HandleProfileDirtied(ref readonly CharacterEditorProfileDirtiedUIEvent args)

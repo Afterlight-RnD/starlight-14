@@ -28,9 +28,6 @@ public sealed partial class CharacterMenuWidget : CharacterEditorWidget
     protected override void EnteredTree()
     {
         base.EnteredTree();
-        SubscribeUIEvent<EditorIsDirtyUIEvent>(HandleEditorDirtied);
-        SubscribeUIEvent<EditorChangesAppliedUIEvent>(HandleChangesApplied);
-        SubscribeUIEvent<EditorChangesDiscardedUIEvent>(HandleChangesDiscarded);
     }
 
     private void HandleChangesDiscarded(ref readonly EditorChangesDiscardedUIEvent args)
@@ -54,11 +51,11 @@ public sealed partial class CharacterMenuWidget : CharacterEditorWidget
 
     private void DiscardPressed(BaseButton.ButtonEventArgs obj)
     {
-        RaiseEditorUIEvent(new EditorChangesDiscardedUIEvent());
+        OwningEditor?.DiscardChanges(true);
     }
 
     private void SaveChangesPressed(BaseButton.ButtonEventArgs obj)
     {
-        RaiseEditorUIEvent(new EditorChangesAppliedUIEvent());
+        OwningEditor?.SaveChanges();
     }
 }

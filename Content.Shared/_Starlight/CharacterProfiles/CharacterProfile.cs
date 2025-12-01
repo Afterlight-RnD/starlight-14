@@ -8,8 +8,11 @@ using Robust.Shared.Serialization.Manager;
 
 namespace Content.Shared._Starlight.CharacterProfiles;
 
+public interface IPersistentProfile;
+
+
 [DataDefinition]
-public sealed partial class CharacterProfile
+public sealed partial class CharacterProfile : IPersistentProfile
 {
     [Dependency] private readonly ISerializationManager _serMan = default!;
     [DataField] public int Slot;

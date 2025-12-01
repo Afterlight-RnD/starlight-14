@@ -10,8 +10,10 @@ using Robust.Shared.Prototypes;
 namespace Content.Client._Starlight.CharacterEditor.Editors.Species;
 
 [GenerateTypedNameReferences]
-public sealed partial class SpeciesSelectorPanel : CharacterEditorPanel
+public sealed partial class SpeciesSelectorPanel : CharacterEditorRightPanel
 {
+    public override CharacterEditorStep Step => CharacterEditorStep.Species;
+
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     private string _localizedSpeciesName = string.Empty;

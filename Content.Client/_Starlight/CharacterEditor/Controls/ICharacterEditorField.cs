@@ -1,8 +1,5 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
-
-using Content.Client._Starlight.CharacterEditor.Systems;
-using Content.Client._Starlight.UI.Core;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.UserInterface;
 using Robust.Shared.Prototypes;
@@ -14,10 +11,12 @@ public interface ICharacterEditorField
     public bool Disabled { get; set; }
     public void Randomize();
 
-    public static void SetData<TProfileData, TValue>(CharacterProfile? profile,TValue value, CharacterDataSetterDelegate<TProfileData, TValue> setter)
+    public static void SetData<TProfileData, TValue>(
+        CharacterEditorMainControl? editorControl,
+        TValue value, CharacterDataSetterDelegate<TProfileData, TValue> setter)
         where TProfileData : CharacterData, new()
     {
-        if (profile == null)
+        if (EditorControl == null)
             return;
         var data = profile.GetData<TProfileData>();
         setter.Invoke(value, profile, data);
@@ -25,7 +24,9 @@ public interface ICharacterEditorField
         // UIEvents.RaiseEvent(new CharacterEditorProfileDirtiedUIEvent(profile));
     }
 
-    public static void RandomizeField<TProfileData, TValue>(CharacterProfile? profile, Func<TValue> dataRandomizer, CharacterDataSetterDelegate<TProfileData, TValue> setter)
+    public static void RandomizeField<TProfileData, TValue>(
+        CharacterEditorMainControl? editorControl,
+        Func<TValue> dataRandomizer, CharacterDataSetterDelegate<TProfileData, TValue> setter)
         where TProfileData : CharacterData, new()
     {
         var value = dataRandomizer.Invoke();
@@ -49,7 +50,9 @@ public interface ICharacterEditorField
     }
 
     public static CharacterEditorDropdownPrototypeField<TData, TPrototype> AddPrototypeField<TData, TPrototype>(
-        Control parent, CharacterDataSetterDelegate<TData, TPrototype> setter, CharacterDataGetterDelegate<TData, TPrototype> getter,
+        Control parent,
+        CharacterDataSetterDelegate<TData, TPrototype> setter,
+        CharacterDataGetterDelegate<TData, TPrototype> getter,
         Func<TPrototype, string>? localizedNameGetter = null)
         where TData : CharacterData, new()
         where TPrototype : class, IPrototype
@@ -66,7 +69,8 @@ public interface ICharacterEditorField
     }
 
     public static CharacterEditorTextField<TData> AddTextField<TData>(
-        Control parent, CharacterDataSetterDelegate<TData, string> setter, CharacterDataGetterDelegate<TData, string> getter)
+        Control parent,
+        CharacterDataSetterDelegate<TData, string> setter, CharacterDataGetterDelegate<TData, string> getter)
         where TData : CharacterData, new()
     {
         var editField =

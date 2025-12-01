@@ -1,84 +1,185 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
-using Content.Client._Starlight.UI;
+
+
+using Content.Client._Starlight.ProfileEditor.UI;
+using Content.Shared._Starlight.CharacterProfiles;
+using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
+using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Serialization.Manager.Exceptions;
+
 
 namespace Content.Client._Starlight.ProfileEditor;
 
-
-
-public interface IProfileEditorControl : ISLControl
+public interface IProfileEditor
 {
-    public bool EditorControlsInjected { get; set; }
+    public bool HasEdits { get; }
+    public void Initialize(List<Control> panels, IResourceCache resCache, IDynamicTypeFactory typeFactory, ISawmill log);
+    public Type GetPanelBaseType { get; }
 
-    public bool RequireExitConfirmation { get; set; }
+    public void MarkChanged();
+
+    public void ClearEdits(bool discard = true);
+
+    public void Open();
+
+    public void Close(bool discard = true);
 };
 
-public interface IProfileEditorControl<out TSelf> : IProfileEditorControl
-    where TSelf : Control, ISLControl,  IProfileEditorControl<TSelf>
+public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TBasePanel, TStepButton, TStepEnum, TPosEnum> : IProfileEditor
+where TSelf: ProfileEditor<TSelf,TProfile, TEditorControl, TBasePanel, TStepButton, TStepEnum, TPosEnum>, IProfileEditor, new()
+where TProfile: class, IPersistentProfile, new()
+where TEditorControl: ProfileEditorMainControl<TSelf>, new()
+where TBasePanel: ProfileEditorPanelBaseControl<TSelf, TEditorControl, TStepEnum, TPosEnum>
+where TStepButton: ProfileEditorStepButton<TStepEnum>, new()
+where TStepEnum: struct, Enum, IConvertible
+where TPosEnum: struct, Enum, IConvertible
 {
-    public event Action<TSelf, int>? OnStepSelected;
-    public event Action<TSelf>? OnEntered;
-    public event Action<TSelf>? OnExited;
-    public event Action<TSelf>? OnSaveChanges;
-    public event Action<TSelf, bool>? OnDiscardChanges;
+    public bool HasEdits { get; private set; }
+    public TEditorControl EditorControl { get; }= new TEditorControl();
+    public TStepEnum CurrentStep { get; private set; }
+    public virtual TStepEnum FirstStep => default;
+    public Type GetPanelBaseType => typeof(TBasePanel);
+    public int StepCount { get;}
+    private List<List<TBasePanel?>> _steps = new();
 
-    public void EnterEditor();
+    public bool IsOpen { get; private set; }
 
-    public void ExitEditor();
-
-    public void DiscardChanges(bool clearProfile = false);
-
-    public void SaveChanges();
-}
-
-public sealed class ProfileEditor<TEditorControl, TStep>
-    where TEditorControl : Control, ISLControl, IProfileEditorControl<TEditorControl>
-    where TStep : ProfileEditorStep<TEditorControl>
-{
-    public int CurrentStep { get; private set; } = -1;
-
-    public int StepCount => _steps.Count;
-
-    private readonly List<TStep> _steps = new();
-
-    public IEnumerable<TStep> IterateSteps()
+    public ProfileEditor()
     {
-        foreach (var step in _steps)
-            yield return step;
-    }
-
-    public TStep GetCurrentStep => _steps[CurrentStep];
-
-    public TStep GetStep(int stepIndex)
-    {
-        return _steps[stepIndex];
-    }
-
-    public bool SetStep(int step, TEditorControl editorControl)
-    {
-        if (step >= StepCount || step < 0)
-            throw new InvalidOperationException("Tried to set step out of range!");
-        if (CurrentStep == step)
-            return false;
-        if (CurrentStep >= 0)
+        StepCount = Enum.GetValues<TStepEnum>().Length;
+        var temp = new TBasePanel?[ Enum.GetValues<TPosEnum>().Length];
+        for (var i = 0; i < StepCount; i++)
         {
-            GetCurrentStep.Deactivated(editorControl);
+            _steps.Add(new List<TBasePanel?>(temp));
+        }
+    }
+
+    public void MarkChanged()
+    {
+        HasEdits |= true;
+    }
+
+    public void ClearEdits(bool discard = true)
+    {
+        if (discard)
+            Reset();
+        else
+            Apply();
+        HasEdits = false;
+    }
+
+    public void Open()
+    {
+        if (IsOpen)
+            return;
+        Entered();
+        EditorControl.Visible = true;
+        IsOpen = true;
+    }
+
+    public void Close(bool discard = true)
+    {
+        if (!IsOpen)
+            return;
+        EditorControl.Visible = false;
+        Exited();
+        IsOpen = false;
+        if (HasEdits)
+            ClearEdits(discard);
+    }
+
+
+    public void Initialize(List<Control> panels, IResourceCache resCache, IDynamicTypeFactory typeFactory, ISawmill log)
+    {
+        foreach (var control in panels)
+        {
+            if (control is not TBasePanel panel)
+                throw new GenericParameterMismatchException();
+            if (!TryRegisterPanel(panel))
+            {
+                log.Error($"tried to register Panel:{panel} but there is already a " +
+                          $"panel in pos:{panel.PanelPosition}, for step:{panel.Step}!");
+                continue;
+            }
+            panel.Visible = false;
+            panel.Initialize((TSelf)this,EditorControl);
         }
 
-        CurrentStep = step;
-        GetCurrentStep.Activated(editorControl);
+        foreach (var step in Enum.GetValues<TStepEnum>())
+        {
+            var button = typeFactory.CreateInstance<TStepButton>();
+            button.ToggleMode = true;
+            button.Group = EditorControl.StepSelectorGroup;
+            button.SetFromStep(step, resCache);
+            button.OnToggled += OnStepSelectorToggled;
+        }
+        foreach (var step in GetPanelsForStep(CurrentStep))
+        {
+            if (step == null) continue;
+            step.Visible = true;
+            step.Activate();
+        }
+        if (!EqualityComparer<TStepEnum>.Default.Equals(FirstStep, CurrentStep))
+            SetStep(FirstStep);
+    }
+
+    private void OnStepSelectorToggled(BaseButton.ButtonToggledEventArgs obj)
+    {
+        if (obj.Pressed)
+            SetStep(((TStepButton)obj.Button).Step);
+    }
+
+    private bool TryRegisterPanel(TBasePanel panel)
+    {
+        var step = panel.Step.ToInt32(null);
+        var pos = panel.PanelPosition.ToInt32(null);
+        if (_steps[step][pos] != null)
+            return false;
+        _steps[step][pos] = panel;
         return true;
     }
 
-    public void InjectControls(TEditorControl editorControl)
+    public void SetStep(TStepEnum step)
     {
-        foreach (var step in _steps)
-            step.InjectControls(editorControl);
+        if (EqualityComparer<TStepEnum>.Default.Equals(step, CurrentStep))
+            return;
+        var currentPanels = GetPanelsForStep(CurrentStep);
+        var nextPanels = GetPanelsForStep(step);
+        for (var i = 0; i < nextPanels.Count; i++)
+        {
+            var currentPanel = currentPanels[i];
+            var nextPanel = nextPanels[i];
+            if (currentPanel == nextPanel) continue;
+            if (currentPanel != null)
+            {
+                currentPanel.Visible = false;
+                currentPanel.Deactivate();
+            }
+            if (nextPanel != null)
+            {
+                nextPanel.Visible = true;
+                nextPanel.Activate();
+            }
+        }
+
+        var previousStep = step;
+        CurrentStep = step;
+        StepChanged(previousStep);
     }
 
-    public void RegisterStep(IProfileEditorStep step)
+    protected List<TBasePanel?> GetPanelsForStep(TStepEnum step)
     {
-        _steps.Add((TStep)step);
+        return _steps[step.ToInt32(null)];
     }
+
+    protected virtual void Entered(){}
+    protected virtual void Exited(){}
+
+    protected virtual void Reset(){}
+
+    protected virtual void Apply(){}
+
+    public virtual void StepChanged(TStepEnum previousStep){}
 }

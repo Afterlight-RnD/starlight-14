@@ -11,8 +11,9 @@ using Robust.Client.UserInterface.XAML;
 namespace Content.Client._Starlight.CharacterEditor.Editors.Appearance;
 
 [GenerateTypedNameReferences]
-public sealed partial class AppearancePanel : CharacterEditorPanel
+public sealed partial class AppearancePanel : CharacterEditorRightPanel
 {
+    public override CharacterEditorStep Step => CharacterEditorStep.Appearance;
     public AppearancePanel()
     {
         RobustXamlLoader.Load(this);
