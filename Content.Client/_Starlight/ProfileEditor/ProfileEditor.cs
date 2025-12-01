@@ -15,20 +15,27 @@ namespace Content.Client._Starlight.ProfileEditor;
 public interface IProfileEditor
 {
     public bool HasEdits { get; }
-    public void Initialize(List<Control> panels, IResourceCache resCache, IDynamicTypeFactory typeFactory, ISawmill log);
+    public void Initialize(List<Control> panels,
+        IEntitySystemManager systemManager,
+        IResourceCache resCache,
+        IDynamicTypeFactory typeFactory,
+        ISawmill log);
     public Type GetPanelBaseType { get; }
 
     public void MarkChanged();
 
     public void ClearEdits(bool discard = true);
 
+    public bool IsOpen { get; }
+
     public void Open();
 
     public void Close(bool discard = true);
 };
 
-public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TBasePanel, TStepButton, TStepEnum, TPosEnum> : IProfileEditor
-where TSelf: ProfileEditor<TSelf,TProfile, TEditorControl, TBasePanel, TStepButton, TStepEnum, TPosEnum>, IProfileEditor, new()
+public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TSystem,TBasePanel, TStepButton, TStepEnum, TPosEnum> : IProfileEditor
+where TSystem: EntitySystem, IProfileEditorSystem, new()
+where TSelf: ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TBasePanel, TStepButton, TStepEnum, TPosEnum>, IProfileEditor, new()
 where TProfile: class, IPersistentProfile, new()
 where TEditorControl: ProfileEditorMainControl<TSelf>, new()
 where TBasePanel: ProfileEditorPanelBaseControl<TSelf, TEditorControl, TStepEnum, TPosEnum>
@@ -37,6 +44,7 @@ where TStepEnum: struct, Enum, IConvertible
 where TPosEnum: struct, Enum, IConvertible
 {
     public bool HasEdits { get; private set; }
+    public TSystem LinkedSystem { get; private set; } = default!;
     public TEditorControl EditorControl { get; }= new TEditorControl();
     public TStepEnum CurrentStep { get; private set; }
     public virtual TStepEnum FirstStep => default;
@@ -91,8 +99,17 @@ where TPosEnum: struct, Enum, IConvertible
     }
 
 
-    public void Initialize(List<Control> panels, IResourceCache resCache, IDynamicTypeFactory typeFactory, ISawmill log)
+    public void Initialize(List<Control> panels, IEntitySystemManager systemManager,
+        IResourceCache resCache, IDynamicTypeFactory typeFactory, ISawmill log)
     {
+        if (!systemManager.TryGetEntitySystem<TSystem>(out var found))
+        {
+            log.Fatal($"Could not find entity system for profile editor! Or tried to initialize outside of simulation!");
+            throw new Exception();
+        }
+        LinkedSystem = found;
+        LinkedSystem.RegisterEditor(this);
+
         foreach (var control in panels)
         {
             if (control is not TBasePanel panel)

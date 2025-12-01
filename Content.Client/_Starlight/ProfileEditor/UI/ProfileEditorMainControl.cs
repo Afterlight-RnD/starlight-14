@@ -18,6 +18,7 @@ public abstract class ProfileEditorMainControl<TEditor> : SLControl
     [Dependency] private IDynamicTypeFactory _typeFactory = default!;
     [Dependency] private ILogManager _logManager = default!;
     [Dependency] private IResourceCache _resourceCache = default!;
+    [Dependency] private IEntitySystemManager _systemManager = default!;
 
     public ButtonGroup StepSelectorGroup { get; }
 
@@ -43,7 +44,7 @@ public abstract class ProfileEditorMainControl<TEditor> : SLControl
             {
                 panels.Add(_typeFactory.CreateInstance<Control>(panelType));
             }
-            _editor.Initialize(panels, _resourceCache, _typeFactory,_logManager.GetSawmill("ProfileEditor"));
+            _editor.Initialize(panels,_systemManager, _resourceCache, _typeFactory,_logManager.GetSawmill("ProfileEditor"));
             return _editor;
         }
     }
