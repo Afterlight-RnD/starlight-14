@@ -4,39 +4,138 @@
 using Content.Client._Starlight.ProfileEditor.UI;
 using Content.Client._Starlight.UI;
 using Content.Client._Starlight.UI.Core;
+using Content.Shared._Starlight.CharacterProfiles;
+using Robust.Client.Graphics;
+using Robust.Client.UserInterface;
+using Robust.Shared.Reflection;
 
 namespace Content.Client._Starlight.ProfileEditor;
 
-
-public interface IProfileEditorSystem
+public abstract class ProfileEditorSystem<TProfile, TEditorControl, TStepButton> : BoundUISystem<TEditorControl>
+    where TProfile : class, IPersistentProfile, new()
+    where TEditorControl : Control, IProfileEditorControl<TProfile>, new()
+    where TStepButton : ProfileEditorStepButton, new()
 {
-    public void RegisterEditor(IProfileEditor instance);
+    [Dependency] private IReflectionManager _reflectionManager = default!;
+
+    public int StepCount => _steps.Count;
+    private List<IProfileEditorStep<TProfile, TEditorControl>> _steps = new();
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        foreach (var profileStep in _reflectionManager.GetAllChildren<IProfileEditorStep<TProfile, TEditorControl>>())
+            _steps.Add(
+                (IProfileEditorStep<TProfile, TEditorControl>)EntityManager.EntitySysManager.GetEntitySystem(
+                    profileStep));
+    }
+
+
+    [MustCallBase(true)]
+    protected override void BoundControlEnteredTree(TEditorControl boundControl)
+    {
+        if (boundControl.StepControlsInjected) return;
+        foreach (var step in _steps)
+            step.InjectControls(boundControl);
+
+        _steps.Sort(((step1, step2) =>
+        {
+            var step1Type = step1.GetType();
+            var step2Type = step2.GetType();
+            if (step1.BeforeSteps != null && step1.BeforeSteps.Contains(step2Type))
+                return -1;
+            if (step2.AfterSteps != null && step2.AfterSteps.Contains(step1Type))
+                return -1;
+            if (step1.AfterSteps != null && step1.AfterSteps.Contains(step2Type))
+                return 1;
+            if (step2.BeforeSteps != null && step2.BeforeSteps.Contains(step1Type))
+                return 1;
+            return 0;
+        }));
+
+        for (var i = 0; i < _steps.Count; i++)
+        {
+            var step = _steps[i];
+            var newButton = new TStepButton();
+            newButton.SetFromStep(i, step.StepName, step.StepDescription, step.StepIcon);
+            boundControl.AddStepButton(newButton);
+        }
+        boundControl.StepControlsInjected = true;
+    }
+
+    [MustCallBase(true)]
+    protected override void BoundControlExitedTree(TEditorControl boundControl)
+    {
+    }
 }
 
-public abstract class ProfileEditorSystem<TEditor, TEditorControl> : UISystem, IProfileEditorSystem
-    where TEditor : class, IProfileEditor, new()
-    where TEditorControl : ProfileEditorMainControl<TEditor>, ISLControl, new()
+public interface IProfileEditorStep<TProfile, in TEditorControl>
+    where TProfile : class, IPersistentProfile, new()
+    where TEditorControl : Control, IProfileEditorControl<TProfile>, new()
 {
-    private List<TEditor> _editors = new();
+    public IReadOnlySet<Type>? BeforeSteps { get; }
+    public IReadOnlySet<Type>? AfterSteps { get; }
 
-    void IProfileEditorSystem.RegisterEditor(IProfileEditor instance)
+    public string StepName { get; }
+    public string? StepDescription => null;
+    public Texture? StepIcon => null;
+
+    public void InjectControls(TEditorControl boundControl);
+};
+
+public abstract class ProfileEditorStep<TProfile, TEditorControl, TPanelEnum, TBasePanelControl> : UISystem,
+    IProfileEditorStep<TProfile, TEditorControl>
+    where TProfile : class, IPersistentProfile, new()
+    where TEditorControl : ProfileEditorControl<TProfile, TPanelEnum, TBasePanelControl>, new()
+    where TPanelEnum : struct, Enum, IConvertible
+    where TBasePanelControl : SLControl
+{
+    [Dependency] private readonly IDynamicTypeFactory _typeFactory = default!;
+
+    public IReadOnlySet<Type>? BeforeSteps => _beforeSteps;
+    public IReadOnlySet<Type>? AfterSteps => _afterSteps;
+
+    private HashSet<Type>? _beforeSteps = null;
+    private HashSet<Type>? _afterSteps = null;
+    public abstract string StepName { get; }
+    private Dictionary<TPanelEnum, Type> _panelRegistrations = new();
+
+    public override void Initialize()
     {
-        _editors.Add((TEditor)instance);
+        base.Initialize();
+        Setup();
     }
 
-    public IEnumerable<TEditor> IterateEditors(bool onlyActive = true)
+    public abstract void Setup();
+
+    void IProfileEditorStep<TProfile, TEditorControl>.InjectControls(TEditorControl boundControl)
     {
-        if (!onlyActive)
+        foreach (var (panelEnum, type) in _panelRegistrations)
         {
-            foreach (var editor in _editors)
-                yield return editor;
+            var panel = _typeFactory.CreateInstance<TBasePanelControl>(type);
+            boundControl.InjectPanel(panelEnum, panel);
         }
-        else
-        {
-            foreach (var editor in _editors)
-                if (editor.IsOpen)
-                    yield return editor;
-        }
+        boundControl.StepControlsInjected = true;
     }
 
+    protected void RegisterAfterStep<TOtherStep>()
+        where TOtherStep : ProfileEditorStep<TProfile, TEditorControl, TPanelEnum, TBasePanelControl>, new()
+    {
+        _afterSteps ??= new();
+        _afterSteps.Add(typeof(TOtherStep));
+    }
+
+    protected void RegisterBeforeStep<TOtherStep>()
+        where TOtherStep : ProfileEditorStep<TProfile, TEditorControl, TPanelEnum, TBasePanelControl>, new()
+    {
+        _beforeSteps ??= new();
+        _beforeSteps.Add(typeof(TOtherStep));
+    }
+
+    protected void RegisterPanel<TPanel>(TPanelEnum panelEnum)
+        where TPanel : TBasePanelControl, new()
+    {
+        if (!_panelRegistrations.TryAdd(panelEnum, typeof(TPanel)))
+            Log.Error($"Duplicate panel registration:{typeof(TPanel)} in position:{panelEnum}");
+    }
 }

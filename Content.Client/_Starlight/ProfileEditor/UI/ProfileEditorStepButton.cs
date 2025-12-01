@@ -4,15 +4,15 @@
 
 using Content.Client._Starlight.UI;
 using Robust.Client.Graphics;
-using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.ProfileEditor.UI;
 
-public abstract class ProfileEditorStepButton<TStepEnum> : SLContainerButton
-where TStepEnum: struct, Enum, IConvertible
+[Virtual]
+public class ProfileEditorStepButton : SLContainerButton
 {
-    public TStepEnum Step { get; private set; }
+    public int Step { get; private set; }
+
     public virtual string? StepLocPrefix => null;
     public virtual string? StepDescriptionLocString => null;
 
@@ -39,19 +39,13 @@ where TStepEnum: struct, Enum, IConvertible
         AddChild(mainBox);
     }
 
-    public void SetFromStep(TStepEnum step, IResourceCache resCache)
+    public void SetFromStep(int step, string stepName, string? stepDesc, Texture? stepTexture)
     {
         Step = step;
-        Icon = GetIcon(step, resCache);
-        Label = LocalizeLabel(GetLabel(step));
-        Description = LocalizeDescription(GetDescription(step));
+        Label = LocalizeLabel(stepName);
+        Description = LocalizeDescription(stepDesc);
+        Icon = stepTexture;
     }
-
-    protected virtual Texture? GetIcon(TStepEnum step, IResourceCache resCache)
-    {
-        return null;
-    }
-
     private string? LocalizeDescription(string? description)
     {
         return StepDescriptionLocString == null
@@ -63,16 +57,4 @@ where TStepEnum: struct, Enum, IConvertible
     {
         return StepLocPrefix == null ? label : Loc.GetString($"{StepLocPrefix}-{label}");
     }
-
-    protected virtual string? GetDescription(TStepEnum step)
-    {
-        return null;
-    }
-
-    protected virtual string GetLabel(TStepEnum step)
-    {
-        return step.ToString().ToLower();
-    }
-
-
 }
