@@ -1,4 +1,5 @@
-﻿using Robust.Shared.Prototypes;
+﻿using System.Diagnostics.CodeAnalysis;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Starlight.Abstract.Extensions;
 public static class EntityExtensions
@@ -13,6 +14,21 @@ public static class EntityExtensions
         
         protoId = new EntProtoId(entityPrototype.ID);
         
+        return true;
+    }
+
+    public static bool TryGetDependencyCollection(this IEntityManager entityManager, [NotNullWhen(true)] out IDependencyCollection? systemDeps)
+    {
+        //This is the only way to check if entitySystemManager is initialized... Why isn't this a boolean property... FML
+        try
+        {
+            systemDeps = entityManager.EntitySysManager.DependencyCollection;
+        }
+        catch (InvalidOperationException e)
+        {
+            systemDeps = null;
+            return false;
+        }
         return true;
     }
 

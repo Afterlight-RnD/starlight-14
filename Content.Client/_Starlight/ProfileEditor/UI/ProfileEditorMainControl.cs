@@ -1,87 +1,76 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
-
 using Content.Client._Starlight.UI;
+using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
+using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.ProfileEditor.UI;
 
-
-public interface IProfileEditorMainControl<TSelf, out TProfileEditor> : ISLControl
-    where TSelf: SLControl, IProfileEditorMainControl<TSelf,TProfileEditor>
-    where TProfileEditor: IProfileEditor<TProfileEditor>, new()
+public interface IProfileEditorMainControl<TEditor>
+    where TEditor: IProfileEditor, new()
 {
-    public bool HasProfileChanges { get; }
-    public bool StepControlsInjected { get; set; }
-    public TProfileEditor Editor { get; }
-    public void AddStepButton(ProfileEditorStepButton button);
-    public bool IsOpen { get; }
-
-    public void SetStepCount(int stepCount);
 }
-public abstract class ProfileEditorMainControl<TSelf, TProfileEditor, TPanelEnum> : SLControl,
-    IProfileEditorMainControl<TSelf,TProfileEditor>
-    where TSelf : ProfileEditorMainControl<TSelf,TProfileEditor, TPanelEnum>, new()
-    where TProfileEditor : IProfileEditor<TProfileEditor, TSelf>, new()
-    where TPanelEnum: struct, Enum, IConvertible
 
+
+
+public abstract class ProfileEditorMainControl<TEditor, TLayoutEnum, TStepSelectorButton> : SLControl, IProfileEditorMainControl<TEditor>
+where TEditor: IProfileEditor, new()
+where TLayoutEnum: struct, Enum, IConvertible
+where TStepSelectorButton: ProfileEditorStepButton, new()
 {
-    public bool IsOpen => IsInsideTree;
 
-    void IProfileEditorMainControl<TSelf, TProfileEditor>.SetStepCount(int stepCount)
+    public abstract Control StepButtonRoot { get; }
+    public TEditor Editor { get;  init; } = default!;
+    public Control?[,] StepControls { private get; init; } = default!; //this *should* always be set after the control is created
+    private ButtonGroup _stepSelectorButtonGroup = new(false);
+    public void ToggleStepControls(int step, bool state)
     {
-        if (_stepPanels.Count > 0)
-            throw new Exception("Cannot Set StepCount on editor that already has steps!");
-        for (var i = 0; i < stepCount; i++)
-            _stepPanels.Add(new HashSet<Control>());
+        if (step >= Editor.StepCount)
+            throw new IndexOutOfRangeException($"Tried to set step:{step} on {GetType()}, Max is: {Editor.StepCount-1}");
+        for (var i = 0; i < Editor.LayoutCount; i++)
+        {
+            var control = StepControls[step, i];
+            if (control != null)
+                control.Visible = state;
+        }
     }
 
-    protected abstract Control StepSelectorRoot { get; }
-    public bool HasProfileChanges => Editor.HasProfileChanges;
-    public bool StepControlsInjected { get; set; }
-    public TProfileEditor Editor { get; private set; } = new();
-
-    private Dictionary<(TPanelEnum layout,Type type), Control> _panelLookup = new();
-
-    private List<HashSet<Control>> _stepPanels = new();
-
-    protected ProfileEditorMainControl()
+    public void TryInjectStepControls(int step,
+        string stepName,
+        string? stepDescription,
+        Texture? stepIcon,
+        IDynamicTypeFactory typeFactory,
+        Dictionary<TLayoutEnum, Func<IDynamicTypeFactory,Control>> builders)
     {
-        Editor.Initialize((TSelf)this);
-        Editor.OnStepEntered += HandleStepEntered;
-        Editor.OnStepExited += HandleStepExited;
+        StepButtonRoot.AddChild(new TStepSelectorButton
+        {
+            Group = _stepSelectorButtonGroup,
+            Label = stepName,
+            Description = stepDescription,
+            Icon = stepIcon
+        });
+        foreach (var (layout,builder) in builders)
+        {
+            var layoutId = layout.ToInt32(null);
+            var existing = StepControls[step,  layoutId];
+            if (existing != null)
+                continue;
+            var newControl = builder.Invoke(typeFactory);
+            newControl.Visible = false;
+            InjectPanel(layout, newControl);
+            StepControls[step, layoutId] = newControl;
+        }
     }
 
-    private void HandleStepExited(TProfileEditor _, int step)
-    {
-        foreach (var panel in _stepPanels[step])
-            panel.Visible = false;
-    }
+    protected abstract void InjectPanel(TLayoutEnum layout, Control newControl);
 
-    private void HandleStepEntered(TProfileEditor _, int step)
-    {
-        foreach (var panel in _stepPanels[step])
-            panel.Visible = true;
-    }
-
-    void IProfileEditorMainControl<TSelf,TProfileEditor>.AddStepButton(ProfileEditorStepButton button)
-    {
-        StepSelectorRoot.AddChild(button);
-    }
-
-    public TPanel GetPanel<TPanel>(TPanelEnum panelEnum)
+    public TPanel GetPanel<TPanel>(int step, TLayoutEnum layout)
     where TPanel: Control, new()
     {
-        return (TPanel)_panelLookup[(panelEnum,typeof(TPanel))];
+        var panel = StepControls[step, layout.ToInt32(null)];
+        if (panel == null)
+            throw new KeyNotFoundException($"Panel of type{typeof(TPanel)} not found in step:{step} pos: {layout}");
+        return (TPanel)panel;
     }
-
-    public void RegisterPanel(int step,TPanelEnum panelEnum, Control panel)
-    {
-        if (!_stepPanels[step].Add(panel)
-            || !_panelLookup.TryAdd((panelEnum, panel.GetType()), panel))
-            return;
-        InjectPanel(panelEnum, panel);
-    }
-
-    protected abstract void InjectPanel(TPanelEnum panelEnum, Control panel);
 }

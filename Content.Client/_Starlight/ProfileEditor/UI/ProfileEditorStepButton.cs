@@ -11,7 +11,7 @@ namespace Content.Client._Starlight.ProfileEditor.UI;
 [Virtual]
 public class ProfileEditorStepButton : SLContainerButton
 {
-    public int Step { get; private set; }
+    public int Step { get;  init; }
 
     public virtual string? StepLocPrefix => null;
     public virtual string? StepDescriptionLocString => null;
@@ -19,8 +19,8 @@ public class ProfileEditorStepButton : SLContainerButton
     public Texture? Icon { get => _icon.Texture; set => _icon.Texture = value; }
     public string IconPath { set => _icon.TexturePath = value; }
 
-    public string? Label { get => _mainText.Text; set => _mainText.Text = value; }
-    public string? Description { get => _mainText.Text; set => _mainText.Text = value; }
+    public string? Label { get => _mainText.Text; set => _mainText.Text = LocalizeLabel(value); }
+    public string? Description { get => _mainText.Text; set => _mainText.Text = LocalizeDescription(value); }
 
     private TextureRect _icon = new();
 
@@ -39,13 +39,6 @@ public class ProfileEditorStepButton : SLContainerButton
         AddChild(mainBox);
     }
 
-    public void SetFromStep(int step, string stepName, string? stepDesc, Texture? stepTexture)
-    {
-        Step = step;
-        Label = LocalizeLabel(stepName);
-        Description = LocalizeDescription(stepDesc);
-        Icon = stepTexture;
-    }
     private string? LocalizeDescription(string? description)
     {
         return StepDescriptionLocString == null
@@ -53,8 +46,10 @@ public class ProfileEditorStepButton : SLContainerButton
             : Loc.GetString($"{StepDescriptionLocString}-{description}");
     }
 
-    private string LocalizeLabel(string label)
+    private string? LocalizeLabel(string? label)
     {
+        if (label == null)
+            return null;
         return StepLocPrefix == null ? label : Loc.GetString($"{StepLocPrefix}-{label}");
     }
 }

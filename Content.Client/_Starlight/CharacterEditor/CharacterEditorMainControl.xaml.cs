@@ -13,25 +13,25 @@ public enum CharacterEditorPanelLayout
     Side
 }
 
-public sealed class CharacterEditorRootControl : ProfileEditorRootControl<CharacterEditor, CharacterEditorMainControl>;
+public sealed class CharacterEditorRootControl : ProfileEditorRootControl<CharacterEditor, CharacterEditorMainControl, CharacterEditorPanelLayout>;
 
 [GenerateTypedNameReferences]
-public sealed partial class CharacterEditorMainControl : ProfileEditorMainControl<CharacterEditorMainControl, CharacterEditor,CharacterEditorPanelLayout>
+public sealed partial class CharacterEditorMainControl : ProfileEditorMainControl<CharacterEditor, CharacterEditorPanelLayout>
 {
     protected override Control StepSelectorRoot => EditorStepSelector;
 
-    protected override void InjectPanel(CharacterEditorPanelLayout panelEnum, Control panel)
+    protected override void InjectPanel(CharacterEditorPanelLayout layout, Control newControl)
     {
-        switch (panelEnum)
+        switch (layout)
         {
             case CharacterEditorPanelLayout.Main:
-                MainPanel.AddChild(panel);
+                MainPanel.AddChild(newControl);
                 break;
             case CharacterEditorPanelLayout.Side:
-                SidePanel.AddChild(panel);
+                SidePanel.AddChild(newControl);
                 break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(panelEnum), panelEnum, null);
+                throw new ArgumentOutOfRangeException(nameof(layout), layout, null);
         }
     }
 }
