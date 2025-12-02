@@ -15,6 +15,18 @@ namespace Content.Client._Starlight.ProfileEditor;
 public interface IProfileEditor<TSelf>
     where TSelf: IProfileEditor<TSelf>, new()
 {
+    public int StepCount { get; }
+    public int CurrentStep { get; }
+
+    public bool IsOpen { get; }
+    public void InitFromSystem(int stepCount);
+    public void SetCurrentStep(int step);
+
+    public bool HasProfileChanges { get; }
+
+    public event Action<TSelf,int>? OnStepExited;
+    public event Action<TSelf,int>? OnStepEntered;
+
     public static UIEventHandle SubscribeEditorEvent<TControl, TEvent>(UIEvent<TControl,TEvent> handler)
         where TEvent : struct
         where TControl: Control, new()
@@ -73,8 +85,6 @@ public interface IProfileEditor<TSelf,TEditorControl> : IProfileEditor<TSelf>
     public void Initialize(TEditorControl editorControl);
 
     public TEditorControl EditorControl { get; }
-
-    public bool IsOpen => EditorControl.IsInsideTree;
 }
 
 public abstract class ProfileEditor<TSelf,TProfile, TEditorControl> :  IProfileEditor<TSelf,TEditorControl>
@@ -83,9 +93,34 @@ where TProfile: class, IPersistentProfile, new()
 where TEditorControl: SLControl, IProfileEditorMainControl<TEditorControl,TSelf>
 {
     [Dependency] protected readonly IEntityManager EntityManager = default!;
-
+    public bool IsOpen => EditorControl.IsInsideTree;
+    public int StepCount { get; private set; } = -1;
+    public int CurrentStep { get; private set; } = -1;
     public TProfile? EditingProfile { get; private set; }
     public TEditorControl EditorControl { get; private set; } = default!;
+    public event Action<TSelf,int>? OnStepExited;
+    public event Action<TSelf,int>? OnStepEntered;
+    public event Action<TEditorControl, TProfile>? OnDataSaved;
+    public event Action<TEditorControl, TProfile>? OnDataLoaded;
+
+    void IProfileEditor<TSelf>.InitFromSystem(int stepCount)
+    {
+        StepCount = stepCount;
+        EditorControl.SetStepCount(stepCount);
+    }
+
+    void IProfileEditor<TSelf>.SetCurrentStep(int step)
+    {
+        if (CurrentStep == step)
+            return;
+        if (CurrentStep != -1)
+            OnStepExited?.Invoke((TSelf)this,CurrentStep);
+        CurrentStep = step;
+        OnStepEntered?.Invoke((TSelf)this,CurrentStep);
+    }
+
+
+    public bool HasProfileChanges => EditingProfile is { HasDirtyData: true };
 
     public void Initialize(TEditorControl editorControl)
     {

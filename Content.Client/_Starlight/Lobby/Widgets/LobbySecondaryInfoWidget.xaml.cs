@@ -21,11 +21,6 @@ public sealed partial class LobbySecondaryInfoWidget : SLWidget
         ReportButton.URI = _cfg.GetCVar(CCVars.InfoLinksBugReport);
     }
 
-    protected override void EnteredTree()
-    {
-        SubscribeUIEvent<LobbyMusicUpdatedUIEvent>(OnLobbyMusicUpdated);
-    }
-
     private void OnLobbyMusicUpdated(ref readonly LobbyMusicUpdatedUIEvent args)
     {
         if (!args.HasSong)

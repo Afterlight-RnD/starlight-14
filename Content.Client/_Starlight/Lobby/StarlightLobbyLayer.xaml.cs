@@ -14,7 +14,6 @@ namespace Content.Client._Starlight.Lobby;
 public sealed partial class StarlightLobbyLayer : Control
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-
     public StarlightLobbyLayer()
     {
         RobustXamlLoader.Load(this);

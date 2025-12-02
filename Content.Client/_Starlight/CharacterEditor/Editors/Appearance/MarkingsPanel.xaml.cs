@@ -8,9 +8,8 @@ using Robust.Client.UserInterface.XAML;
 namespace Content.Client._Starlight.CharacterEditor.Editors.Appearance;
 
 [GenerateTypedNameReferences]
-public sealed partial class MarkingsPanel : CharacterEditorRightPanel
+public sealed partial class MarkingsPanel : CharacterEditorPanel
 {
-    public override CharacterEditorStep Step => CharacterEditorStep.Appearance;
     public MarkingsPanel()
     {
         RobustXamlLoader.Load(this);

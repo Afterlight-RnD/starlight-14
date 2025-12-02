@@ -15,15 +15,10 @@ public sealed partial class LobbyPlayerBarWidget : SLWidget
 {
     public int ButtonsPerRow { get => PlayerButtonGrid.Columns; set => PlayerButtonGrid.Columns = value; }
 
-    public CharacterEditorMainMainControl? CharacterEditor = null;
+
+
     public LobbyPlayerBarWidget()
     {
         RobustXamlLoader.Load(this);
-        EditCharacter.OnPressed += HandlePressed;
-    }
-
-    private void HandlePressed(BaseButton.ButtonEventArgs obj)
-    {
-        CharacterEditor?.EnterEditor();
     }
 }

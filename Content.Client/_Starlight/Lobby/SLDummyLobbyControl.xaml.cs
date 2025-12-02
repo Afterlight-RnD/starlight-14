@@ -18,6 +18,12 @@ public sealed partial class SLDummyLobbyControl : SLControl
         RobustXamlLoader.Load(this);
         LayoutContainer.SetAnchorPreset(Background, LayoutContainer.LayoutPreset.Wide);
         LayoutContainer.SetAnchorPreset(this, LayoutContainer.LayoutPreset.Wide);
+        Lobby.LobbyPlayerMenu.EditCharacter.OnPressed += EditCharacterPressed;
+    }
+
+    private void EditCharacterPressed(BaseButton.ButtonEventArgs obj)
+    {
+        CharacterEditor.Open();
     }
 
     public void ChangeLobbyBackground(Texture? texture)

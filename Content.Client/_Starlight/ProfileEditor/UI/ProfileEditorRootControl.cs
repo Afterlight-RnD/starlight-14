@@ -20,7 +20,6 @@ where TEditorControl: SLControl,IProfileEditorMainControl<TEditorControl, TProfi
             if (_profileEditor != null)
                 return _profileEditor;
             _profileEditor = new();
-            _profileEditor.Initialize(new TEditorControl());
             return _profileEditor;
         }
     }

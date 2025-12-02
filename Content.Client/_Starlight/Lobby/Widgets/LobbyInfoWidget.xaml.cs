@@ -25,9 +25,9 @@ public sealed partial class LobbyInfoWidget : SLWidget
 
     protected override void EnteredTree()
     {
-        SubscribeUIEvent<LobbyInfoUpdatedUIEvent>(OnLobbyInfoUpdated);
-        SubscribeUIEvent<RoundStartTimeChangedUIEvent>(OnStartTimeChanged);
-        SubscribeUIEvent<RoundStateChangedUIEvent>(OnRoundStateChanged);
+        // SubscribeUIEvent<LobbyInfoUpdatedUIEvent>(OnLobbyInfoUpdated);
+        // SubscribeUIEvent<RoundStartTimeChangedUIEvent>(OnStartTimeChanged);
+        // SubscribeUIEvent<RoundStateChangedUIEvent>(OnRoundStateChanged);
     }
 
     private void OnStartTimeChanged(ref readonly RoundStartTimeChangedUIEvent args)

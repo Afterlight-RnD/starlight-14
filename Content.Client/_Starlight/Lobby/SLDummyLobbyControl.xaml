@@ -7,6 +7,6 @@
     HorizontalExpand="True" VerticalExpand="True">
     <TextureRect Access="Public" VerticalExpand="True" HorizontalExpand="True" Name="Background"
                  Stretch="KeepAspectCovered" />
-    <layers:StarlightLobbyLayer Name="Lobby" Access="Protected"/>
-    <characterEditor:CharacterEditorMainMainControl Name="CharacterEditor" Access="Protected" Visible="False"/>
+    <layers:StarlightLobbyLayer Name="Lobby" Access="Public"/>
+    <characterEditor:CharacterEditorRootControl Name="CharacterEditor" Access="Public"/>
 </controls:SLDummyLobbyControl>

@@ -8,7 +8,10 @@ using Robust.Shared.Serialization.Manager;
 
 namespace Content.Shared._Starlight.CharacterProfiles;
 
-public interface IPersistentProfile;
+public interface IPersistentProfile
+{
+    public bool HasDirtyData { get; }
+}
 
 
 [DataDefinition]

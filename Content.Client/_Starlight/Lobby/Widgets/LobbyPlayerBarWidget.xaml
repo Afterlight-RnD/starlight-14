@@ -4,7 +4,7 @@
     xmlns:widgets="clr-namespace:Content.Client._Starlight.Lobby.Widgets"
     Orientation="Vertical">
     <GridContainer Name="PlayerButtonGrid" Access="Protected">
-        <Button Name="EditCharacter" Access="Protected"
+        <Button Name="EditCharacter" Access="Public"
                 Text="{Loc 'lobby-character-preview-panel-character-setup-button'}"/>
     </GridContainer>
 </widgets:LobbyPlayerBarWidget>
