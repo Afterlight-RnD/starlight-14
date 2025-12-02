@@ -22,7 +22,7 @@ public sealed partial class CharacterMenuWidget : CharacterEditorWidget
     private void HandleSelectCharacter(BaseButton.ButtonEventArgs obj)
     {
         //TODO: select character confirmation so that you can't discard changes by accident
-        OwningEditor?.TogglePopoutPanel(true);
+        //OwningEditor?.TogglePopoutPanel(true);
     }
 
     protected override void EnteredTree()
@@ -51,11 +51,11 @@ public sealed partial class CharacterMenuWidget : CharacterEditorWidget
 
     private void DiscardPressed(BaseButton.ButtonEventArgs obj)
     {
-        OwningEditor?.DiscardChanges(true);
+        //OwningEditor?.DiscardChanges(true);
     }
 
     private void SaveChangesPressed(BaseButton.ButtonEventArgs obj)
     {
-        OwningEditor?.SaveChanges();
+        //OwningEditor?.SaveChanges();
     }
 }

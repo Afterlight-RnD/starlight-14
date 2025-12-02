@@ -25,7 +25,6 @@ public sealed class CharacterSlotView : SLSpriteView
     protected override void EnteredTree()
     {
         base.EnteredTree();
-        SubscribeUIEvent<CharacterSlotUpdatedUIEvent>(OnCharacterUpdated);
     }
 
     private void OnCharacterUpdated(ref readonly CharacterSlotUpdatedUIEvent ev)

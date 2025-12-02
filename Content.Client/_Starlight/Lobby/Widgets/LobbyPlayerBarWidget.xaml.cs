@@ -15,7 +15,7 @@ public sealed partial class LobbyPlayerBarWidget : SLWidget
 {
     public int ButtonsPerRow { get => PlayerButtonGrid.Columns; set => PlayerButtonGrid.Columns = value; }
 
-    public CharacterEditorMainControl? CharacterEditor = null;
+    public CharacterEditorMainMainControl? CharacterEditor = null;
     public LobbyPlayerBarWidget()
     {
         RobustXamlLoader.Load(this);

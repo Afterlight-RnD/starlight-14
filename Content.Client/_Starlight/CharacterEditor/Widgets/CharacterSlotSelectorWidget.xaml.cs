@@ -37,7 +37,7 @@ public sealed partial class CharacterSlotSelectorWidget : CharacterEditorWidget
         if (_buttonGroup.Pressed is ProfileSelectorButton selectorButton)
             selectorButton.ToggleDeleteButton(false);
         _cfg.OnValueChanged(CCVars.GameMaxCharacterSlots, OnValueChanged, true);
-        SubscribeUIEvent<CharacterSlotUpdatedUIEvent>(HandleCharacterProfileUpdated);
+        //SubscribeUIEvent<CharacterSlotUpdatedUIEvent>(HandleCharacterProfileUpdated);
     }
 
     private void HandleCharacterProfileUpdated(ref readonly CharacterSlotUpdatedUIEvent args)

@@ -66,6 +66,7 @@ public class SLWindow : DefaultWindow, ISLControl
     [MustCallBase]
     protected override void EnteredTree()
     {
+        this.RegisterUIEvents();
         UIEvents.RaiseControlEvent(this, new ControlEnteredTreeUIEvent());
     }
 
@@ -74,58 +75,6 @@ public class SLWindow : DefaultWindow, ISLControl
     protected override void ExitedTree()
     {
         UIEvents.RaiseControlEvent(this, new ControlExitedTreeUIEvent());
-        UnsubscribeAllUIEvents();
+        this.UnsubscribeAllUIEvents();
     }
-
-    #region UIEvents
-    private HashSet<UIEventHandle> _uiEventHandles { get; } = new();
-
-    public void SubscribeUIRequest<T>(UIRequest<T> handler) where T: struct
-    {
-        _uiEventHandles.Add(UIEvents.SubscribeRequest(handler));
-    }
-
-    public void SubscribeUIEvent<T>(UIEvent<T> handler) where T: struct
-    {
-        _uiEventHandles.Add(UIEvents.Subscribe(handler));
-    }
-
-    public void RaiseUIEvent<T>(T args) where T : struct
-    {
-        UIEvents.RaiseEvent(args);
-    }
-
-    public void RaiseRequest<T>(ref T args) where T : struct
-    {
-        UIEvents.RaiseRequest(ref args);
-    }
-
-    public void RaiseControlUIEvent<T>(T args)
-        where T : struct
-    {
-        UIEvents.RaiseControlEvent(this,args);
-    }
-
-    public void RaiseControlUIEvent<T>(ref T args) where T : struct
-    {
-        UIEvents.RaiseControlRequest(this,ref args);
-    }
-
-    public void UnsubscribeUIEvent(ref UIEventHandle handle)
-    {
-        //EventType is never null if handle is valid
-        if (!handle.IsValid || _uiEventHandles.Remove(handle))
-            return;
-        handle.Unsubscribe();
-    }
-
-    public void UnsubscribeAllUIEvents()
-    {
-        foreach (var handle in _uiEventHandles)
-        {
-            handle.Unsubscribe();
-        }
-        _uiEventHandles.Clear();
-    }
-    #endregion
 }

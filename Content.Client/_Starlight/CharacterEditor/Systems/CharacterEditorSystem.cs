@@ -6,7 +6,7 @@ using Content.Client._Starlight.ProfileEditor;
 
 namespace Content.Client._Starlight.CharacterEditor.Systems;
 
-public sealed partial class CharacterEditorSystem : ProfileEditorSystem<CharacterEditor,CharacterEditorMainControl>
+public sealed partial class CharacterEditorSystem : ProfileEditorSystem<CharacterEditor,CharacterEditorMainMainControl>
 {
     [Dependency] private readonly CharacterProfileSystem _characterProfileSystem = default!;
 

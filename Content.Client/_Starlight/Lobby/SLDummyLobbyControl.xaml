@@ -8,5 +8,5 @@
     <TextureRect Access="Public" VerticalExpand="True" HorizontalExpand="True" Name="Background"
                  Stretch="KeepAspectCovered" />
     <layers:StarlightLobbyLayer Name="Lobby" Access="Protected"/>
-    <characterEditor:CharacterEditorMainControl Name="CharacterEditor" Access="Protected" Visible="False"/>
+    <characterEditor:CharacterEditorMainMainControl Name="CharacterEditor" Access="Protected" Visible="False"/>
 </controls:SLDummyLobbyControl>

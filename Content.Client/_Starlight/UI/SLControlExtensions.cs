@@ -7,7 +7,7 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.UI;
 
-public static class SLControlExtensions
+public static partial class SLControlExtensions
 {
     public static BaseButton WhenPressed(this BaseButton parent, Action<BaseButton.ButtonEventArgs> OnPressed,
         Action<IDisposable>? subscription = null)

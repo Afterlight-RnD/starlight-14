@@ -12,7 +12,7 @@ public interface ICharacterEditorField
     public void Randomize();
 
     public static void SetData<TProfileData, TValue>(
-        CharacterEditorMainControl? editorControl,
+        CharacterEditorMainMainControl? editorControl,
         TValue value, CharacterDataSetterDelegate<TProfileData, TValue> setter)
         where TProfileData : CharacterData, new()
     {
@@ -25,7 +25,7 @@ public interface ICharacterEditorField
     }
 
     public static void RandomizeField<TProfileData, TValue>(
-        CharacterEditorMainControl? editorControl,
+        CharacterEditorMainMainControl? editorControl,
         Func<TValue> dataRandomizer, CharacterDataSetterDelegate<TProfileData, TValue> setter)
         where TProfileData : CharacterData, new()
     {

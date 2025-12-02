@@ -9,7 +9,6 @@ using Content.Shared._Starlight.CharacterProfiles;
 namespace Content.Client._Starlight.CharacterEditor;
 
 
-public sealed class CharacterEditor : ProfileEditor<CharacterEditor, CharacterProfile, CharacterEditorMainControl,
-    CharacterEditorSystem, CharacterEditorBasePanel, CharacterEditorStepButton,CharacterEditorStep, CharacterEditorPanelPosition>
+public sealed class CharacterEditor : ProfileEditor<CharacterEditor, CharacterProfile, CharacterEditorMainControl>
 {
 }

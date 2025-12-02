@@ -12,49 +12,42 @@ namespace Content.Client._Starlight.CharacterEditor.Widgets;
 public sealed partial class CharacterEditorMenuBarWidget : CharacterEditorWidget
 {
     private readonly CharacterEditorCloseConfirmWindow _closeConfirmWindow;
+
+    public event Action<bool>? OnClosePressed;
+
+    public bool HasChanges { get; private set; }
+
     public CharacterEditorMenuBarWidget()
     {
         RobustXamlLoader.Load(this);
-        CloseButton.OnPressed += OnClosePressed;
+        CloseButton.OnPressed += OpenClosePrompt;
         _closeConfirmWindow = new();
         _closeConfirmWindow.NoSaveButton.OnPressed += ExitWithoutChanges;
         _closeConfirmWindow.SaveButton.OnPressed += ExitWithChanges;
         _closeConfirmWindow.CancelButton.OnPressed += _ => { _closeConfirmWindow.Close(); };
     }
 
-    private void ExitWithChanges(BaseButton.ButtonEventArgs obj)
+    private void ExitWithChanges(BaseButton.ButtonEventArgs? obj = null)
     {
         _closeConfirmWindow.Close();
-        if (OwningEditor == null)
-            return;
-        OwningEditor.SaveChanges();
-        OwningEditor.ExitEditor();
+        OnClosePressed?.Invoke(true);
     }
 
-    private void ExitWithoutChanges(BaseButton.ButtonEventArgs obj)
+    private void ExitWithoutChanges(BaseButton.ButtonEventArgs? obj = null)
     {
         _closeConfirmWindow.Close();
-        if (OwningEditor == null)
-            return;
-        OwningEditor.DiscardChanges();
-        OwningEditor.ExitEditor();
+        OnClosePressed?.Invoke(false);
     }
 
-    private void OnClosePressed(BaseButton.ButtonEventArgs obj)
+    private void OpenClosePrompt(BaseButton.ButtonEventArgs obj)
     {
-        if (OwningEditor == null)
+        if (!HasChanges)
         {
             _closeConfirmWindow.Close();
+            ExitWithoutChanges();
             return;
         }
-        if (OwningEditor.RequireExitConfirmation)
-        {
-            if (_closeConfirmWindow.IsOpen)
-                return;
-            _closeConfirmWindow.OpenCentered();
-            return;
-        }
-        OwningEditor.DiscardChanges();
-        OwningEditor.ExitEditor();
+        _closeConfirmWindow.OpenCentered();
+        return;
     }
 }
