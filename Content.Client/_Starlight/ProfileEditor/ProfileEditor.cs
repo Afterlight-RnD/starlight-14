@@ -77,7 +77,8 @@ where TLayoutEnum: struct, Enum
         var self = (TSelf)this;
         var editorInterface = GetEditorInterface;
         var layoutSize = Enum.GetValues<TLayoutEnum>().Length;
-        EditorControl = new(){Editor = self, StepControls = new Control[StepCount, layoutSize]};
+        EditorControl = IoCManager.Resolve<IDynamicTypeFactory>().CreateInstance<TEditorControl>();
+        EditorControl.Setup(self);
         editorInterface.EditorCreated(self);
     }
     public void FinishSetup(Control editorRoot)

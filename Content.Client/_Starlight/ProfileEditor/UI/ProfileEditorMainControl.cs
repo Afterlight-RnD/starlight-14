@@ -21,18 +21,18 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
 {
 
     public abstract Control StepSelectorRoot { get; }
-    public TEditor Editor { get;  init; } = default!;
+    public TEditor Editor { get;  private set; } = default!;
 
-    private Control?[,] _controls = default!;
-    public Control?[,] StepControls { private get => _controls; init => _controls = value; } //this *should* always be set after the control is created
+    private Control?[,] _controls = default!;//this *should* always be set after the control is created
     private ButtonGroup _stepSelectorButtonGroup = new(false);
+    private IDynamicTypeFactory _typeFactory = default!;
     public void ToggleStepControls(int step, bool state)
     {
         if (step >= Editor.StepCount)
             throw new IndexOutOfRangeException($"Tried to set step:{step} on {GetType()}, Max is: {Editor.StepCount-1}");
         for (var i = 0; i < Editor.LayoutCount; i++)
         {
-            var control = StepControls[step, i];
+            var control = _controls[step, i];
             if (control != null)
                 control.Visible = state;
         }
@@ -59,9 +59,16 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
     public TPanel GetPanel<TPanel>(int step, TLayoutEnum layout)
     where TPanel: Control, new()
     {
-        var panel = StepControls[step, layout.ToInt32(null)];
+        var panel = _controls[step, layout.ToInt32(null)];
         if (panel == null)
             throw new KeyNotFoundException($"Panel of type{typeof(TPanel)} not found in step:{step} pos: {layout}");
         return (TPanel)panel;
+    }
+
+    public void Setup(TEditor editor, IDynamicTypeFactory typeFactory)
+    {
+        _typeFactory = typeFactory;
+        Editor = editor;
+        _controls = new Control[editor.StepCount, editor.LayoutCount];
     }
 }
