@@ -6,9 +6,25 @@ using Content.Shared._Starlight.CharacterProfiles;
 
 namespace Content.Client._Starlight.ProfileEditor.UI;
 
-public sealed class ProfileEditorEnumField<TEnum, TProfile> : SLOptionButton<TEnum>,
+
+public partial interface IProfileEditorFieldBuilder<TProfile>
+{
+    public void RegisterFieldEnum<TEnum>(ProfileEditorField<TProfile> fieldControl,
+        Func<TProfile, TEnum> readData,
+        Action<TProfile, TEnum> writeData,
+        Func<TEnum, string>? localizeEnum = null,
+        string? locPrefix = null,
+        Func<TEnum, bool>? ignoredEnums = null)
+        where TEnum : struct, Enum
+    {
+        RegisterField(fieldControl,
+            new ProfileEditorFieldEnum<TEnum, TProfile>(readData, writeData, localizeEnum, locPrefix, ignoredEnums));
+    }
+}
+
+public sealed class ProfileEditorFieldEnum<TEnum, TProfile> : SLOptionButton<TEnum>,
     IProfileEditorField<TEnum, TProfile>
-    where TProfile : IPersistentProfile, new()
+    where TProfile : class, IPersistentProfile<TProfile>
     where TEnum : struct, Enum
 {
     private readonly Func<TEnum, string>? _localizeFunc;
@@ -16,31 +32,37 @@ public sealed class ProfileEditorEnumField<TEnum, TProfile> : SLOptionButton<TEn
     private readonly Func<TProfile, TEnum> _readData;
     private readonly Action<TProfile, TEnum> _writeData;
 
-    public ProfileEditorEnumField(
-        IProfileEditor<TProfile> editor,
+    private TProfile _data {
+        get
+        {
+            if (_profile == null)
+                throw new InvalidOperationException("Profile must be injected!");
+            return _profile;
+        }
+    }
+    private TProfile? _profile = null;
+    public void InjectProfile(TProfile profile)
+    {
+        _profile = profile;
+        profile.OnSync += FromProfile;
+    }
+
+    public ProfileEditorFieldEnum(
         Func<TProfile, TEnum> readData,
         Action<TProfile, TEnum> writeData,
         Func<TEnum, string>? localizeEnum = null,
         string? locPrefix = null,
         Func<TEnum, bool>? ignoredEnums = null)
     {
-        Editor = editor;
         LocPrefix = locPrefix;
         _localizeFunc = localizeEnum;
         _ignoredEnums = ignoredEnums;
         _readData = readData;
         _writeData = writeData;
     }
+    public void FromProfile(TProfile profile) => SelectByData(_readData.Invoke(profile));
 
-    public IProfileEditor<TProfile> Editor { get;}
-
-    public void SetData(TEnum data) => SelectByData(data);
-
-    public TEnum GetData() => CurrentOption;
-
-    public void FromProfile(TProfile data) => SelectByData(_readData.Invoke(data));
-
-    public void ToProfile(TProfile data) => _writeData.Invoke(data, CurrentOption);
+    public void ToProfile() => _writeData.Invoke(_data, CurrentOption);
 
     public override IEnumerable<TEnum> EnumerateOptions()
     {

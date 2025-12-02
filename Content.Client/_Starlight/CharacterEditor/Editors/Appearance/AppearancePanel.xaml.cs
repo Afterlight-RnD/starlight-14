@@ -14,14 +14,5 @@ public sealed partial class AppearancePanel : CharacterEditorPanel
     public AppearancePanel()
     {
         RobustXamlLoader.Load(this);
-        SetupEditorFields();
-    }
-
-    private void SetupEditorFields()
-    {
-        // CharacterBodyTypeField.InitializeAsEnumField((Sex bodyType, CharacterProfile profile, CharacterIdentityData data) =>
-        // {
-        //     data.BodyType = bodyType;
-        // }, data => data.BodyType);
     }
 }

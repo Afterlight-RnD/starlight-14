@@ -6,22 +6,38 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.ProfileEditor.UI;
 
-public sealed class ProfileEditorTextField<TProfile>(
-    IProfileEditor<TProfile> editor,
+
+public partial interface IProfileEditorFieldBuilder<TProfile>
+{
+    public void ProfileEditorFieldText(
+        ProfileEditorField<TProfile> fieldControl,
+        Func<TProfile, string> readData,
+        Action<TProfile, string> writeData)
+    {
+        RegisterField(fieldControl, new ProfileEditorFieldText<TProfile>(readData, writeData));
+    }
+}
+
+public sealed class ProfileEditorFieldText<TProfile>(
     Func<TProfile, string> readData,
     Action<TProfile, string> writeData)
     : LineEdit, IProfileEditorField<string, TProfile>
-    where TProfile : IPersistentProfile, new()
+    where TProfile : class, IPersistentProfile<TProfile>
 {
-    public IProfileEditor<TProfile> Editor { get; } = editor;
-
-    public void SetData(string data) => SetText(data);
-
-    public string GetData() => Text;
-
-    public void FromProfile(TProfile data)
+    private TProfile _data
     {
-        SetText(readData.Invoke(data), false);
+        get
+        {
+            if (_profile == null)
+                throw new InvalidOperationException("Profile must be injected!");
+            return _profile;
+        }
+    }
+    private TProfile? _profile = null;
+    public void InjectProfile(TProfile profile)
+    {
+        _profile = profile;
+        profile.OnSync += FromProfile;
     }
 
     public void SetEditWidth(int width)
@@ -29,5 +45,10 @@ public sealed class ProfileEditorTextField<TProfile>(
         MinWidth = width;
     }
 
-    public void ToProfile(TProfile data) => writeData.Invoke(data, Text);
+
+    public void FromProfile(TProfile profile)
+    {
+        SetText(readData.Invoke(profile), false);
+    }
+    public void ToProfile() => writeData.Invoke(_data, Text);
 }

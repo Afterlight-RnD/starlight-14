@@ -3,7 +3,6 @@
 
 using System.Linq;
 using Content.Client._Starlight.ProfileEditor.UI;
-using Content.Client._Starlight.UI;
 using Content.Client._Starlight.UI.Core;
 using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Shared.Reflection;
@@ -11,7 +10,7 @@ using Robust.Shared.Reflection;
 namespace Content.Client._Starlight.ProfileEditor;
 
 public interface IProfileEditorSystem<TProfile, in TProfileEditor>
-    where TProfile : IPersistentProfile, new()
+    where TProfile : class, IPersistentProfile
     where TProfileEditor : IProfileEditor, new()
 {
     public void EditorCreated(TProfileEditor editor);
@@ -24,14 +23,16 @@ public interface IProfileEditorSystem<TProfile, in TProfileEditor>
 public abstract class ProfileEditorSystem<TSelf, TEditorControl, TProfile, TProfileEditor, TLayoutEnum, TStepButton> : UISystem,
     IProfileEditorSystem<TProfile, TProfileEditor>
     where TSelf : ProfileEditorSystem<TSelf, TEditorControl, TProfile, TProfileEditor, TLayoutEnum, TStepButton>, new()
-    where TEditorControl : ProfileEditorMainControl<TProfileEditor, TLayoutEnum, TStepButton>, new()
-    where TProfile : IPersistentProfile, new()
+    where TEditorControl : ProfileEditorMainControl<TProfileEditor, TProfile,TLayoutEnum, TStepButton>, new()
+    where TProfile : class, IPersistentProfile<TProfile>
     where TProfileEditor : ProfileEditor<TProfileEditor, TProfile, TEditorControl, TSelf, TLayoutEnum, TStepButton>, new()
     where TStepButton : ProfileEditorStepButton, new()
     where TLayoutEnum : struct, Enum
 {
     [Dependency] private readonly IReflectionManager _reflectionManager = default!;
     private List<ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TSelf, TLayoutEnum, TStepButton>> _stepSystems = new();
+
+    public abstract TProfile CreateEditorProfile();
 
     public int StepCount => _stepSystems.Count;
 

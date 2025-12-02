@@ -13,9 +13,17 @@ public interface IPersistentProfile
     public bool HasDirtyData { get; }
 }
 
+public interface IPersistentProfile<TSelf> : IPersistentProfile
+where TSelf: class,IPersistentProfile<TSelf>
+{
+    public event Action<TSelf> OnSync;
+
+    public void Sync();
+}
+
 
 [DataDefinition]
-public sealed partial class CharacterProfile : IPersistentProfile
+public sealed partial class CharacterProfile : IPersistentProfile<CharacterProfile>
 {
     [Dependency] private readonly ISerializationManager _serMan = default!;
     [DataField] public int Slot;
@@ -26,7 +34,8 @@ public sealed partial class CharacterProfile : IPersistentProfile
 
     [DataField]
     public bool Active { get; set; }
-
+    public event Action<CharacterProfile>? OnSync;
+    public void Sync() => OnSync?.Invoke(this);
     public bool HasDirtyData
     {
         get

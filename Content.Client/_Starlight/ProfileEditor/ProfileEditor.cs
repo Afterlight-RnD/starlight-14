@@ -25,7 +25,7 @@ public interface IProfileEditor
 };
 
 public interface IProfileEditor<out TProfile> : IProfileEditor
-    where TProfile: IPersistentProfile, new()
+    where TProfile: class, IPersistentProfile
 {
     public TProfile Profile { get;}
 }
@@ -36,13 +36,22 @@ public interface IProfileEditor<TSelf,out TEditorControl, TLayoutEnum> : IProfil
     where TLayoutEnum: struct, Enum
 {
     public TEditorControl EditorControl { get; }
+}
 
+public interface IProfileEditor<TSelf, TProfile, TEditorControl, TLayoutEnum, TStepButton>
+    : IProfileEditor<TSelf,TEditorControl, TLayoutEnum> ,IProfileEditor<TProfile>
+    where TProfile: class, IPersistentProfile
+    where TSelf: IProfileEditor<TSelf, TEditorControl, TLayoutEnum>, new()
+    where TEditorControl: SLControl, IProfileEditorMainControl<TSelf>, new()
+    where TLayoutEnum: struct, Enum
+
+{
 }
 public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum, TStepButton>
-    : IProfileEditor<TSelf,TEditorControl, TLayoutEnum>, IProfileEditor<TProfile>
+    : IProfileEditor<TProfile>, IProfileEditor<TSelf, TProfile, TEditorControl, TLayoutEnum, TStepButton>
 where TSelf:ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum, TStepButton>, new()
-where TProfile: IPersistentProfile, new()
-where TEditorControl: ProfileEditorMainControl<TSelf, TLayoutEnum, TStepButton>, new()
+where TProfile: class, IPersistentProfile<TProfile>
+where TEditorControl: ProfileEditorMainControl<TSelf, TProfile,TLayoutEnum, TStepButton>, new()
 where TSystem: ProfileEditorSystem<TSystem, TEditorControl,TProfile, TSelf, TLayoutEnum, TStepButton>, new()
 where TStepButton: ProfileEditorStepButton, new()
 where TLayoutEnum: struct, Enum
@@ -64,11 +73,11 @@ where TLayoutEnum: struct, Enum
         if (!EntityManager.TryGetDependencyCollection(out var systemDeps))
             throw new InvalidOperationException($"Tried to create profile editor:{GetType()} out of sim!");
         EditorSystem = systemDeps.Resolve<TSystem>();
+        Profile = EditorSystem.CreateEditorProfile();
         var self = (TSelf)this;
         var editorInterface = GetEditorInterface;
         var layoutSize = Enum.GetValues<TLayoutEnum>().Length;
         EditorControl = new(){Editor = self, StepControls = new Control[StepCount, layoutSize]};
-        Profile = new();
         editorInterface.EditorCreated(self);
     }
     public void FinishSetup(Control editorRoot)

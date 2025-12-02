@@ -10,8 +10,8 @@ using Robust.Client.UserInterface;
 namespace Content.Client._Starlight.ProfileEditor;
 
 public abstract class ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TEditorSystem, TLayoutEnum, TStepButton> : UISystem
-where TProfile: IPersistentProfile, new()
-where TEditorControl: ProfileEditorMainControl<TProfileEditor, TLayoutEnum, TStepButton>, new()
+where TProfile: class,IPersistentProfile<TProfile>
+where TEditorControl: ProfileEditorMainControl<TProfileEditor, TProfile,TLayoutEnum, TStepButton>, new()
 where TProfileEditor: ProfileEditor<TProfileEditor, TProfile, TEditorControl, TEditorSystem, TLayoutEnum, TStepButton>, new()
 where TEditorSystem: ProfileEditorSystem<TEditorSystem,TEditorControl,TProfile, TProfileEditor, TLayoutEnum, TStepButton>, new()
 where TStepButton:ProfileEditorStepButton, new()
@@ -50,14 +50,12 @@ where TLayoutEnum: struct, Enum
 
     public void INTERNAL_SaveData(TProfileEditor editor)
     {
-        if (editor.Profile != null)
-            _handleLoadData?.Invoke(editor.EditorControl, editor.Profile);
+        _handleLoadData?.Invoke(editor.EditorControl, editor.Profile);
     }
 
     public void INTERNAL_LoadData(TProfileEditor editor)
     {
-        if (editor.Profile != null)
-            _handleSaveData?.Invoke(editor.EditorControl, editor.Profile);
+        _handleSaveData?.Invoke(editor.EditorControl, editor.Profile);
     }
 
     public void INTERNAL_SetupEditor(TProfileEditor editor)
@@ -70,7 +68,7 @@ where TLayoutEnum: struct, Enum
         EditorCreated(editor);
     }
 
-    protected abstract void SetupStep(IProfileEditorPanelBuilder<TProfile> panelBuilder);
+    protected abstract void SetupStep(IProfileEditorPanelBuilder<TProfile,TLayoutEnum> panelBuilder);
 
     protected virtual void EditorCreated(TProfileEditor editor){}
 }

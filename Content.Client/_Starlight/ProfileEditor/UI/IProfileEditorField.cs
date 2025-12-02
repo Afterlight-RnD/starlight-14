@@ -10,15 +10,16 @@ public interface IProfileEditorField
 }
 
 public interface IProfileEditorField<TProfile> : IProfileEditorField
-    where TProfile : IPersistentProfile, new()
+    where TProfile : class, IPersistentProfile
 {
     public virtual void SetEditWidth(int width){}
+    public void InjectProfile(TProfile profile);
 }
 public interface IProfileEditorField<TData, TProfile> : IProfileEditorField<TProfile>
-where TProfile: IPersistentProfile, new()
+where TProfile: class, IPersistentProfile<TProfile>
 {
-    public IProfileEditor<TProfile> Editor { get; }
-    public void FromProfile(TProfile data);
 
-    public void ToProfile(TProfile data);
+    public void FromProfile(TProfile profile);
+
+    public void ToProfile();
 }

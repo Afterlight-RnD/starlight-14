@@ -11,6 +11,11 @@ namespace Content.Client._Starlight.CharacterEditor.Systems;
 public sealed partial class CharacterEditorSystem : ProfileEditorSystem<CharacterEditorSystem, CharacterEditorMainControl, CharacterProfile, CharacterEditor, CharacterEditorPanelLayout, CharacterEditorStepButton>
 {
     [Dependency] private readonly CharacterProfileSystem _characterProfileSystem = default!;
+
+    public override CharacterProfile CreateEditorProfile()
+    {
+        return new CharacterProfile();
+    }
 }
 
 public abstract class CharacterEditorStep : ProfileEditorStep<CharacterProfile, CharacterEditor, CharacterEditorMainControl, CharacterEditorSystem, CharacterEditorPanelLayout, CharacterEditorStepButton>

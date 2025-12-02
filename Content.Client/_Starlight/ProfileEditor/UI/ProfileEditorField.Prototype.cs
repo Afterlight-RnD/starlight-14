@@ -7,12 +7,27 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client._Starlight.ProfileEditor.UI;
 
-public sealed class ProfileEditorPrototypeField<TProto,TProfile> : SLOptionButton<ProtoId<TProto>>, IProfileEditorField<TProto, TProfile>
-where TProto: class,IPrototype
-where TProfile : IPersistentProfile, new()
+public partial interface IProfileEditorFieldBuilder<TProfile>
 {
-    public IProfileEditor<TProfile> Editor { get; }
+    public void ProfileEditorFieldProto<TProto>(
+        ProfileEditorField<TProfile> fieldControl,
+        IPrototypeManager protoManager,
+        Func<TProfile,  ProtoId<TProto>> readData,
+        Action<TProfile,  ProtoId<TProto>> writeData,
+        Func<TProto, string> getOptionLabel,
+        Func<TProto, bool>? ignoredPrototypes = null)
+        where TProto: class,IPrototype
+    {
+        RegisterField(fieldControl,
+            new ProfileEditorFieldPrototype<TProto, TProfile>(protoManager, readData, writeData, getOptionLabel, ignoredPrototypes));
+    }
+}
 
+
+public sealed class ProfileEditorFieldPrototype<TProto,TProfile> : SLOptionButton<ProtoId<TProto>>, IProfileEditorField<TProto, TProfile>
+where TProto: class,IPrototype
+where TProfile : class, IPersistentProfile<TProfile>
+{
     private IPrototypeManager _prototypeManager = default!;
 
     private Func<TProto, string> _getOptionLabel;
@@ -20,15 +35,29 @@ where TProfile : IPersistentProfile, new()
     private readonly Func<TProfile,  ProtoId<TProto>> _readData;
     private readonly Action<TProfile, ProtoId<TProto>> _writeData;
 
-    public ProfileEditorPrototypeField(
-        IProfileEditor<TProfile> editor,
+    private TProfile _data
+    {
+        get
+        {
+            if (_profile == null)
+                throw new InvalidOperationException("Profile must be injected!");
+            return _profile;
+        }
+    }
+    private TProfile? _profile = null;
+    public void InjectProfile(TProfile profile)
+    {
+        _profile = profile;
+        profile.OnSync += FromProfile;
+    }
+
+    public ProfileEditorFieldPrototype(
         IPrototypeManager protoManager,
         Func<TProfile,  ProtoId<TProto>> readData,
         Action<TProfile,  ProtoId<TProto>> writeData,
         Func<TProto, string> getOptionLabel,
         Func<TProto, bool>? ignoredPrototypes = null)
     {
-        Editor = editor;
         _prototypeManager = protoManager;
         _getOptionLabel = getOptionLabel;
         _ignoredProtos = ignoredPrototypes;
@@ -70,7 +99,7 @@ where TProfile : IPersistentProfile, new()
     }
     protected override string GetOptionLabel(ProtoId<TProto> data) => _getOptionLabel(_prototypeManager.Index(data));
 
-    public void FromProfile(TProfile data) => SelectByData(_readData.Invoke(data));
+    public void FromProfile(TProfile profile) => SelectByData(_readData.Invoke(profile));
 
-    public void ToProfile(TProfile data) => _writeData.Invoke(data, CurrentOption);
+    public void ToProfile() => _writeData.Invoke(_data, CurrentOption);
 }

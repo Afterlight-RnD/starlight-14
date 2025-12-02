@@ -4,7 +4,7 @@
     xmlns:controls1="clr-namespace:Content.Client._Starlight.CharacterEditor.Controls">
 
     <controls1:CharacterEditorField
-        Name="CharacterBodyTypeField" Access="Protected" HorizontalAlignment="Center"
-        LabelText="BodyType: "/>
+        Name="CharacterBodyTypeField" HorizontalAlignment="Center" Access="Public"
+        Label="BodyType: "/>
 
 </controls:AppearancePanel>

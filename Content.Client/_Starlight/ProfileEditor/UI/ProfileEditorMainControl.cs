@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 using Content.Client._Starlight.UI;
+using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
@@ -12,10 +13,9 @@ public interface IProfileEditorMainControl<TEditor>
 {
 }
 
-
-
-public abstract class ProfileEditorMainControl<TEditor, TLayoutEnum, TStepSelectorButton> : SLControl, IProfileEditorMainControl<TEditor>
-where TEditor: IProfileEditor, new()
+public abstract class ProfileEditorMainControl<TEditor, TProfile, TLayoutEnum, TStepSelectorButton> : SLControl, IProfileEditorMainControl<TEditor>
+where TEditor: IProfileEditor<TProfile>, new()
+where TProfile: class, IPersistentProfile
 where TLayoutEnum: struct, Enum, IConvertible
 where TStepSelectorButton: ProfileEditorStepButton, new()
 {
@@ -42,7 +42,7 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
         string stepName,
         string? stepDescription,
         Texture? stepIcon,
-        IProfileEditorPanelBuilder<TEditor, TLayoutEnum> builder)
+        IProfileEditorPanelInjector<TProfile, TLayoutEnum> builder)
     {
         StepSelectorRoot.AddChild(new TStepSelectorButton
         {
@@ -51,7 +51,7 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
             Description = stepDescription,
             Icon = stepIcon
         });
-        builder.InjectPanels(step, ref _controls, InjectPanel);
+        builder.InjectPanels(Editor.Profile, step, ref _controls, InjectPanel);
     }
 
     protected abstract void InjectPanel(TLayoutEnum layout, Control newControl);
