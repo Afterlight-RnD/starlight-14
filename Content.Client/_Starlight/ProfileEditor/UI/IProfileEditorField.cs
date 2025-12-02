@@ -8,8 +8,9 @@ namespace Content.Client._Starlight.ProfileEditor.UI;
 public interface IProfileEditorField
 {
 }
-
-public interface IProfileEditorField<TData, TProfile> : IProfileEditorField
+public interface IProfileEditorField<TProfile> : IProfileEditorField
+    where TProfile : IPersistentProfile, new();
+public interface IProfileEditorField<TData, TProfile> : IProfileEditorField<TProfile>
 where TProfile: IPersistentProfile, new()
 {
     public IProfileEditor<TProfile> Editor { get; }

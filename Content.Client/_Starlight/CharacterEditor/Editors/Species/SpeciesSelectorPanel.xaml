@@ -18,9 +18,6 @@
         <BoxContainer
             Orientation="Horizontal"
             Name="CustomSpeciesBox" Access="Protected">
-            <controls1:CharacterEditorField
-                Name="CustomSpeciesName" Access="Protected"
-                LabelText="Custom Species Name: " TextEditWidth="250"/>
         </BoxContainer>
     </BoxContainer>
 </species:SpeciesSelectorPanel>

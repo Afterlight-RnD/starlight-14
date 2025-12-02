@@ -11,8 +11,8 @@ public interface IProfileEditorPanelBuilder;
 public interface IProfileEditorPanelBuilder<TProfile> : IProfileEditorPanelBuilder
     where TProfile: IPersistentProfile, new()
 {
-    public void RegisterField<TField>(ProfileEditorField fieldControl, TField field)
-        where TField : Control, IProfileEditorField;
+    public void RegisterField<TField>(ProfileEditorField<TProfile> fieldControl, TField field)
+        where TField : Control, IProfileEditorField<TProfile>;
 }
 
 public sealed class ProfileEditorPanelBuilder<TEditor,TProfile,TLayoutEnum, TEditorControl, TStepSelectorButton> : IProfileEditorPanelBuilder<TProfile>
@@ -61,8 +61,8 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
             _log.Warning("Panel was already registered!");
     }
 
-    public void RegisterField<TField>(ProfileEditorField fieldControl, TField field)
-        where TField: Control, IProfileEditorField
+    public void RegisterField<TField>(ProfileEditorField<TProfile> fieldControl, TField field)
+        where TField: Control, IProfileEditorField<TProfile>
     {
         fieldControl.InitializeAsFieldType(field);
     }

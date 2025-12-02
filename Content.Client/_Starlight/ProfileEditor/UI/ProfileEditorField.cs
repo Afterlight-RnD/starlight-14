@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Client._Starlight.UI;
+using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.ProfileEditor.UI;
 
-public sealed class ProfileEditorField : SLBox
+public abstract class ProfileEditorField<TProfile> : SLBox
+where TProfile: IPersistentProfile, new()
 {
     public string? Label { get => _label.Text; set => _label.Text = value; }
 
@@ -22,7 +24,7 @@ public sealed class ProfileEditorField : SLBox
         AddChild(_label);
     }
     public void InitializeAsFieldType<TFieldType>(TFieldType field)
-    where TFieldType: Control,IProfileEditorField
+    where TFieldType: Control, IProfileEditorField<TProfile>
     {
         if (_field != null)
             throw new InvalidOperationException($"Field:{Name} is already registered as type:{field.GetType()}");
