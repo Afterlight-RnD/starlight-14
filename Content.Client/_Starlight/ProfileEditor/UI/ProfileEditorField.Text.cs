@@ -6,7 +6,8 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Starlight.ProfileEditor.UI;
 
-public sealed class ProfileEditorTextField<TProfile>(IProfileEditor<TProfile> editor,
+public sealed class ProfileEditorTextField<TProfile>(
+    IProfileEditor<TProfile> editor,
     Func<TProfile, string> readData,
     Action<TProfile, string> writeData)
     : LineEdit, IProfileEditorField<string, TProfile>

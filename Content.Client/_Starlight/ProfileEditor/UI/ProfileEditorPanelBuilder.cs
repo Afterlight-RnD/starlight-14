@@ -5,13 +5,17 @@ using Content.Shared._Starlight.CharacterProfiles;
 using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.ProfileEditor.UI;
-public interface IProfileEditorPanelBuilder
+
+public interface IProfileEditorPanelBuilder;
+
+public interface IProfileEditorPanelBuilder<TProfile> : IProfileEditorPanelBuilder
+    where TProfile: IPersistentProfile, new()
 {
     public void RegisterField<TField>(ProfileEditorField fieldControl, TField field)
         where TField : Control, IProfileEditorField;
 }
 
-public sealed class ProfileEditorPanelBuilder<TEditor,TProfile,TLayoutEnum, TEditorControl, TStepSelectorButton> : IProfileEditorPanelBuilder
+public sealed class ProfileEditorPanelBuilder<TEditor,TProfile,TLayoutEnum, TEditorControl, TStepSelectorButton> : IProfileEditorPanelBuilder<TProfile>
 where TProfile: IPersistentProfile, new()
 where TEditorControl: ProfileEditorMainControl<TEditor, TLayoutEnum, TStepSelectorButton>
 where TEditor: IProfileEditor, new()
@@ -19,7 +23,7 @@ where TLayoutEnum: struct, Enum, IConvertible
 where TStepSelectorButton: ProfileEditorStepButton, new()
 {
 
-    private Dictionary<TLayoutEnum, (Type, Action<Control, IProfileEditorPanelBuilder>)> _panelTypes = new();
+    private Dictionary<TLayoutEnum, (Type, Action<Control, IProfileEditorPanelBuilder<TProfile>>)> _panelTypes = new();
 
     private ISawmill _log;
     private readonly IDynamicTypeFactory _typeFactory;
@@ -50,7 +54,7 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
     }
 
     public void RegisterPanel<TPanel>(TLayoutEnum layout,
-        Action<TPanel, IProfileEditorPanelBuilder> setupFields)
+        Action<TPanel, IProfileEditorPanelBuilder<TProfile>> setupFields)
         where TPanel : Control, new()
     {
         if (_panelTypes.TryAdd(layout, (typeof(TPanel), (control, builder) => setupFields.Invoke((TPanel)control, builder))))
