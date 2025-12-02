@@ -4,18 +4,24 @@
 using Content.Client._Starlight.ProfileEditor.UI;
 using Content.Client._Starlight.UI.Core;
 using Content.Shared._Starlight.CharacterProfiles;
+using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.ProfileEditor;
 
-public abstract class ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TEditorSystem, TLayoutEnum> : UISystem
+public abstract class ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TEditorSystem, TLayoutEnum, TStepButton> : UISystem
 where TProfile: IPersistentProfile, new()
-where TEditorControl: ProfileEditorMainControl<TProfileEditor, TLayoutEnum, ProfileEditorStepButton>, new()
-where TProfileEditor: ProfileEditor<TProfileEditor, TProfile, TEditorControl, TEditorSystem, TLayoutEnum>, new()
-where TEditorSystem: ProfileEditorSystem<TEditorSystem,TEditorControl,TProfile, TProfileEditor, TLayoutEnum>, new()
+where TEditorControl: ProfileEditorMainControl<TProfileEditor, TLayoutEnum, TStepButton>, new()
+where TProfileEditor: ProfileEditor<TProfileEditor, TProfile, TEditorControl, TEditorSystem, TLayoutEnum, TStepButton>, new()
+where TEditorSystem: ProfileEditorSystem<TEditorSystem,TEditorControl,TProfile, TProfileEditor, TLayoutEnum, TStepButton>, new()
+where TStepButton:ProfileEditorStepButton, new()
 where TLayoutEnum: struct, Enum
 {
     [Dependency] private readonly IDynamicTypeFactory _typeFactory = default!;
+
+    public abstract string StepName { get; }
+    public virtual string? StepDescription => null;
+    public virtual Texture? StepIcon => null;
 
     public int Step { get; private set; } = -1;
     public virtual Type[]? BeforeSteps => null;
@@ -45,7 +51,7 @@ where TLayoutEnum: struct, Enum
 
     public void INTERNAL_SetupEditor(TProfileEditor editor)
     {
-        editor.EditorControl.TryInjectStepControls(Step, _typeFactory, _panelBuilders);
+        editor.EditorControl.TryInjectStepControls(Step,StepName, StepDescription, StepIcon, _typeFactory, _panelBuilders);
     }
 
     public void INTERNAL_EditorCreated(TProfileEditor editor)

@@ -20,7 +20,7 @@ where TLayoutEnum: struct, Enum, IConvertible
 where TStepSelectorButton: ProfileEditorStepButton, new()
 {
 
-    public abstract Control StepButtonRoot { get; }
+    public abstract Control StepSelectorRoot { get; }
     public TEditor Editor { get;  init; } = default!;
     public Control?[,] StepControls { private get; init; } = default!; //this *should* always be set after the control is created
     private ButtonGroup _stepSelectorButtonGroup = new(false);
@@ -43,7 +43,7 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
         IDynamicTypeFactory typeFactory,
         Dictionary<TLayoutEnum, Func<IDynamicTypeFactory,Control>> builders)
     {
-        StepButtonRoot.AddChild(new TStepSelectorButton
+        StepSelectorRoot.AddChild(new TStepSelectorButton
         {
             Group = _stepSelectorButtonGroup,
             Label = stepName,

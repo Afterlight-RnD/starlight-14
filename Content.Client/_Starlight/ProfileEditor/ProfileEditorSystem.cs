@@ -21,20 +21,21 @@ public interface IProfileEditorSystem<TProfile, in TProfileEditor>
     public void LoadData(TProfileEditor editor);
 }
 
-public abstract class ProfileEditorSystem<TSelf, TEditorControl, TProfile, TProfileEditor, TLayoutEnum> : UISystem,
+public abstract class ProfileEditorSystem<TSelf, TEditorControl, TProfile, TProfileEditor, TLayoutEnum, TStepButton> : UISystem,
     IProfileEditorSystem<TProfile, TProfileEditor>
-    where TSelf : ProfileEditorSystem<TSelf, TEditorControl, TProfile, TProfileEditor, TLayoutEnum>, new()
-    where TEditorControl : ProfileEditorMainControl<TProfileEditor, TLayoutEnum, ProfileEditorStepButton>, new()
+    where TSelf : ProfileEditorSystem<TSelf, TEditorControl, TProfile, TProfileEditor, TLayoutEnum, TStepButton>, new()
+    where TEditorControl : ProfileEditorMainControl<TProfileEditor, TLayoutEnum, TStepButton>, new()
     where TProfile : IPersistentProfile, new()
-    where TProfileEditor : ProfileEditor<TProfileEditor, TProfile, TEditorControl, TSelf, TLayoutEnum>, new()
+    where TProfileEditor : ProfileEditor<TProfileEditor, TProfile, TEditorControl, TSelf, TLayoutEnum, TStepButton>, new()
+    where TStepButton : ProfileEditorStepButton, new()
     where TLayoutEnum : struct, Enum
 {
     [Dependency] private readonly IReflectionManager _reflectionManager = default!;
-    private List<ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TSelf, TLayoutEnum>> _stepSystems = new();
+    private List<ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TSelf, TLayoutEnum, TStepButton>> _stepSystems = new();
 
     public int StepCount => _stepSystems.Count;
 
-    protected Type GetStepBaseType => typeof(ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TSelf, TLayoutEnum>);
+    protected Type GetStepBaseType => typeof(ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TSelf, TLayoutEnum, TStepButton>);
 
     public override void Initialize()
     {
@@ -79,7 +80,7 @@ public abstract class ProfileEditorSystem<TSelf, TEditorControl, TProfile, TProf
         foreach (var stepType in _reflectionManager.GetAllChildren(GetStepBaseType))
         {
             _stepSystems.Add(
-                (ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TSelf, TLayoutEnum>)
+                (ProfileEditorStep<TProfile, TProfileEditor, TEditorControl, TSelf, TLayoutEnum, TStepButton>)
                 EntityManager.EntitySysManager.GetEntitySystem(stepType));
         }
         _stepSystems.Sort(((step1, step2) =>

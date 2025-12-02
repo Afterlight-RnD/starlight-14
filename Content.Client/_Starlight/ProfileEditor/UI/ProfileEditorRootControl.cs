@@ -4,9 +4,10 @@ using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.ProfileEditor.UI;
 
-public abstract class ProfileEditorRootControl<TProfileEditor, TEditorControl, TLayoutEnum> : Control
+public abstract class ProfileEditorRootControl<TProfileEditor, TEditorControl, TLayoutEnum, TStepButton> : Control
 where TProfileEditor: class, IProfileEditor<TProfileEditor,TEditorControl,TLayoutEnum>, new()
-where TEditorControl: ProfileEditorMainControl<TProfileEditor, TLayoutEnum, ProfileEditorStepButton>, new()
+where TEditorControl: ProfileEditorMainControl<TProfileEditor, TLayoutEnum, TStepButton>, new()
+where TStepButton: ProfileEditorStepButton, new()
 where TLayoutEnum: struct, Enum
 {
     public bool IsOpen => EditorControl.IsInsideTree;

@@ -32,11 +32,12 @@ public interface IProfileEditor<TSelf,out TEditorControl, TLayoutEnum> : IProfil
     public TEditorControl EditorControl { get; }
 
 }
-public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum> : IProfileEditor<TSelf,TEditorControl, TLayoutEnum>
-where TSelf:ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum>, new()
+public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum, TStepButton> : IProfileEditor<TSelf,TEditorControl, TLayoutEnum>
+where TSelf:ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum, TStepButton>, new()
 where TProfile: IPersistentProfile, new()
-where TEditorControl: ProfileEditorMainControl<TSelf, TLayoutEnum, ProfileEditorStepButton>, new()
-where TSystem: ProfileEditorSystem<TSystem, TEditorControl,TProfile, TSelf, TLayoutEnum>, new()
+where TEditorControl: ProfileEditorMainControl<TSelf, TLayoutEnum, TStepButton>, new()
+where TSystem: ProfileEditorSystem<TSystem, TEditorControl,TProfile, TSelf, TLayoutEnum, TStepButton>, new()
+where TStepButton: ProfileEditorStepButton, new()
 where TLayoutEnum: struct, Enum
 {
     [Dependency] protected readonly IEntityManager EntityManager = default!;
