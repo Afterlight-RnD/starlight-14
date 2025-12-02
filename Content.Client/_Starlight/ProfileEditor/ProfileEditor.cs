@@ -24,6 +24,12 @@ public interface IProfileEditor
     public void SetStep(int step);
 };
 
+public interface IProfileEditor<out TProfile> : IProfileEditor
+    where TProfile: IPersistentProfile, new()
+{
+    public TProfile Profile { get;}
+}
+
 public interface IProfileEditor<TSelf,out TEditorControl, TLayoutEnum> : IProfileEditor
     where TSelf: IProfileEditor<TSelf, TEditorControl, TLayoutEnum>, new()
     where TEditorControl: SLControl, IProfileEditorMainControl<TSelf>, new()
@@ -32,7 +38,8 @@ public interface IProfileEditor<TSelf,out TEditorControl, TLayoutEnum> : IProfil
     public TEditorControl EditorControl { get; }
 
 }
-public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum, TStepButton> : IProfileEditor<TSelf,TEditorControl, TLayoutEnum>
+public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum, TStepButton>
+    : IProfileEditor<TSelf,TEditorControl, TLayoutEnum>, IProfileEditor<TProfile>
 where TSelf:ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum, TStepButton>, new()
 where TProfile: IPersistentProfile, new()
 where TEditorControl: ProfileEditorMainControl<TSelf, TLayoutEnum, TStepButton>, new()
