@@ -22,7 +22,9 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
 
     public abstract Control StepSelectorRoot { get; }
     public TEditor Editor { get;  init; } = default!;
-    public Control?[,] StepControls { private get; init; } = default!; //this *should* always be set after the control is created
+
+    private Control?[,] _controls = default!;
+    public Control?[,] StepControls { private get => _controls; init => _controls = value; } //this *should* always be set after the control is created
     private ButtonGroup _stepSelectorButtonGroup = new(false);
     public void ToggleStepControls(int step, bool state)
     {
@@ -40,8 +42,7 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
         string stepName,
         string? stepDescription,
         Texture? stepIcon,
-        IDynamicTypeFactory typeFactory,
-        Dictionary<TLayoutEnum, Func<IDynamicTypeFactory,Control>> builders)
+        IProfileEditorPanelBuilder<TEditor, TLayoutEnum> builder)
     {
         StepSelectorRoot.AddChild(new TStepSelectorButton
         {
@@ -50,17 +51,7 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
             Description = stepDescription,
             Icon = stepIcon
         });
-        foreach (var (layout,builder) in builders)
-        {
-            var layoutId = layout.ToInt32(null);
-            var existing = StepControls[step,  layoutId];
-            if (existing != null)
-                continue;
-            var newControl = builder.Invoke(typeFactory);
-            newControl.Visible = false;
-            InjectPanel(layout, newControl);
-            StepControls[step, layoutId] = newControl;
-        }
+        builder.InjectPanels(step, ref _controls, InjectPanel);
     }
 
     protected abstract void InjectPanel(TLayoutEnum layout, Control newControl);

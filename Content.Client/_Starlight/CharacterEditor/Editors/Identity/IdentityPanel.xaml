@@ -7,13 +7,13 @@
     xmlns:identity="clr-namespace:Content.Client._Starlight.CharacterEditor.Editors.Identity">
     <controls:CharacterEditorField
         Name="FirstNameField" Access="Protected" HorizontalAlignment="Center"
-        LabelText="First Name: " TextEditWidth="250" />
+        Label="First Name: " EditingWidth="250" />
     <controls:CharacterEditorField
         Name="NicknameField" Access="Protected"
-        LabelText="Nickname:  " TextEditWidth="250" HorizontalAlignment="Center"/>
+        Label="Nickname:  " EditingWidth="250" HorizontalAlignment="Center"/>
     <controls:CharacterEditorField
         Name="LastNameField" Access="Protected" HorizontalAlignment="Center"
-        LabelText="Last Name: " TextEditWidth="250" />
+        Label="Last Name: " EditingWidth="250" />
     <PanelContainer>
         <Label Name="NameRuleDisclaimer" Access="Protected" HorizontalAlignment="Center"/>
     </PanelContainer>
@@ -24,19 +24,19 @@
                    HorizontalAlignment="Center">
         <controls:CharacterEditorField
             Name="CharacterBodyTypeField" Access="Protected" HorizontalAlignment="Center"
-            LabelText="BodyType: "/>
+            Label="BodyType: "/>
 
         <controls:CharacterEditorField
             Name="CharacterPronounField" Access="Protected" HorizontalAlignment="Center"
-            LabelText="Pronouns: "/>
+            Label="Pronouns: "/>
 
         <controls:CharacterEditorField
             Name="CharacterPhysicalAgeField" Access="Protected" HorizontalAlignment="Center"
-            LabelText="Physical Age: " TextEditWidth="50" />
+            Label="Physical Age: " EditingWidth="50" />
 
         <controls:CharacterEditorField
             Name="CharacterChronologicalAgeField" Access="Protected" HorizontalAlignment="Center"
-            LabelText="Chronological Age: " TextEditWidth="50" />
+            Label="Chronological Age: " EditingWidth="50" />
 
     </GridContainer>
 </identity:IdentityPanel>

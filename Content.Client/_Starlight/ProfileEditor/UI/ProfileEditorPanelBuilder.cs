@@ -15,7 +15,16 @@ public interface IProfileEditorPanelBuilder<TProfile> : IProfileEditorPanelBuild
         where TField : Control, IProfileEditorField<TProfile>;
 }
 
-public sealed class ProfileEditorPanelBuilder<TEditor,TProfile,TLayoutEnum, TEditorControl, TStepSelectorButton> : IProfileEditorPanelBuilder<TProfile>
+public interface IProfileEditorPanelBuilder<TEditor, out TLayoutEnum>:  IProfileEditorPanelBuilder
+    where TEditor: IProfileEditor, new()
+    where TLayoutEnum: struct, Enum, IConvertible
+{
+    public void InjectPanels(int step,
+        ref Control?[,] stepControls,
+        Action<TLayoutEnum, Control> injectionHandler);
+}
+
+public sealed class ProfileEditorPanelBuilder<TEditor,TProfile,TLayoutEnum, TEditorControl, TStepSelectorButton> : IProfileEditorPanelBuilder<TProfile>,  IProfileEditorPanelBuilder<TEditor, TLayoutEnum>
 where TProfile: IPersistentProfile, new()
 where TEditorControl: ProfileEditorMainControl<TEditor, TLayoutEnum, TStepSelectorButton>
 where TEditor: IProfileEditor, new()
@@ -34,8 +43,7 @@ where TStepSelectorButton: ProfileEditorStepButton, new()
         _typeFactory = typeFactory;
     }
 
-    public void InjectPanels(IDynamicTypeFactory typeFactory,
-        int step,
+    public void InjectPanels(int step,
         ref Control?[,] stepControls,
         Action<TLayoutEnum,Control> injectionHandler)
     {

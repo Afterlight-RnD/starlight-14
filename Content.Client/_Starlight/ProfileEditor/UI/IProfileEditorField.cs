@@ -8,8 +8,12 @@ namespace Content.Client._Starlight.ProfileEditor.UI;
 public interface IProfileEditorField
 {
 }
+
 public interface IProfileEditorField<TProfile> : IProfileEditorField
-    where TProfile : IPersistentProfile, new();
+    where TProfile : IPersistentProfile, new()
+{
+    public virtual void SetEditWidth(int width){}
+}
 public interface IProfileEditorField<TData, TProfile> : IProfileEditorField<TProfile>
 where TProfile: IPersistentProfile, new()
 {

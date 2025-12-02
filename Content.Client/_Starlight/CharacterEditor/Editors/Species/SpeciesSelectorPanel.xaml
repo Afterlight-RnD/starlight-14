@@ -5,7 +5,6 @@
     xmlns:controls2="clr-namespace:Content.Client.UserInterface.Controls"
     xmlns:xNamespace="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:style="clr-namespace:Content.Client.Stylesheets"
-    xmlns:controls1="clr-namespace:Content.Client._Starlight.CharacterEditor.Controls"
     Orientation="Vertical">
     <Label Text="Species"  HorizontalExpand="True" HorizontalAlignment="Center"/>
     <controls:SpeciesGroupList GroupName="Biological" Columns="6" HorizontalAlignment="Center"/>

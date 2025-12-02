@@ -106,6 +106,6 @@ public abstract class ProfileEditorSystem<TSelf, TEditorControl, TProfile, TProf
             return 0;
         }));
         for (var i = 0; i < StepCount; i++)
-            _stepSystems[i].INTERNAL_SetStep(i);
+            _stepSystems[i].INTERNAL_SetupStep(i);
     }
 }

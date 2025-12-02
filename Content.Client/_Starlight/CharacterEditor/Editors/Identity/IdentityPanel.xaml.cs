@@ -21,54 +21,8 @@ public sealed partial class IdentityPanel : CharacterEditorPanel
     {
         RobustXamlLoader.Load(this);
         Margin = new Thickness(10);
-
-        SetupEditorFields();
-
         NameRuleDisclaimer.Text =
             "Warning: Offensive or LRP IC names will lead\n to admin intervention on this server. \n Read our [Rules] for more.";
         NameRuleDisclaimer.FontColorOverride = Color.Red;
-    }
-    private void SetupEditorFields()
-    {
-        CharacterBodyTypeField.InitializeAsEnumField((Sex bodyType, CharacterProfile profile, CharacterIdentityData data) =>
-        {
-            data.BodyType = bodyType;
-        }, data => data.BodyType);
-
-        CharacterPronounField.InitializeAsEnumField((Gender gender, CharacterProfile profile, CharacterIdentityData data) =>
-        {
-            data.Gender = gender;
-        }, data => data.Gender);
-
-        FirstNameField.InitializeAsTextField( (string name, CharacterProfile profile, CharacterIdentityData data) => { data.Name = name; },
-            data => data.Name);
-
-        NicknameField.InitializeAsTextField( (string name,CharacterProfile profile,  CharacterIdentityData data) => { data.Nickname = name;},
-            data => data.Nickname);
-
-        LastNameField.InitializeAsTextField((string name, CharacterProfile profile, CharacterIdentityData data) => { data.LastName = name; },
-            data => data.LastName);
-
-        CharacterPhysicalAgeField.InitializeAsTextField((string ageIn, CharacterProfile profile, CharacterIdentityData data) =>
-        {
-            if (int.TryParse(ageIn, out var age))
-            {
-                var speciesData = profile.GetData<CharacterSpeciesData>();
-                data.ChronologicalAge = int.Clamp(age,speciesData.MinAge, speciesData.MaxAge);
-                return;
-            }
-            CharacterPhysicalAgeField.SetTextFieldValue(data.PhysicalAge.ToString());
-        }, data => data.PhysicalAge.ToString());
-
-        CharacterChronologicalAgeField.InitializeAsTextField((string ageIn, CharacterProfile profile, CharacterIdentityData data) =>
-        {
-            if (int.TryParse(ageIn, out var age))
-            {
-                var speciesData = profile.GetData<CharacterSpeciesData>();
-                data.ChronologicalAge = int.Clamp(age,speciesData.MinAge, speciesData.MaxAge);
-                return;
-            }
-            CharacterChronologicalAgeField.SetTextFieldValue(data.ChronologicalAge.ToString());
-        }, data => data.ChronologicalAge.ToString());
     }
 }

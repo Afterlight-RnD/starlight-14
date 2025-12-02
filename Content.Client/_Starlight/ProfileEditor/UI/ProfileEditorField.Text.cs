@@ -24,5 +24,10 @@ public sealed class ProfileEditorTextField<TProfile>(
         SetText(readData.Invoke(data), false);
     }
 
+    public void SetEditWidth(int width)
+    {
+        MinWidth = width;
+    }
+
     public void ToProfile(TProfile data) => writeData.Invoke(data, Text);
 }

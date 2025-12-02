@@ -31,10 +31,21 @@ where TLayoutEnum: struct, Enum
     private event Action<TEditorControl, TProfile>? _handleLoadData;
     private event Action<TEditorControl, TProfile>? _handleSaveData;
 
+    private ProfileEditorPanelBuilder<TProfileEditor, TProfile, TLayoutEnum, TEditorControl, TStepButton> _builder =
+        default!;
 
-    public void INTERNAL_SetStep(int step)
+    public override void Initialize()
+    {
+        _builder = new ProfileEditorPanelBuilder<TProfileEditor, TProfile, TLayoutEnum, TEditorControl, TStepButton>(
+            Log,
+            _typeFactory);
+        base.Initialize();
+    }
+
+    public void INTERNAL_SetupStep(int step)
     {
         Step = step;
+        SetupStep(_builder);
     }
 
     public void INTERNAL_SaveData(TProfileEditor editor)
@@ -51,7 +62,7 @@ where TLayoutEnum: struct, Enum
 
     public void INTERNAL_SetupEditor(TProfileEditor editor)
     {
-        editor.EditorControl.TryInjectStepControls(Step,StepName, StepDescription, StepIcon, _typeFactory, _panelBuilders);
+        editor.EditorControl.TryInjectStepControls(Step,StepName, StepDescription, StepIcon, _builder);
     }
 
     public void INTERNAL_EditorCreated(TProfileEditor editor)
@@ -59,29 +70,7 @@ where TLayoutEnum: struct, Enum
         EditorCreated(editor);
     }
 
-    protected virtual void EditorCreated(TProfileEditor editor){}
+    protected abstract void SetupStep(IProfileEditorPanelBuilder<TProfile> panelBuilder);
 
-    protected void RegisterPanel<TControl>(TLayoutEnum layout,
-        Action<TControl,TProfile> loadData,
-        Action<TControl,TProfile> saveData)
-        where TControl: Control, new()
-    {
-        if (_panelBuilders.ContainsKey(layout))
-        {
-            Log.Warning("Panel was already registered!");
-            return;
-        }
-        _panelBuilders.Add(layout, static typeFact =>
-        {
-            return typeFact.CreateInstance<TControl>();
-        });
-        _handleLoadData += (editorControl, profile) =>
-        {
-            loadData.Invoke(editorControl.GetPanel<TControl>(Step, layout), profile);
-        };
-        _handleSaveData += (editorControl, profile) =>
-        {
-            loadData.Invoke(editorControl.GetPanel<TControl>(Step, layout), profile);
-        };
-    }
+    protected virtual void EditorCreated(TProfileEditor editor){}
 }

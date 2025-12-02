@@ -13,6 +13,8 @@ where TProfile: IPersistentProfile, new()
 {
     public string? Label { get => _label.Text; set => _label.Text = value; }
 
+    public virtual int EditingWidth { get; set; }
+
     private readonly Label _label = new();
     private IProfileEditorField? _field = null;
     protected ProfileEditorField()
@@ -29,6 +31,7 @@ where TProfile: IPersistentProfile, new()
         if (_field != null)
             throw new InvalidOperationException($"Field:{Name} is already registered as type:{field.GetType()}");
         _field = field;
+        field.SetEditWidth(EditingWidth);
         AddChild(field);
     }
 }
