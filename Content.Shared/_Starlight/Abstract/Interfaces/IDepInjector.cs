@@ -13,34 +13,38 @@ public interface IInjectDependencies<TDepType>
 
 public interface IDependencyType
 {
-    public static abstract bool HasSystems { get; }
-    public static abstract bool AssertOnFail { get; }
+    //TODO: test if abstract statics explode sandboxing
+
+    // public static abstract bool HasSystems { get; }
+    // public static abstract bool AssertOnFail { get; }
 }
 
 public sealed class GlobalDependencies : IDependencyType
 {
-    public static bool HasSystems => false;
-    public static bool AssertOnFail => true;
+    // public static bool HasSystems => false;
+    // public static bool AssertOnFail => true;
 
     private GlobalDependencies(){}
 };
 
 public sealed class SystemDependencies : IDependencyType
 {
-    public static bool HasSystems => true;
-    public static bool AssertOnFail => true;
+    // public static bool HasSystems => true;
+    // public static bool AssertOnFail => true;
 
     private SystemDependencies(){}
 }
 
 public static class SLDependencyHelpers
 {
-    public static void InjectSystemDependencies<T>(T type, IEntitySystemManager entitySystemManager, bool oneOff = false)
+    public static void InjectSystemDependencies<T>(T type, IEntitySystemManager entitySystemManager,
+        bool assertOnFail = true,
+        bool oneOff = false)
     where T: IInjectDependencies<SystemDependencies>
     {
         if (!entitySystemManager.TryGetDependencyCollection(out var dependencies))
         {
-            if (SystemDependencies.AssertOnFail)
+            if (assertOnFail)
                 throw new InvalidOperationException("Tried inject system dependencies outside of simulation!");
             return;
         }

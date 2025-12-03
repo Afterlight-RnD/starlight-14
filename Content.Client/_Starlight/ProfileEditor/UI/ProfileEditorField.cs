@@ -15,7 +15,7 @@ where TProfile: class, IPersistentProfile
     public virtual int EditingWidth { get; set; }
 
     private readonly Label _label = new();
-    private IProfileEditorField? _field = null;
+    //private IProfileEditorField? _field = null;
     private TProfile? _profile = null;
     public void InjectProfile(TProfile profile) => _profile = profile;
     protected ProfileEditorField()
@@ -27,16 +27,16 @@ where TProfile: class, IPersistentProfile
         SeparationOverride = 5;
         AddChild(_label);
     }
-    public void InitializeAsFieldType<TFieldType>(TFieldType field)
-    where TFieldType: Control, IProfileEditorField<TProfile>
-    {
-        if (_field != null)
-            throw new InvalidOperationException($"Field:{Name} is already registered as type:{field.GetType()}");
-        _field = field;
-        field.SetEditWidth(EditingWidth);
-        if (_profile == null)
-            throw new InvalidOperationException("Profile Must Be Injected Before Field Initialization");
-        field.InjectProfile(_profile);
-        AddChild(field);
-    }
+    // public void InitializeAsFieldType<TFieldType>(TFieldType field)
+    // where TFieldType: Control, IProfileEditorField<TProfile>
+    // {
+    //     if (_field != null)
+    //         throw new InvalidOperationException($"Field:{Name} is already registered as type:{field.GetType()}");
+    //     _field = field;
+    //     field.SetEditWidth(EditingWidth);
+    //     if (_profile == null)
+    //         throw new InvalidOperationException("Profile Must Be Injected Before Field Initialization");
+    //     field.InjectProfile(_profile);
+    //     AddChild(field);
+    // }
 }
