@@ -4,4 +4,3 @@
 namespace Content.Client._Starlight.ProfileEditor;
 
 //== UIEvents ==
-public record struct ProfileEditorLoadUIEvent<TProfile>(IProfileEditor Editor);

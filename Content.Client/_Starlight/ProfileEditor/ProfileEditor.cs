@@ -1,118 +1,87 @@
 ﻿// SPDX-FileCopyrightText: 2025 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
+
 using Content.Client._Starlight.ProfileEditor.UI;
-using Content.Client._Starlight.UI;
 using Content.Shared._Starlight.Abstract.Extensions;
+using Content.Shared._Starlight.Abstract.Interfaces;
 using Content.Shared._Starlight.CharacterProfiles;
-using Robust.Client.UserInterface;
+using Robust.Shared.Collections;
 
 namespace Content.Client._Starlight.ProfileEditor;
 
-public interface IProfileEditor
-{
-    public bool IsOpen { get;}
-    public void FinishSetup(Control editorRoot);
-    public int StepCount { get; }
-
-    public int LayoutCount { get; }
-
-    public int CurrentStep { get; }
-
-    public void Open();
-    public void Close();
-
-    public void SetStep(int step);
-};
-
-public interface IProfileEditor<out TProfile> : IProfileEditor
+public interface IProfileEditor<TSelf, TProfile>
+    where TSelf: IProfileEditor<TSelf, TProfile>
     where TProfile: class, IPersistentProfile
 {
-    public TProfile Profile { get;}
+    public TProfile Profile { get; }
 }
 
-public interface IProfileEditor<TSelf,out TEditorControl, TLayoutEnum> : IProfileEditor
-    where TSelf: IProfileEditor<TSelf, TEditorControl, TLayoutEnum>, new()
-    where TEditorControl: SLControl, IProfileEditorMainControl<TSelf>, new()
-    where TLayoutEnum: struct, Enum
+public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TPanelEnum> : IProfileEditor<TSelf, TProfile>, IInjectDependencies<SystemDependencies>
+    where TSelf: ProfileEditor<TSelf,TProfile, TEditorControl, TPanelEnum>
+    where TProfile : class, IPersistentProfile
+    where TEditorControl: ProfileEditorMainControl<TEditorControl,TProfile, TSelf, TPanelEnum>, new()
+    where TPanelEnum: struct, Enum
 {
+    private ValueList<ProfileEditorStep<TProfile>> _steps;
     public TEditorControl EditorControl { get; }
-}
+    public TProfile Profile { get; }
 
-public interface IProfileEditor<TSelf, TProfile, TEditorControl, TLayoutEnum, TStepButton>
-    : IProfileEditor<TSelf,TEditorControl, TLayoutEnum> ,IProfileEditor<TProfile>
-    where TProfile: class, IPersistentProfile
-    where TSelf: IProfileEditor<TSelf, TEditorControl, TLayoutEnum>, new()
-    where TEditorControl: SLControl, IProfileEditorMainControl<TSelf>, new()
-    where TLayoutEnum: struct, Enum
-
-{
-}
-public abstract class ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum, TStepButton>
-    : IProfileEditor<TProfile>, IProfileEditor<TSelf, TProfile, TEditorControl, TLayoutEnum, TStepButton>
-where TSelf:ProfileEditor<TSelf,TProfile, TEditorControl, TSystem, TLayoutEnum, TStepButton>, new()
-where TProfile: class, IPersistentProfile<TProfile>
-where TEditorControl: ProfileEditorMainControl<TSelf, TProfile,TLayoutEnum, TStepButton>, new()
-where TSystem: ProfileEditorSystem<TSystem, TEditorControl,TProfile, TSelf, TLayoutEnum, TStepButton>, new()
-where TStepButton: ProfileEditorStepButton, new()
-where TLayoutEnum: struct, Enum
-{
-    [Dependency] protected readonly IEntityManager EntityManager = default!;
-    public int StepCount => EditorSystem.StepCount;
-    public int CurrentStep { get; private set; } = 0;
-    public int LayoutCount { get; } = Enum.GetValues<TLayoutEnum>().Length;
-    public TEditorControl EditorControl { get; }
-    public TProfile Profile { get; private set; }
-    public bool IsOpen { get; private set; } = false;
-    protected Control? _editorRootControl = null;
-    public TSystem EditorSystem { get; private set; }
-
-    private IProfileEditorSystem<TProfile, TSelf> GetEditorInterface => EditorSystem;
-    protected ProfileEditor()
+    protected ProfileEditor( IDynamicTypeFactory typeFactory,
+        IDependencyCollection dependencyCollection,
+        TProfile profile,
+        BuilderDelegate builder)
     {
-        IoCManager.InjectDependencies(this);
-        if (!EntityManager.TryGetDependencyCollection(out var systemDeps))
-            throw new InvalidOperationException($"Tried to create profile editor:{GetType()} out of sim!");
-        EditorSystem = systemDeps.Resolve<TSystem>();
-        Profile = EditorSystem.CreateEditorProfile();
-        var self = (TSelf)this;
-        var editorInterface = GetEditorInterface;
-        var layoutSize = Enum.GetValues<TLayoutEnum>().Length;
-        EditorControl = IoCManager.Resolve<IDynamicTypeFactory>().CreateInstance<TEditorControl>();
-        EditorControl.Setup(self);
-        editorInterface.EditorCreated(self);
-    }
-    public void FinishSetup(Control editorRoot)
-    {
-        _editorRootControl = editorRoot;
-        SetStep(CurrentStep);
+        var editorCollection = dependencyCollection.FromParent(dependencyCollection);
+        Profile = profile;
+        editorCollection.RegisterInstance<TProfile>(Profile);
+        editorCollection.RegisterInstance<TSelf>(this);
+
+        EditorControl = typeFactory.CreateInstance<TEditorControl, SystemDependencies>(editorCollection);
+        editorCollection.RegisterInstance<TEditorControl>(EditorControl);
+
+        var stepBuilder = new StepStepBuilder();
+        builder.Invoke(stepBuilder);
+        if (stepBuilder.Builders.Count == 0)
+            throw new InvalidOperationException($"profileEditor: {GetType()} must have at least one step!");
+        foreach (var (name, priority,builderDelegate) in stepBuilder.Builders)
+        {
+            var step = ProfileEditorStep<TProfile>.BuildEditorStep(typeFactory, dependencyCollection, name, priority, builderDelegate);
+            _steps.Add(step);
+            EditorControl.INTERNAL_InjectPanels(typeFactory, dependencyCollection, stepBuilder.PanelRegistrations);
+        }
+        //Sort steps by ascending!
+        _steps.Sort((step1, step2) =>
+        {
+            if (step1.Priority < step2.Priority)
+                return -1;
+            return step1.Priority > step2.Priority ? 1 : 0;
+        });
     }
 
-    public virtual void Initialize(){}
-
-    public void Open()
+    #region BuilderPattern
+    public interface IStepBuilder
     {
-        if (IsOpen)
-            return;
-        if (_editorRootControl == null)
-            throw new InvalidOperationException("EditorRootControl must be defined!");
-        _editorRootControl.AddChild(EditorControl);
-        IsOpen = true;
+        public IStepBuilder BuildStep(string name, int priority, ProfileEditorStep<TProfile>.BuilderDelegate builder);
+
+        public IStepBuilder RegisterPanel<TPanel>(TPanelEnum panelEnum);
     }
 
-    public void Close()
+    private struct StepStepBuilder() : IStepBuilder
     {
-        if (!IsOpen || _editorRootControl == null)
-            return;
-        EditorControl.Orphan();
-        IsOpen = false;
+        public ValueList<(string name, int priority, ProfileEditorStep<TProfile>.BuilderDelegate buildDelegate)>
+            Builders = new ();
+        public HashSet<(TPanelEnum, Type)> PanelRegistrations = new();
+        public IStepBuilder BuildStep(string name, int priority, ProfileEditorStep<TProfile>.BuilderDelegate builder)
+        {
+            Builders.Add((name, priority, builder));
+            return this;
+        }
+        public IStepBuilder RegisterPanel<TPanel>(TPanelEnum panelEnum)
+        {
+            PanelRegistrations.Add((panelEnum, typeof(TPanel)));
+            return this;
+        }
     }
-
-    public void SetStep(int step)
-    {
-        if (CurrentStep == step)
-            return;
-        EditorControl.ToggleStepControls(CurrentStep, false);
-        EditorControl.ToggleStepControls(CurrentStep, true);
-        CurrentStep = step;
-    }
+    public delegate void BuilderDelegate(IStepBuilder stepBuilder);
+    #endregion
 }

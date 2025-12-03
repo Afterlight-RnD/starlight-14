@@ -16,33 +16,4 @@ public static class EntityExtensions
         
         return true;
     }
-
-    public static bool TryGetDependencyCollection(this IEntityManager entityManager, [NotNullWhen(true)] out IDependencyCollection? systemDeps)
-    {
-        //This is the only way to check if entitySystemManager is initialized... Why isn't this a boolean property... FML
-        try
-        {
-            systemDeps = entityManager.EntitySysManager.DependencyCollection;
-        }
-        catch (InvalidOperationException e)
-        {
-            systemDeps = null;
-            return false;
-        }
-        return true;
-    }
-
-    public static bool IsInitialized(this IEntityManager entityManager)
-    {
-        //This is the only way to check if entitySystemManager is initialized... Why isn't this a boolean property... FML
-        try
-        {
-            var systemDeps = entityManager.EntitySysManager.DependencyCollection;
-        }
-        catch (InvalidOperationException e)
-        {
-            return false;
-        }
-        return true;
-    }
 }

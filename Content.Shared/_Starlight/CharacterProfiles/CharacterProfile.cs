@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using System.Linq;
+using Content.Shared._Starlight.Abstract.Interfaces;
 using Content.Shared._Starlight.CharacterProfiles.Systems;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager;
 
 namespace Content.Shared._Starlight.CharacterProfiles;
 
-public interface IPersistentProfile
+public interface IPersistentProfile: IInjectDependencies<SystemDependencies>
 {
     public bool HasDirtyData { get; }
 }
