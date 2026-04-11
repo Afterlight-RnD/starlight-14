@@ -7,7 +7,7 @@ using Robust.Shared.Utility;
 
 namespace Content.Shared._Starlight.Body.Systems;
 
-public sealed class BodySystem : EntitySystem
+public sealed partial class BodySystem : EntitySystem
 {
     public override void Initialize()
     {

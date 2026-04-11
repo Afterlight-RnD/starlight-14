@@ -14,12 +14,11 @@ public sealed partial class SLBodyComponent : Component
     [DataField, AutoNetworkedField, Access(typeof(BodySystem))]
     public EntityUid? RootBodyPart { get; set; } = null;
 
-    //TODO: horrible kludge, replace with actual caching later!
-    public Entity<SLBodyPartComponent> CachedRootPart =>
-        (RootBodyPart!.Value, IoCManager.Resolve<IEntityManager>().GetComponent<SLBodyPartComponent>(RootBodyPart!.Value));
-
     [DataField, AutoNetworkedField, Access(typeof(BodySystem))]
     public List<EntityUid> BodyParts = new();
+
+//TODO Jezi: Actually sync this!
+    public List<Entity<SLBodyPartComponent>> CachedBodyParts = new();
 
     [DataField, AutoNetworkedField, Access(typeof(BodySystem))]
     public Dictionary<ProtoId<BodyPartTypePrototype>, List<EntityUid>> TypedBodyParts = new();

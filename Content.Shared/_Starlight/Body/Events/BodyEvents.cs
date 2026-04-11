@@ -2,31 +2,12 @@
 // SPDX-License-Identifier: Starlight-MIT
 
 using Content.Shared._Starlight.Body.Components;
-using Content.Shared._Starlight.Body.Systems;
-
 namespace Content.Shared._Starlight.Body.Events;
 
-public interface IBodyEvent
-{
-   [Access(typeof(BodySystem))]
-   Entity<SLBodyComponent> Body { get; set; }
-}
 
-public interface ICancellableBodyEvent
-{
-    bool IsCancelled { get; set; }
-}
 
-public interface IBodyPartEvent
-{
-    [Access(typeof(BodySystem))]
-    Entity<SLBodyPartComponent> BodyPart { get; set; }
-
-    [Access(typeof(BodySystem))]
-    Entity<SLBodyComponent> Body { get; set; }
-}
-
-public interface ICancellableBodyPartEvent : IBodyPartEvent, ICancellableBodyEvent;
+public delegate void BodyPartEventHandler<in TEvent>(Entity<SLBodyComponent> body, Entity<SLBodyPartComponent> bodyPart, TEvent args) where TEvent: notnull;
+public delegate void BodyPartRefEventHandler<TEvent>(Entity<SLBodyComponent> body, Entity<SLBodyPartComponent> bodyPart, ref TEvent args) where TEvent: notnull;
 
 public record struct PartAddedToBodyEvent(Entity<SLBodyPartComponent> Part);
 
