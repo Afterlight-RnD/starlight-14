@@ -1,13 +1,25 @@
 ﻿// SPDX-FileCopyrightText: 2026 Starlight Network
 // SPDX-License-Identifier: Starlight-MIT
 
+using System.Collections;
 using Robust.Shared.Serialization.Manager.Exceptions;
 
 namespace Content.Shared._Starlight.Core;
 
 public static partial class EnumerationHelpers
 {
+    public interface IPolyCollectionApi<TCollection> : IPolyCollection, IPolyEnumerableApi<TCollection>
+        where TCollection : ICollection, IEnumerable, IDisposable, IEnumerator, allows ref struct;
+    public interface IPolyListApi<TList> : IPolyCollectionApi<TList>
+        where TList: IList, ICollection, IEnumerable, IDisposable, IEnumerator, allows ref struct;
+
+    public interface IPolySetApi<TSet> : IPolyCollectionApi<TSet>
+        where TSet: ICollection, IEnumerable, IDisposable, IEnumerator, allows ref struct;
+
     #region ICollection
+
+    public interface IPolyCollection;
+
     public interface IPolyCollection<TInner> : IPolyEnumerableBase, ICollection<TInner>;
 
     public interface IPolyCollection<TInner, in TSelf> : IPolyCollection<TInner>
@@ -20,11 +32,10 @@ public static partial class EnumerationHelpers
             where TInnerCollection : class, ICollection<TInner> => null;
     }
 
-    public interface IPolyCollection<TInner, in TOuter, in TInnerCollection, in TSelf>
+    public interface IPolyCollection<TInner, in TOuter, in TInnerCollection, TSelf>
         : IPolyEnumerable<TInner, TOuter, TInnerCollection, TSelf>, IPolyCollection<TInner, TSelf>
-        where TSelf : IPolyCollection<TInner, TOuter, TInnerCollection, TSelf>,
-        IPolyEnumerable<TSelf>, IPolyCollection<TInner, TSelf>
-        where TInnerCollection : ICollection<TInner>
+        where TSelf : TInnerCollection, IPolyCollection<TInner, TOuter, TInnerCollection, TSelf>, IPolyCollection<TInner, TSelf>, IPolyEnumerable<TInner, TOuter, TSelf, TSelf>
+        where TInnerCollection : ICollection<TInner>, IDisposable, IEnumerator
         where TOuter : TInner;
 
     #region BoilerPlate Extensions
@@ -53,10 +64,10 @@ public static partial class EnumerationHelpers
 
     public interface IPolyList<TInner> : IPolyEnumerableBase, IList<TInner>;
 
-    public interface IPolyList<TInner, in TOuter, in TList, in TSelf> :
+    public interface IPolyList<TInner, in TOuter, in TList, TSelf> :
         IPolyCollection<TInner, TOuter, TList, TSelf>, IPolyList<TInner>
-        where TSelf : IPolyCollection<TInner, TOuter, TList, TSelf>
-        where TList : IList<TInner>
+        where TSelf : TList, IPolyCollection<TInner, TOuter, TList, TSelf>, IPolyEnumerable<TInner, TOuter, TSelf, TSelf>
+        where TList : IList<TInner>, IDisposable, IEnumerator
         where TOuter : TInner;
 
     #region BoilerPlate Extensions
@@ -84,10 +95,10 @@ public static partial class EnumerationHelpers
 
     public interface IPolySet<TInner> : IPolyCollection<TInner>, ISet<TInner>;
 
-    public interface IPolySet<TInner, in TOuter, in TSet, in TSelf> :
+    public interface IPolySet<TInner, in TOuter, in TSet, TSelf> :
         IPolyCollection<TInner, TOuter, TSet, TSelf>, IPolySet<TInner>
-        where TSelf : IPolyCollection<TInner, TOuter, TSet, TSelf>
-        where TSet : ISet<TInner>
+        where TSelf : TSet, IPolyCollection<TInner, TOuter, TSet, TSelf>, IPolyEnumerable<TInner, TOuter, TSelf, TSelf>
+        where TSet : ISet<TInner>, IDisposable, IEnumerator
         where TOuter : TInner;
 
     #region BoilerPlate Extensions
