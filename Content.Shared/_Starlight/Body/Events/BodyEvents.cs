@@ -4,6 +4,8 @@
 using Content.Shared._Starlight.Body.Components;
 namespace Content.Shared._Starlight.Body.Events;
 
+public interface IBodyEventSubscriber;
+
 public delegate void BodyPartEventHandler<in TEvent>(
     Entity<SLBodyComponent> body,
     Entity<SLBodyPartComponent> bodyPart,
