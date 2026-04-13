@@ -217,7 +217,7 @@ public sealed partial class BodySystem
                 RefHandlers -= refHandler;
             if (RegisteredConditionalListeners.Remove(subscriber, out var conHandler))
                 ConditionalHandlers -= conHandler;
-            if (RegisteredConditionalRefListeners.Remove(subscriber), out var conRefHandler)
+            // if (RegisteredConditionalRefListeners.Remove(subscriber), out var conRefHandler)
 
             if (clearRegistryIfEmpty && !HasListeners)
                 ClearRelays();
