@@ -2,51 +2,32 @@
 // SPDX-License-Identifier: Starlight-MIT
 namespace Content.Shared._Starlight.Core.ECS;
 
-
-public readonly struct EntityArchetype<TComp,TSelf>(TSelf self, TComp comp) : IEntityArchetype<TComp,TSelf>
-    where TSelf : struct, IEntityArchetype.IComp<TComp, TSelf>, IEntityArchetype.IComp<TComp>
-    where TComp : IComponent
+public readonly partial struct EntityArchetype<TSelf> (EntityUid id): IEntityArchetype<TSelf>
+    where TSelf : IEntityArchetype<TSelf>, IEntityArchetype.IBuilder
 {
-    public TComp GetComp => comp;
-    public TSelf GetSelf => self;
-}
+    public EntityUid Uid { get; init; } = id;
+};
 
-public readonly struct EntityArchetype<TSelf>(TSelf self)
-    where TSelf : struct, IEntityArchetype.IComp
+[ImplicitDataDefinitionForInheritors]
+public partial interface IEntityArchetype
 {
-    public TSelf GetSelf => self;
-}
+    EntityUid Uid { get; init; }
 
-public interface IEntityArchetype<TComp, TSelf> : IEntityArchetype.IComp<TComp, TSelf>
-    where TComp : IComponent
-    where TSelf : IEntityArchetype.IComp<TComp, TSelf>,
-    IEntityArchetype.IComp<TComp>;
-
-public interface IEntityArchetype
-{
-    interface IComp<TComp, TSelf> : IComp
-        where TComp : IComponent
-        where TSelf : IComp<TComp, TSelf>, IComp<TComp>, IComp
+    public interface IBuilder
     {
-        TSelf GetSelf { get; }
-
-        readonly struct Comp(TSelf self)
-        {
-            public TSelf GetSelf => self;
-        }
     }
 
-    interface IComp<TComp> : IComp
+    public interface IBuilder<TSelf> : IBuilder
+        where TSelf : IEntityArchetype, IBuilder<TSelf>;
+
+    public interface IBuilder<TComp, TSelf> : IBuilder<TSelf>
+        where TSelf : IEntityArchetype, IBuilder<TComp, TSelf>
         where TComp : IComponent
     {
-        TComp GetComp { get; }
-
-        readonly struct Comp(TComp self)
-            : IComp<TComp>
-        {
-            public TComp GetComp => self;
-        }
     }
-
-    interface IComp;
 }
+
+public partial interface IEntityArchetype<TSelf> : IEntityArchetype, IEntityArchetype.IBuilder<TSelf>
+    where TSelf : IEntityArchetype.IBuilder<TSelf>, IEntityArchetype
+{
+};

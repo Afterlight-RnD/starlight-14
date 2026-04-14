@@ -6,43 +6,25 @@ using Robust.Shared.Collections;
 
 namespace Content.Shared._Starlight.Core.ECS;
 
-
 [Virtual]
-public class EntityCollection<TArchetype>(params TArchetype[] archetypes): IEnumerable<TArchetype>,
-    IEntityCollection<TArchetype>
-    where TArchetype : struct, IEntityArchetype
+public class EntityCollection<TArch>(params ValueList<TArch> instances) : IEntityCollection<TArch>
+    where TArch : IEntityArchetype, IEntityArchetype.IBuilder<TArch>
 {
-    private readonly ValueList<TArchetype> _data = new(archetypes);
-    public int Count => _data.Count;
-
-    public TArchetype this[int index]
-    {
-        get => _data[index];
-        set => _data[index] = value;
-    }
-
-    public IEnumerator<TArchetype> GetEnumerator() => _data.GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public ValueList<TArch> Instances { get; set; } = instances;
 }
 
-
-public interface IEntityCollection<TArchetype> : IEntityArchetype
-    where TArchetype: IEntityArchetype
+public interface IEntityCollection<TArch> : IEntityCollection.IBuilder<TArch>
+    where TArch: IEntityArchetype, IEntityArchetype.IBuilder<TArch>
 {
 }
-public interface IEntityCollection;
 
-
-public static class EntityCollection
+public interface IEntityCollection
 {
-    extension<TArchetype, TComp>(EntityCollection<TArchetype> collection) where TArchetype : struct, IEntityArchetype, IEntityArchetype.IComp<TComp>
-        where TComp : IComponent
-    {
-        public IEnumerator<TComp> GetComp()
-        {
-            foreach (var arch in collection) yield return arch.GetComp;
-        }
-    }
+    public interface IBuilder;
 
+    public interface IBuilder<TArch> : IBuilder
+        where TArch : IEntityArchetype.IBuilder<TArch>, IEntityArchetype
+    {
+        ValueList<TArch> Instances { get; set; }
+    }
 }
